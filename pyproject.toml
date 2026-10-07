@@ -1,0 +1,24 @@
+[project]
+name = "micro-llm-2bit"
+version = "0.1.0"
+description = "Petit LLM quantifié 2 bits (ternaire BitNet b1.58), inférence CPU < 100 Mo, distillation parent -> enfant."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.4",
+    "transformers>=4.44",
+    "tokenizers>=0.19",
+    "huggingface-hub>=0.24",
+    "numpy>=1.26",
+    "psutil>=6.0",
+    "safetensors>=0.4",
+    "ollama>=0.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.uv]
+package = false

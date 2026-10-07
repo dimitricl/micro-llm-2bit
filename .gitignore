@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+uv.lock
+
+# Artefacts modèle (lourds, régénérables)
+*.bin
+*.pt
+*.safetensors
+checkpoints/
+exports/
+data/cache/
+*.gguf
+
+# macOS / build C
+*.dylib
+*.o
+build/
+.DS_Store
+
+# Outils
+.mise/
+pytest cache
+.pytest_cache/

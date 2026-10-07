@@ -1,0 +1,12 @@
+# Dépendances pip (macOS, Python 3.11+). Installation conseillée via uv :
+#   uv sync   (depuis pyproject.toml)
+# Torch CPU/MPS uniquement : pas de CUDA, pas de bitsandbytes, pas de flash-attn.
+torch>=2.4
+transformers>=4.44
+tokenizers>=0.19
+huggingface-hub>=0.24
+numpy>=1.26
+psutil>=6.0
+safetensors>=0.4
+ollama>=0.4
+pytest>=8.0
