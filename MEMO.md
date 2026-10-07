@@ -50,7 +50,7 @@ loss ~8, CE ~7 (< hasard ln(8000)=8.99). Test numérique inline + 15 tests pytes
   (MPS). ~639 steps ≈ 20-40 min pour le corpus 1.7M.
 
 ## GitHub
-Repo : `limigitkit42/micro-llm-2bit`. Ne jamais committer : `.venv/`,
+Repo : `dimitricl/micro-llm-2bit`. Ne jamais committer : `.venv/`,
 `*.pt`, `*.bin`, `~/.cache/huggingface` (déjà dans `.gitignore`).
 Pour runner sur le mini : `git clone`, `mise install`, `uv sync`, `make`,
 mêmes commandes (adapter `--data` au chemin local du corpus).
