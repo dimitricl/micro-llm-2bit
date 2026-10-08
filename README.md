@@ -78,6 +78,25 @@ Débit d'entraînement mesuré (`tools/bench_train.py`, seq 128, 30 steps) :
 - Généralisation (mini-run tiny, 3 Mo) : train-PPL 55.7 vs val-PPL 60.9
   (ratio 1.09, sain) — `checkpoints/train_mini.log`.
 
+## Évaluation
+
+```bash
+# 20 prompts FR fixes (greedy + sampling seedée), métriques sans jugement
+python tools/eval_fixed.py --model exports/m.bin --out eval/m1/samples.md
+# PPL du .bin quantifié sur jeu mis de côté (anti-fuite), vs val-PPL
+python tools/eval_ppl.py --model exports/m.bin \
+    --heldout slices/slice_09.jsonl --train-docs corpus_train.jsonl \
+    --val-ppl 60.9
+# Courbe PNG d'un run + tableau des runs
+python tools/plot_run.py --log runs/DATE/train.log --run DATE
+python tools/runs_table.py  # -> docs/RUNS.md
+```
+
+`tools/eval_ppl.py` signale tout écart > 5 % avec la val-PPL comme problème
+de fidélité d'export. Les sorties `eval/` ne sont commitées que sous 200 Ko.
+Limite moteur : le KV cache est de taille fixe — `generate()` s'arrête à
+capacité (préfill + génération bornés par seq_max), sans fenêtre glissante.
+
 ## Limites honnêtes
 
 - Modèle minuscule : le motif appris par cœur est parfait (fiches pays),

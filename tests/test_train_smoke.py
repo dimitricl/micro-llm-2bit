@@ -267,3 +267,42 @@ def test_lr_resume_applique(tmp_path):
         transformers.AutoModelForCausalLM.from_pretrained = real
     ckpt = torch.load(final2, map_location="cpu", weights_only=False)
     assert ckpt["opt"]["param_groups"][0]["lr"] == 1e-5
+
+
+def test_resume_depuis_bestval(tmp_path):
+    """Reprise depuis un _bestval (poids seuls) : nouvel optimiseur, pas de KeyError."""
+    import transformers
+
+    p_full, vocab, pb, sb, cfg = _petit_setup()
+    student = TinyTransformer(cfg)
+    real = transformers.AutoModelForCausalLM.from_pretrained
+
+    @classmethod
+    def fake_from_pretrained(cls, *a, **k):
+        return FakeParent(p_full)
+
+    transformers.AutoModelForCausalLM.from_pretrained = fake_from_pretrained
+    try:
+        out = str(tmp_path / "enfant.pt")
+        vstream = torch.randint(0, p_full, (256,)).tolist()
+        vpb = make_batches(vstream, 16, 4, shuffle=False, seed=0)
+        vsb = make_batches([t % 64 for t in vstream], 16, 4, shuffle=False, seed=0)
+        dist.train(
+            student, pb, sb, vocab, "fake-parent", out,
+            epochs=2, batch_size=2, accum=2, log_every=1000,
+            eval_every=1, patience=0,
+            val_parent_batches=vpb, val_student_batches=vsb,
+            device=torch.device("cpu"),
+        )
+        best = out.replace(".pt", "_bestval.pt")
+        assert os.path.exists(best)
+        student2 = TinyTransformer(cfg)
+        final = dist.train(
+            student2, pb, sb, vocab, "fake-parent", out,
+            epochs=10, batch_size=2, accum=2, log_every=1000,
+            resume=best, lr_resume=1e-4, rewarmup_ratio=0.05,
+            device=torch.device("cpu"),
+        )
+    finally:
+        transformers.AutoModelForCausalLM.from_pretrained = real
+    assert os.path.exists(final)

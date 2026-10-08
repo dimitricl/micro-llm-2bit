@@ -376,7 +376,14 @@ def train(
         student.load_state_dict(ckpt["model"])
         if proj is not None and ckpt.get("proj") is not None:
             proj.load_state_dict(ckpt["proj"])
-        opt.load_state_dict(ckpt["opt"])
+        if ckpt.get("opt") is not None:
+            # Reprise classique : on garde l'optimiseur.
+            opt.load_state_dict(ckpt["opt"])
+        else:
+            # Best-val (poids seuls) : nouvel optimiseur. --lr-resume
+            # devient alors le LR de départ (défaut : lr).
+            print("[train] pas d'état optimiseur dans le checkpoint "
+                  "(best-val) : nouvel optimiseur.")
         if lr_resume and lr_resume > 0:
             for g in opt.param_groups:
                 g["lr"] = lr_resume
@@ -387,8 +394,13 @@ def train(
             remaining = max(total_steps - ckpt["step"], 1)
             sched = cosine_with_warmup(opt, int(remaining * rewarmup_ratio), remaining)
             print(f"[train] scheduler reconstruit : {remaining} steps restants")
-        else:
+        elif ckpt.get("sched") is not None:
             sched.load_state_dict(ckpt["sched"])
+        else:
+            # Best-val sans scheduler : reconstruction standard.
+            sched = cosine_with_warmup(opt, int(total_steps * warmup_ratio),
+                                       total_steps)
+            print("[train] scheduler reconstruit (défaut, pas d'état).")
         start_step = ckpt["step"]
         global_step = start_step
         print(f"[train] reprise depuis {resume} (step {start_step})")
