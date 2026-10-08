@@ -284,6 +284,10 @@ class Engine:
     def step(self, tok: int) -> np.ndarray:
         """Avance d'un token, retourne les logits (V,) fp32 (buffer réutilisé)."""
         m = self.meta
+        if self.pos >= m["seq_max"]:
+            raise IndexError(
+                f"Contexte plein (pos={self.pos}, seq_max={m['seq_max']}) : "
+                "generate() s'arrête à capacité.")
         D, Dh, Hq, Hkv = m["d"], m["head_dim"], m["Hq"], m["Hkv"]
         # Seule la ligne d'embedding du token courant est déquantifiée.
         x = self.embed_q[tok].astype(np.float32) * float(self.embed_s[tok])
@@ -349,14 +353,21 @@ class Engine:
         stop: set[int] | None = None,
         rng: np.random.Generator | None = None,
     ) -> list[int]:
-        """Préfill puis génération. temperature=0 -> glouton."""
+        """Préfill puis génération. temperature=0 -> glouton.
+
+        S'arrête à capacité (préfill + max_new bornés par seq_max) : le
+        KV cache est de taille fixe, sans fenêtre glissante.
+        """
         self.reset()
+        S = self.meta["seq_max"]
         logits = None
-        for t in ids:
+        for t in ids[-S:]:
             logits = self.step(t)
         out = []
         rng = rng or np.random.default_rng(0)
         for _ in range(max_new):
+            if self.pos >= S:
+                break
             nxt = sample(logits, temperature, top_k, top_p, rng)
             out.append(nxt)
             if stop and nxt in stop:
