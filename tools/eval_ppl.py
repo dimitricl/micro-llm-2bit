@@ -83,7 +83,10 @@ def main() -> None:
     ap.add_argument("--model", required=True)
     ap.add_argument("--heldout", required=True,
                     help=".jsonl candidat (tranche jamais entraînée).")
-    ap.add_argument("--heldout-mb", type=float, default=2.0)
+    ap.add_argument("--heldout-mb", type=float, default=0.0,
+                    help="OBSOLÈTE : utilisez --max-bytes.")
+    ap.add_argument("--max-bytes", type=float, default=512000,
+                    help="Taille max du jeu en octets (défaut 500 Ko).")
     ap.add_argument("--train-docs", default="", help=".jsonl des docs train")
     ap.add_argument("--val-docs", default="", help=".jsonl des docs val")
     ap.add_argument("--val-ppl", type=float, default=0.0,
@@ -102,11 +105,12 @@ def main() -> None:
     print(f"[eval-ppl] candidats={len(cands)} exclus(fuite)={exclus} "
           f"gardés={len(gardes)}", flush=True)
     # Tronque à la taille demandée (en octets de texte).
+    limite = a.max_bytes or (a.heldout_mb * 1024 * 1024)
     total, pris = 0, []
     for t in gardes:
         total += len(t.encode("utf-8"))
         pris.append(t)
-        if total >= a.heldout_mb * 1024 * 1024:
+        if total >= limite:
             break
     ids: list[int] = []
     for t in pris:

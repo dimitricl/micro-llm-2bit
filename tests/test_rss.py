@@ -60,3 +60,35 @@ def test_c_vs_numpy_equivalence(monkeypatch):
     monkeypatch.setattr(E, "_LIB", None)
     out_np = E.Engine(TINY_BIN).generate(ids, max_new=4, temperature=0.0)
     assert out_np == out_c, f"C={out_c} vs NumPy={out_np}"
+
+
+@pytest.mark.skipif(not os.path.exists(TINY_BIN), reason="export tiny absent")
+def test_arret_propre_a_capacite():
+    """Préfill + génération >= seq_max : arrêt sans écrire hors du KV.
+
+    Le mini (S=64) sert de cas limite : saturation = 0 nouveau token,
+    pas d'erreur ; au-delà, step() lève IndexError au lieu d'écrire hors
+    limites. Rejeu déterministe : deux runs saturés donnent des caches
+    strictement identiques (aucune écriture parasite).
+    """
+    import numpy as np
+
+    S = E.Engine(TINY_BIN).meta["seq_max"]
+    e1, e2 = E.Engine(TINY_BIN), E.Engine(TINY_BIN)
+    # Préfill qui remplit exactement le cache : 0 nouveau token, pas d'erreur.
+    assert e1.generate(list(range(S)), max_new=64, temperature=0.0) == []
+    assert e1.pos == S
+    assert e2.generate(list(range(S)), max_new=64, temperature=0.0) == []
+    for attr in ("k_cache", "v_cache", "k_scales", "v_scales"):
+        assert np.array_equal(getattr(e1, attr), getattr(e2, attr)), attr
+    # Préfill S-4 + 64 demandés : seuls 4 tokens sortent, dans les limites.
+    e1.reset()
+    assert len(e1.generate(list(range(S - 4)), max_new=64,
+                            temperature=0.0)) == 4
+    assert e1.pos == S
+    # Un step de plus lève au lieu d'écrire hors limites.
+    try:
+        e1.step(0)
+        raise AssertionError("aurait dû lever IndexError")
+    except IndexError:
+        pass
