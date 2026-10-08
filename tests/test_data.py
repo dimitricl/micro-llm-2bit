@@ -46,3 +46,17 @@ def test_batches_alignes():
         assert (x == y).all()
     # Forme (B, seq+1) pour LM causale.
     assert b1[0].shape[1] == 17
+
+
+def test_split_sans_fuite():
+    texts = [f"doc {i} " + "mot " * (i % 7) for i in range(40)]
+    tr1, va1 = D.train_val_split(texts, 0.05, seed=3)
+    tr2, va2 = D.train_val_split(texts, 0.05, seed=3)
+    # Déterministe, sans chevauchement, ratio respecté.
+    assert (tr1, va1) == (tr2, va2)
+    assert len(va1) == 2 and len(tr1) == 38
+    assert not set(map(id, tr1)) & set(map(id, va1))
+    assert sorted(tr1 + va1, key=texts.index) == texts
+    # Seed différente -> split différent (mélange réel).
+    _, va3 = D.train_val_split(texts, 0.05, seed=4)
+    assert va3 != va1

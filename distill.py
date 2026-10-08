@@ -60,7 +60,11 @@ class DistillationLoss(nn.Module):
         # ce qui gonflerait la KL d'un facteur seq_len.)
         s_logp = F.log_softmax(student_logits / t, dim=-1)
         t_prob = F.softmax(teacher_logits / t, dim=-1)
-        kl = (t_prob * (t_prob.log() - s_logp)).sum(dim=-1).mean() * (t * t)
+        # Garde 0*log(0) : hors top-k (cache), t_prob vaut exactement 0 et
+        # 0 * -inf = NaN. Analytiquement la contribution est 0 (limite).
+        term = t_prob * (t_prob.log() - s_logp)
+        kl = torch.where(t_prob > 0, term, torch.zeros_like(term)).sum(
+            dim=-1).mean() * (t * t)
         ce = F.cross_entropy(
             student_logits.reshape(-1, student_logits.shape[-1]),
             targets.reshape(-1),
@@ -80,49 +84,158 @@ def hidden_mse(
 
 
 # ---------------------------------------------------------------------------
-# Cache logits parent top-k sur disque
+# Cache logits parent top-k sur disque (format mmap + manifeste)
 # ---------------------------------------------------------------------------
+#
+# L'ancien format .npz dense était à la fois lourd ET faux : en entraînement
+# les batchs sont mélangés (randperm) mais le cache était relu en ordre
+# séquentiel (compteur micro), donc les logits ne correspondaient plus aux
+# entrées. Le nouveau format indexe chaque micro-chunk par (batch, chunk).
+# Fichiers : {prefix}.manifest.json + {prefix}.vals.fp16 (lignes float16) +
+# {prefix}.idx.u16 (uint16) + {prefix}.tgt.i64 (ids réduits).
+# Chaque chunk = (B*S, K) lignes aplaties, ordre explicite dans le manifeste.
+
+import hashlib
+import json
 
 
-def precompute_teacher_cache(
+def _sha(obj) -> str:
+    return hashlib.sha1(json.dumps(obj, sort_keys=True).encode()).hexdigest()[:16]
+
+
+def build_teacher_cache(
     parent,
-    batches: list[torch.Tensor],
+    parent_batches: list,
+    student_batches: list,
     kept_ids: list[int],
     top_k: int,
-    device: torch.device,
-    path: str,
-) -> None:
-    """Calcule les top-k logits parent (vocab réduit) et les sauve en .npz."""
+    device,
+    micro_batch: int,
+    prefix: str,
+    parent_name: str = "",
+) -> dict:
+    """Pré-calcule le top-k parent par micro-chunk (même découpage que train).
+
+    parent_batches / student_batches : mêmes listes que train() (alignées).
+    Retourne le descripteur (manifest + memmaps). Le parent n'est plus
+    nécessaire ensuite.
+    """
+    import numpy as np
+
     kept = torch.tensor(kept_ids, device=device)
-    vals_all, idx_all, tgt_all = [], [], []
+    V = len(kept_ids)
+    if V > 65535:
+        raise ValueError("Cache uint16 : vocab réduit > 65535 non supporté.")
+    if not parent_batches:
+        raise ValueError("Cache vide : aucun batch parent.")
+    S = parent_batches[0].shape[1] - 1
+    K = min(top_k, V)
+    order, rows_v, rows_i, rows_t = [], [], [], []
     parent.eval()
     with torch.no_grad():
-        for b in batches:
-            inp = b[:, :-1].to(device)  # ids parent
-            logits = parent(input_ids=inp).logits.float()  # (B, S, P)
-            small = logits.index_select(-1, kept)  # (B, S, V)
-            v, i = small.topk(min(top_k, small.shape[-1]), dim=-1)
-            vals_all.append(v.cpu())
-            idx_all.append(i.cpu())
-            tgt_all.append(b[:, 1:])  # cibles réduites
-    np.savez_compressed(
-        path,
-        vals=torch.cat(vals_all).numpy(),
-        idx=torch.cat(idx_all).numpy(),
-        tgt=torch.cat(tgt_all).numpy(),
-    )
+        for bi, (pb, sb) in enumerate(zip(parent_batches, student_batches)):
+            for ci, off in enumerate(range(0, pb.shape[0], micro_batch)):
+                px = pb[off : off + micro_batch][:, :-1].to(device)
+                y = sb[off : off + micro_batch][:, 1:]
+                logits = parent(input_ids=px).logits.float()
+                small = logits.index_select(-1, kept)
+                v, i = small.topk(K, dim=-1)
+                B = v.shape[0]
+                order.append([bi, ci, B])
+                rows_v.append(v.cpu().half().numpy())
+                rows_i.append(i.cpu().numpy().astype("<u2"))
+                rows_t.append(y.numpy().astype("<i8"))
+    tot_rows = sum(r.shape[0] * r.shape[1] for r in rows_v)
+    vals = np.memmap(prefix + ".vals.fp16", dtype="<f2", mode="w+",
+                     shape=(tot_rows, K))
+    idx = np.memmap(prefix + ".idx.u16", dtype="<u2", mode="w+",
+                    shape=(tot_rows, K))
+    tgt = np.memmap(prefix + ".tgt.i64", dtype="<i8", mode="w+",
+                    shape=(tot_rows,))
+    pos = 0
+    for v, i, t in zip(rows_v, rows_i, rows_t):
+        n = v.shape[0] * v.shape[1]
+        vals[pos : pos + n] = v.reshape(-1, K)
+        idx[pos : pos + n] = i.reshape(-1, K)
+        tgt[pos : pos + n] = t.reshape(-1)
+        pos += n
+    vals.flush(); idx.flush(); tgt.flush()
+    first = parent_batches[0].numpy().tobytes()
+    last = parent_batches[-1].numpy().tobytes()
+    manifest = {
+        "version": 1,
+        "parent": parent_name or getattr(parent, "name_or_path", None) or "?",
+        "vocab_hash": _sha(list(kept_ids)),
+        "seq_len": S,
+        "k": K,
+        "micro_batch": micro_batch,
+        "n_chunks": len(order),
+        "order": order,
+        "slice_hash": _sha([len(parent_batches), first[:64].hex(), last[-64:].hex()]),
+    }
+    with open(prefix + ".manifest.json", "w", encoding="utf-8") as f:
+        json.dump(manifest, f)
+    print(f"[cache] écrit : {prefix}.* ({len(order)} chunks, top-{K})")
+    return load_teacher_cache(prefix, manifest["parent"], kept_ids, S, K)
 
 
-def load_teacher_cache(path: str, top_k: int, vocab: int):
-    """Recharge le cache -> tenseurs denses (B*batch, S, V) scatterés."""
-    z = np.load(path)
-    vals = torch.from_numpy(z["vals"])
-    idx = torch.from_numpy(z["idx"])
-    tgt = torch.from_numpy(z["tgt"]).long()
-    # Reconstruction dense : -inf partout sauf top-k (approximation standard).
-    dense = torch.full((*vals.shape[:2], vocab), float("-inf"))
-    dense.scatter_(-1, idx, vals.float())
-    return dense, tgt
+def load_teacher_cache(prefix: str, parent_name: str, kept_ids: list[int],
+                       seq_len: int, top_k: int) -> dict:
+    """Recharge le cache mmap. Refuse tout cache incompatible (ValueError)."""
+    import numpy as np
+
+    try:
+        with open(prefix + ".manifest.json", encoding="utf-8") as f:
+            m = json.load(f)
+    except FileNotFoundError:
+        raise ValueError(f"Cache introuvable : {prefix}.manifest.json")
+    if m.get("version") != 1:
+        raise ValueError("Version de cache non supportée.")
+    if m.get("parent") != parent_name:
+        raise ValueError(
+            f"Cache d'un autre parent ({m.get('parent')} != {parent_name}).")
+    if m.get("vocab_hash") != _sha(list(kept_ids)):
+        raise ValueError("Cache incompatible : vocabulaire réduit différent "
+                         "(--vocab-from / tranche différente ?).")
+    if m.get("seq_len") != seq_len:
+        raise ValueError("Cache incompatible : seq_len différente.")
+    if m.get("k") != min(top_k, len(kept_ids)):
+        raise ValueError("Cache incompatible : top-k différent.")
+    tot = sum(B * m["seq_len"] for _, _, B in m["order"])
+    K = m["k"]
+    vals = np.memmap(prefix + ".vals.fp16", dtype="<f2", mode="r",
+                     shape=(tot, K))
+    idx = np.memmap(prefix + ".idx.u16", dtype="<u2", mode="r",
+                    shape=(tot, K))
+    tgt = np.memmap(prefix + ".tgt.i64", dtype="<i8", mode="r", shape=(tot,))
+    print(f"[cache] chargé : {prefix}.* ({m['n_chunks']} chunks, top-{K})")
+    return {"manifest": m, "vals": vals, "idx": idx, "tgt": tgt}
+
+
+def teacher_logits_from_cache(cache: dict, bi: int, ci: int, vocab: int,
+                              device) -> torch.Tensor:
+    """Reconstruit les logits denses (B, S, V) d'un chunk : -inf hors top-k.
+
+    Le softmax renormalise donc sur le top-k (KL tronquée renormalisée).
+    """
+    import numpy as np
+
+    m = cache["manifest"]
+    S = m["seq_len"]
+    pos = 0
+    for obi, oci, B in m["order"]:
+        if obi == bi and oci == ci:
+            break
+        pos += B * S
+    else:
+        raise KeyError(f"Chunk ({bi}, {ci}) absent du cache.")
+    v = torch.from_numpy(
+        np.ascontiguousarray(cache["vals"][pos : pos + B * S]).copy()).float()
+    i = torch.from_numpy(
+        np.ascontiguousarray(cache["idx"][pos : pos + B * S]).copy()).long()
+    dense = torch.full((B * S, vocab), float("-inf"))
+    dense.scatter_(-1, i, v)
+    return dense.view(B, S, vocab).to(device)
 
 
 # ---------------------------------------------------------------------------
@@ -177,9 +290,16 @@ def train(
     max_grad_norm: float = 1.0,
     top_k_cache: int = 0,  # >0 : utilise/crée le cache top-k
     cache_path: str = "",
+    cache_k: int = 32,  # top-k stocké (uint16 + float16, mmap)
     resume: str = "",
     log_every: int = 20,
     device: torch.device | None = None,
+    val_parent_batches: list | None = None,  # batchs val parent (même format)
+    val_student_batches: list | None = None,  # batchs val enfant alignés
+    eval_every: int = 0,  # >0 : évalue la val tous les N steps (0 = désactivé)
+    patience: int = 0,  # >0 : early stopping après N evals sans progrès
+    lr_resume: float = 0.0,  # >0 : remplace le LR à la reprise
+    rewarmup_ratio: float = 0.0,  # >0 : reconstruit le scheduler sur les steps restants
 ) -> str:
     """Entraîne l'enfant par distillation. Retourne le chemin du checkpoint."""
     device = device or pick_device()
@@ -187,13 +307,26 @@ def train(
     kept = vocab["kept_ids"]
     student.to(device).train()
 
-    # --- Parent (inférence seule). ---
-    teacher_logits_all = None
+    # --- Parent (inférence seule) ou cache mmap (parent non chargé). ---
+    cache = None
     parent = None
-    if top_k_cache > 0 and cache_path and os.path.exists(cache_path):
-        print(f"[train] cache parent réutilisé : {cache_path}")
-        teacher_logits_all, _ = load_teacher_cache(cache_path, top_k_cache, len(kept))
-    else:
+    if top_k_cache > 0 and cache_path:
+        try:
+            cache = load_teacher_cache(
+                cache_path, parent_name, kept,
+                parent_batches[0].shape[1] - 1, cache_k)
+            if cache["manifest"]["micro_batch"] != batch_size:
+                raise ValueError(
+                    "Cache incompatible : micro_batch "
+                    f"({cache['manifest']['micro_batch']}) != --batch-size "
+                    f"({batch_size}). Reconstruisez le cache avec le même "
+                    "--batch-size que l'entraînement.")
+            print(f"[train] cache parent réutilisé (parent non chargé).")
+        except ValueError as e:
+            if os.path.exists(cache_path + ".manifest.json"):
+                raise  # cache existant mais incompatible : on refuse
+            print(f"[train] pas de cache : {e}")
+    if cache is None:
         from transformers import AutoModelForCausalLM
 
         dtype = torch.float16 if device.type == "mps" else torch.float32
@@ -202,13 +335,16 @@ def train(
         for p in parent.parameters():
             p.requires_grad_(False)
         if top_k_cache > 0 and cache_path:
-            precompute_teacher_cache(
-                parent, parent_batches, kept, top_k_cache, device, cache_path
-            )
-            print(f"[train] cache parent écrit : {cache_path}")
-            teacher_logits_all, _ = load_teacher_cache(
-                cache_path, top_k_cache, len(kept)
-            )
+            cache = build_teacher_cache(
+                parent, parent_batches, student_batches, kept, cache_k,
+                device, batch_size, cache_path, parent_name=parent_name)
+            if proj is None:
+                # Sans hidden : le parent ne sert plus, on libère la mémoire.
+                print(f"[train] parent déchargé, suite sur cache.")
+                del parent
+                parent = None
+                if device.type == "mps":
+                    torch.mps.empty_cache()
 
     kept_t = torch.tensor(kept, device=device)
     # La projection cachée doit exister AVANT l'optimiseur et le scheduler
@@ -232,11 +368,27 @@ def train(
     start_step, global_step = 0, 0
     if resume and os.path.exists(resume):
         ckpt = torch.load(resume, map_location=device, weights_only=False)
+        # Enchaînement de tranches : le vocab ne doit pas avoir bougé.
+        if ckpt.get("vocab") is not None:
+            from data import check_vocab_compatible
+
+            check_vocab_compatible(vocab, ckpt["vocab"])
         student.load_state_dict(ckpt["model"])
         if proj is not None and ckpt.get("proj") is not None:
             proj.load_state_dict(ckpt["proj"])
         opt.load_state_dict(ckpt["opt"])
-        sched.load_state_dict(ckpt["sched"])
+        if lr_resume and lr_resume > 0:
+            for g in opt.param_groups:
+                g["lr"] = lr_resume
+            print(f"[train] LR reprise forcé : {lr_resume}")
+        if rewarmup_ratio and rewarmup_ratio > 0:
+            # Scheduler reconstruit sur les steps restants (warmup frais),
+            # adapté à l'enchaînement sur nouvelles données.
+            remaining = max(total_steps - ckpt["step"], 1)
+            sched = cosine_with_warmup(opt, int(remaining * rewarmup_ratio), remaining)
+            print(f"[train] scheduler reconstruit : {remaining} steps restants")
+        else:
+            sched.load_state_dict(ckpt["sched"])
         start_step = ckpt["step"]
         global_step = start_step
         print(f"[train] reprise depuis {resume} (step {start_step})")
@@ -246,6 +398,17 @@ def train(
         f"[train] enfant: {n_params / 1e6:.1f}M params latents, "
         f"{len(student_batches)} batchs, {total_steps} steps"
     )
+    use_val = (
+        eval_every > 0
+        and val_parent_batches
+        and val_student_batches
+        and len(val_student_batches) > 0
+    )
+    if eval_every > 0 and not use_val:
+        print("[train] attention : --eval-every sans batchs val -> pas d'éval.")
+    best_val, best_step, no_improve = float("inf"), start_step, 0
+    best_path = out.replace(".pt", "_bestval.pt") if out.endswith(".pt") else out + "_bestval.pt"
+    stopped_early = False
 
     t0 = time.time()
     tok_total = 0
@@ -261,8 +424,11 @@ def train(
                 x = sb[off : off + batch_size][:, :-1].to(device)
                 y = sb[off : off + batch_size][:, 1:].to(device)
                 px = pb[off : off + batch_size][:, :-1].to(device)
-                if teacher_logits_all is not None:
-                    t_logits = teacher_logits_all[micro].to(device)
+                ci = off // batch_size
+                if cache is not None and proj is None:
+                    # Logits parent depuis le cache (parent non chargé).
+                    t_logits = teacher_logits_from_cache(
+                        cache, bi, ci, len(kept), device)
                     t_h = None
                 else:
                     with torch.no_grad():
@@ -282,6 +448,28 @@ def train(
                 else:
                     s_logits = student(x)
                     loss, parts = criterion(s_logits, t_logits, y)
+                if not torch.isfinite(loss):
+                    # Garde-fou (ex. OOM GPU silencieuse -> NaN) : arrêt
+                    # propre avec checkpoint de sauvegarde, pas de backward.
+                    bad_path = (out.replace(".pt", "_nonfinite.pt")
+                                if out.endswith(".pt") else out + "_nonfinite.pt")
+                    torch.save(
+                        {
+                            "model": student.state_dict(),
+                            "cfg": student.cfg,
+                            "vocab": vocab,
+                            "parent": parent_name,
+                            "step": global_step,
+                            "reason": "loss non finie",
+                        },
+                        bad_path,
+                    )
+                    print(
+                        f"[train] ARRÊT : loss non finie à step {global_step} "
+                        f"(OOM ?). Poids sauvegardés dans {bad_path}."
+                    )
+                    stopped_early = True
+                    break
                 (loss / accum).backward()
                 tok_total += x.numel()
                 micro += 1
@@ -301,9 +489,44 @@ def train(
                             f"{tok_total / dt:.0f} tok/s",
                             flush=True,
                         )
+                    if use_val and global_step % eval_every == 0:
+                        # Éval val (CE enfant seule, sans parent) + best + patience.
+                        val_ce = eval_loss(student, val_student_batches, device)
+                        val_ppl = math.exp(min(val_ce, 20))
+                        tag = ""
+                        if val_ce < best_val:
+                            best_val, best_step, no_improve = val_ce, global_step, 0
+                            torch.save(
+                                {
+                                    "model": student.state_dict(),
+                                    "cfg": student.cfg,
+                                    "vocab": vocab,
+                                    "parent": parent_name,
+                                    "val_ce": val_ce,
+                                    "step": global_step,
+                                },
+                                best_path,
+                            )
+                            tag = " [best]"
+                        else:
+                            no_improve += 1
+                        print(
+                            f"[val] step {global_step}/{total_steps} "
+                            f"val_ce={val_ce:.4f} val_ppl~{val_ppl:.1f}{tag}",
+                            flush=True,
+                        )
+                        if patience > 0 and no_improve >= patience:
+                            print(
+                                f"[val] early stopping : {patience} evals sans "
+                                f"progrès (best step {best_step})."
+                            )
+                            stopped_early = True
+                            break
                     if global_step >= total_steps:
                         break
-            if global_step >= total_steps:
+                if stopped_early or global_step >= total_steps:
+                    break
+            if stopped_early or global_step >= total_steps:
                 break
         ckpt_path = out.replace(".pt", f"_e{epoch}.pt")
         torch.save(
@@ -321,8 +544,27 @@ def train(
             ckpt_path,
         )
         print(f"[train] checkpoint : {ckpt_path}")
-        if global_step >= total_steps:
+        if stopped_early or global_step >= total_steps:
             break
+    if stopped_early and os.path.exists(best_path):
+        # Restaure les meilleurs poids avant la sauvegarde finale.
+        best = torch.load(best_path, map_location=device, weights_only=False)
+        student.load_state_dict(best["model"])
+        print(f"[val] poids restaurés depuis {best_path} (step {best['step']}).")
+    if use_val:
+        # Tableau final : PPL train (échantillon) vs PPL val (complète).
+        train_ce = eval_loss(student, student_batches[:50], device)
+        val_ce = eval_loss(student, val_student_batches, device)
+        train_ppl, val_ppl = math.exp(min(train_ce, 20)), math.exp(min(val_ce, 20))
+        print(
+            f"[eval] train-PPL ~{train_ppl:.1f} (50 batchs) vs "
+            f"val-PPL ~{val_ppl:.1f} ({len(val_student_batches)} batchs)"
+        )
+        if train_ppl > 0 and val_ppl / train_ppl > 1.5:
+            print(
+                "[eval] AVERTISSEMENT : écart train/val > 1.5x, "
+                "surapprentissage probable."
+            )
     final = out if out.endswith(".pt") else out + ".pt"
     torch.save(
         {

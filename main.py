@@ -104,19 +104,35 @@ def cmd_infer(a: argparse.Namespace) -> None:
 # ---------------------------------------------------------------------------
 
 
-def cmd_train(a: argparse.Namespace) -> None:
-    tok = load_tokenizer(a.parent)
+def prepare_corpus(tok, a: argparse.Namespace, save_vocab_to: str = ""):
+    """Charge textes, split val, vocab, batchs parent/enfant alignés.
+
+    Retourne (pb, sb, vpb, vsb, vocab). Même code pour `train` et
+    `cache-logits` : le cache pré-calculé correspond exactement aux batchs
+    d'entraînement (même seed, même découpage).
+    """
     texts = D.load_texts(a.data)
-    print(f"[train] {len(texts)} documents, {sum(len(t) for t in texts)} caractères")
-    vocab = D.build_reduced_vocab(tok, texts, a.vocab_size)
-    with open(a.vocab_out or (a.out + ".vocab.json"), "w", encoding="utf-8") as f:
-        json.dump(vocab, f)
+    print(f"[corpus] {len(texts)} documents, {sum(len(t) for t in texts)} caractères")
+    val_ratio = getattr(a, "val_ratio", 0.0) or 0.0
+    val_texts: list[str] = []
+    if val_ratio > 0 and len(texts) > 1:
+        texts, val_texts = D.train_val_split(texts, val_ratio, getattr(a, "seed", 0))
+        print(f"[corpus] split : {len(texts)} docs train, {len(val_texts)} docs val")
+    if getattr(a, "vocab_from", ""):
+        with open(a.vocab_from, encoding="utf-8") as f:
+            vocab = json.load(f)
+        print(f"[corpus] vocab réutilisé : {a.vocab_from} "
+              f"({len(vocab['kept_ids'])} tokens)")
+    else:
+        vocab = D.build_reduced_vocab(tok, texts, a.vocab_size)
+    if save_vocab_to:
+        with open(save_vocab_to, "w", encoding="utf-8") as f:
+            json.dump(vocab, f)
     # Deux flux parallèles alignés (mapping 1 token -> 1 token) : ids parent
     # pour le teacher forcing du parent, ids réduits pour l'enfant.
     parent_stream: list[int] = []
     for t in texts:
         parent_stream += tok.encode(t, add_special_tokens=False) + [tok.eos_token_id]
-    unk_old = tok.unk_token_id
     new_of = {old: new for new, old in enumerate(vocab["kept_ids"])}
     student_stream = [new_of.get(t, vocab["unk_new"]) for t in parent_stream]
     # Même seed -> même permutation -> batchs alignés parent/enfant.
@@ -127,12 +143,33 @@ def cmd_train(a: argparse.Namespace) -> None:
         student_stream, a.seq_len, a.save_batch, shuffle=True, seed=a.seed
     )
     assert len(pb) == len(sb), "Flux désalignés (ne devrait pas arriver)."
+    # Batchs val alignés (même seed, sans mélange) pour l'éval périodique.
+    vpb, vsb = [], []
+    if val_texts:
+        val_parent_stream: list[int] = []
+        for t in val_texts:
+            val_parent_stream += tok.encode(t, add_special_tokens=False) + [tok.eos_token_id]
+        val_student_stream = [new_of.get(t, vocab["unk_new"]) for t in val_parent_stream]
+        vpb = D.make_batches(
+            val_parent_stream, a.seq_len, a.save_batch, shuffle=False, seed=a.seed
+        )
+        vsb = D.make_batches(
+            val_student_stream, a.seq_len, a.save_batch, shuffle=False, seed=a.seed
+        )
+        assert len(vpb) == len(vsb), "Flux val désalignés."
+    return pb, sb, vpb, vsb, vocab
+
+
+def cmd_train(a: argparse.Namespace) -> None:
+    tok = load_tokenizer(a.parent)
+    pb, sb, vpb, vsb, vocab = prepare_corpus(
+        tok, a, save_vocab_to=a.vocab_out or (a.out + ".vocab.json"))
     cfg = CONFIGS[a.config]
     import dataclasses
 
     cfg = dataclasses.replace(cfg, vocab_size=len(vocab["kept_ids"]), seq_max=a.seq_len)
     student = TinyTransformer(cfg)
-    cache = a.cache or (a.out + ".teacherk.npz")
+    cache = a.cache or (a.out + ".teacherk")
     dist.train(
         student,
         pb,
@@ -149,9 +186,54 @@ def cmd_train(a: argparse.Namespace) -> None:
         accum=a.accum,
         top_k_cache=a.top_k_cache,
         cache_path=cache if a.top_k_cache > 0 else "",
+        cache_k=getattr(a, "cache_k", 32),
         resume=a.resume,
         device=None,
+        val_parent_batches=vpb,
+        val_student_batches=vsb,
+        eval_every=getattr(a, "eval_every", 0),
+        patience=getattr(a, "patience", 0),
+        lr_resume=getattr(a, "lr_resume", 0.0),
+        rewarmup_ratio=getattr(a, "rewarmup_ratio", 0.0),
     )
+
+
+# ---------------------------------------------------------------------------
+# cache-logits
+# ---------------------------------------------------------------------------
+
+
+def cmd_cache_logits(a: argparse.Namespace) -> None:
+    """Pré-calcule le cache top-k parent (train + val) sans entraîner.
+
+    Utilise exactement le même prepare_corpus que `train` (même seed,
+    même découpage) : le cache correspond aux batchs d'entraînement.
+    Le train suivant utilisera --top-k-cache 1 --cache <out-dir>/train
+    avec le MÊME --batch-size (vérifié au chargement).
+    """
+    tok = load_tokenizer(a.parent)
+    os.makedirs(a.out_dir, exist_ok=True)
+    pb, sb, vpb, vsb, vocab = prepare_corpus(
+        tok, a, save_vocab_to=os.path.join(a.out_dir, "vocab.json"))
+    device = dist.pick_device()
+    print(f"[cache-logits] device={device} parent={a.parent}")
+    from transformers import AutoModelForCausalLM
+
+    dtype = torch.float16 if device.type == "mps" else torch.float32
+    parent = AutoModelForCausalLM.from_pretrained(a.parent, dtype=dtype)
+    parent.to(device).eval()
+    for p in parent.parameters():
+        p.requires_grad_(False)
+    kept = vocab["kept_ids"]
+    dist.build_teacher_cache(parent, pb, sb, kept, a.cache_k, device,
+                             a.batch_size, os.path.join(a.out_dir, "train"),
+                             parent_name=a.parent)
+    if vpb:
+        dist.build_teacher_cache(parent, vpb, vsb, kept, a.cache_k, device,
+                                 a.batch_size, os.path.join(a.out_dir, "val"),
+                                 parent_name=a.parent)
+    else:
+        print("[cache-logits] pas de split val (--val-ratio 0) : cache train seul.")
 
 
 # ---------------------------------------------------------------------------
@@ -220,7 +302,8 @@ def cmd_export(a: argparse.Namespace) -> None:
 
 
 def cmd_bench(a: argparse.Namespace) -> None:
-    before = rss_mb()
+    # Baseline : Python + imports déjà chargés, avant tout chargement modèle.
+    baseline = rss_mb()
     eng = E.Engine(a.model)
     after_load = rss_mb()
     m = eng.meta
@@ -238,7 +321,13 @@ def cmd_bench(a: argparse.Namespace) -> None:
     eng.generate(ids, max_new=a.bench_tokens, temperature=0.0)
     dt = time.time() - t0
     after_gen = rss_mb()
-    ok = total < 100 * 1024 * 1024
+    delta_load = after_load - baseline
+    delta_gen = after_gen - baseline
+    ok_theory = total < 100 * 1024 * 1024
+    # Critère de réussite : le DELTA RSS réel après génération < 100 Mo
+    # (pas la RSS absolue, qui inclut Python + torch déjà chargés).
+    ok_delta = delta_gen < 100.0
+    ok = ok_theory and ok_delta
     print(f"[bench] noyau     : {E.KERNEL_NAME}")
     print(
         f"[bench] config      : V={V} d={Dd} L={L} Hq={m['Hq']} Hkv={m['Hkv']} ffn={F} seq={S}"
@@ -252,7 +341,10 @@ def cmd_bench(a: argparse.Namespace) -> None:
         f"[bench] TOTAL       : {total / 1024 / 1024:.2f} Mo / 100 Mo -> {'OK' if ok else 'DÉPASSEMENT'}"
     )
     print(
-        f"[bench] RSS réel    : avant={before:.1f} Mo, après chargement={after_load:.1f} Mo, après génération={after_gen:.1f} Mo"
+        f"[bench] RSS réel    : baseline={baseline:.1f} Mo, après chargement={after_load:.1f} Mo (+{delta_load:.1f}), après génération={after_gen:.1f} Mo (+{delta_gen:.1f})"
+    )
+    print(
+        f"[bench] DELTA vs baseline : +{delta_gen:.1f} Mo / 100 Mo -> {'OK' if ok_delta else 'DÉPASSEMENT'}"
     )
     print(f"[bench] vitesse     : {a.bench_tokens / max(dt, 1e-6):.1f} tok/s")
     if not ok:
@@ -356,13 +448,45 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--temperature", type=float, default=2.0)
     pt.add_argument("--hidden-weight", type=float, default=0.0)
     pt.add_argument("--top-k-cache", type=int, default=0)
+    pt.add_argument("--cache-k", type=int, default=32,
+                    help="Top-k stocké dans le cache mmap (défaut 32).")
     pt.add_argument("--cache", default="")
     pt.add_argument("--resume", default="")
     pt.add_argument("--seed", type=int, default=0)
+    pt.add_argument("--val-ratio", type=float, default=0.0,
+                    help="Part des docs en validation (0 = désactivé).")
+    pt.add_argument("--eval-every", type=int, default=0,
+                    help="Évalue la val tous les N steps (0 = désactivé).")
+    pt.add_argument("--patience", type=int, default=0,
+                    help="Early stopping après N evals sans progrès (0 = désactivé).")
+    pt.add_argument("--vocab-from", default="",
+                    help="Réutilise un .vocab.json existant au lieu de recalculer "
+                    "(requis pour enchaîner les tranches à vocab constant).")
+    pt.add_argument("--lr-resume", type=float, default=0.0,
+                    help="Remplace le LR à la reprise (0 = garde celui du checkpoint).")
+    pt.add_argument("--rewarmup-ratio", type=float, default=0.0,
+                    help="Reconstruit le scheduler sur les steps restants à la "
+                    "reprise (0 = garde celui du checkpoint).")
 
     pe = sub.add_parser("export", help="Quantifie et packe en .bin.")
     pe.add_argument("--ckpt", required=True)
     pe.add_argument("--out", required=True)
+
+    pc = sub.add_parser("cache-logits",
+                        help="Pré-calcule le cache top-k parent (train+val).")
+    pc.add_argument("--data", required=True, nargs="+")
+    pc.add_argument("--parent", required=True)
+    pc.add_argument("--out-dir", required=True,
+                    help="Dossier : vocab.json + train.* + val.* (mmap).")
+    pc.add_argument("--vocab-size", type=int, default=12000)
+    pc.add_argument("--vocab-out", default="")
+    pc.add_argument("--seq-len", type=int, default=128)
+    pc.add_argument("--save-batch", type=int, default=8)
+    pc.add_argument("--batch-size", type=int, default=2)
+    pc.add_argument("--val-ratio", type=float, default=0.05)
+    pc.add_argument("--seed", type=int, default=0)
+    pc.add_argument("--vocab-from", default="")
+    pc.add_argument("--cache-k", type=int, default=32)
 
     pb = sub.add_parser("bench", help="RAM réelle, tok/s, budget 100 Mo.")
     pb.add_argument("--model", required=True)
@@ -394,10 +518,17 @@ def build_parser() -> argparse.ArgumentParser:
         "temperature",
         "hidden_weight",
         "top_k_cache",
+        "cache_k",
         "cache",
         "resume",
         "seed",
         "vocab_out",
+        "val_ratio",
+        "eval_every",
+        "patience",
+        "vocab_from",
+        "lr_resume",
+        "rewarmup_ratio",
     ):
         d = {
             "vocab_size": 8000,
@@ -410,10 +541,17 @@ def build_parser() -> argparse.ArgumentParser:
             "temperature": 2.0,
             "hidden_weight": 0.0,
             "top_k_cache": 0,
+            "cache_k": 32,
             "cache": "",
             "resume": "",
             "seed": 0,
             "vocab_out": "",
+            "val_ratio": 0.0,
+            "eval_every": 0,
+            "patience": 0,
+            "vocab_from": "",
+            "lr_resume": 0.0,
+            "rewarmup_ratio": 0.0,
             "config": "tiny",
         }[name]
         t = int if isinstance(d, int) else (float if isinstance(d, float) else str)
@@ -427,6 +565,7 @@ def main() -> None:
     {
         "infer": cmd_infer,
         "train": cmd_train,
+        "cache-logits": cmd_cache_logits,
         "export": cmd_export,
         "bench": cmd_bench,
         "distill-loop": cmd_loop,

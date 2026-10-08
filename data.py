@@ -25,6 +25,27 @@ TEXT_FIELD = "text"
 _TAG_RE = re.compile(r"<[^>]+>")
 
 
+def train_val_split(
+    texts: list[str], val_ratio: float = 0.05, seed: int = 0
+) -> tuple[list[str], list[str]]:
+    """Split train/val reproductible au niveau documents, sans chevauchement.
+
+    Mélange déterministe des indices (seed fixe), les `val_ratio` derniers
+    vont en val. Le vocabulaire doit être construit sur le train SEULEMENT
+    (pas de fuite val -> vocab).
+    """
+    if not 0.0 < val_ratio < 1.0:
+        raise ValueError("val_ratio doit être dans ]0, 1[.")
+    n = len(texts)
+    n_val = max(1, int(n * val_ratio)) if n > 1 else 0
+    rng = torch.Generator().manual_seed(seed)
+    perm = torch.randperm(n, generator=rng).tolist()
+    val_idx = set(perm[-n_val:]) if n_val else set()
+    train = [t for i, t in enumerate(texts) if i not in val_idx]
+    val = [t for i, t in enumerate(texts) if i in val_idx]
+    return train, val
+
+
 def _read_xml(fp: str) -> str:
     """Extrait le texte d'un XML/RSS : supprime les balises, dé-échappe."""
     with open(fp, encoding="utf-8", errors="replace") as f:
@@ -109,6 +130,25 @@ def build_reduced_vocab(tokenizer, texts: list[str], vocab_size: int = 8000) -> 
         "unk_new": new_of_old[int(unk_id)],
         "eos_new": new_of_old.get(int(tokenizer.eos_token_id), new_of_old[int(unk_id)]),
     }
+
+
+def check_vocab_compatible(vocab: dict, ckpt_vocab: dict) -> None:
+    """Refuse l'enchaînement si le vocab diffère de celui du checkpoint.
+
+    Indispensable pour l'entraînement par tranches : le mapping
+    token->id doit rester identique d'une tranche à l'autre, sinon les
+    poids (embeddings, tête liée) ne correspondent plus à rien.
+    """
+    a, b = vocab.get("kept_ids"), (ckpt_vocab or {}).get("kept_ids")
+    if a is None or b is None:
+        raise ValueError("Vocabulaire incomplet : kept_ids manquant.")
+    if list(a) != list(b):
+        raise ValueError(
+            "Vocabulaire incompatible avec le checkpoint "
+            f"({len(a)} vs {len(b)} tokens ou ordre différent). "
+            "Pour enchaîner les tranches, réutilisez le même vocab "
+            "(--vocab-from tranche précédente) au lieu de le recalculer."
+        )
 
 
 def encode_mapped(tokenizer, vocab: dict, text: str, add_eos: bool = True) -> list[int]:

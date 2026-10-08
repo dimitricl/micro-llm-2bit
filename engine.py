@@ -3,7 +3,14 @@
 - Linéaires via le noyau C (.dylib, ctypes) avec fallback NumPy si la
   compilation/la lib est absente.
 - KV cache pré-alloué à taille fixe (int8 + scales fp32 par tête).
+- Poids lus en memmap zéro-copie (aucune duplication du .bin en RAM) ;
+  embeddings gardés en int8 (seule la ligne du token courant est
+  déquantifiée) ; logits calculés par blocs sans matérialiser la matrice
+  fp32 complète ; tous les buffers de travail sont préalloués une fois.
 - Sampling : glouton, température, top-k, top-p.
+
+NOTE : `step()` réutilise un buffer de logits interne préalloué. Le tableau
+retourné est valide jusqu'au prochain appel de `step()` sur le même Engine.
 """
 
 from __future__ import annotations
@@ -24,6 +31,10 @@ VERSION = 1
 # magic, version, vocab, d, L, Hq, Hkv, ffn, seq_max, group, head_dim
 HEADER_FMT = "<4s10I"
 HEADER_SIZE = struct.calcsize(HEADER_FMT)
+
+# Taille d'un bloc de lignes pour le calcul des logits (2048 x 768 fp32
+# = 6 Mo de temporaire, contre 37 Mo pour la matrice complète en base).
+LOGIT_BLOCK = 2048
 
 
 def _load_lib():
@@ -69,13 +80,17 @@ class PackedLinear:
     def __init__(
         self, packed: np.ndarray, scales: np.ndarray, rows: int, cols: int, group: int
     ):
-        self.packed = packed.reshape(rows, cols // 4)
-        self.scales = scales.reshape(rows, cols // group).astype(np.float32)
+        # Vues zéro-copie (le .bin est mmapé en lecture seule).
+        self.packed = np.ascontiguousarray(packed.reshape(rows, cols // 4))
+        self.scales = np.ascontiguousarray(scales.reshape(rows, cols // group),
+                                           dtype=np.float32)
         self.rows, self.cols, self.group = rows, cols, group
+        # Buffer de sortie préalloué (réutilisé à chaque forward).
+        self._out = np.empty(rows, dtype=np.float32)
 
     def forward(self, x_q: np.ndarray, x_scale: float) -> np.ndarray:
         x_q = np.ascontiguousarray(x_q, dtype=np.int8)
-        out = np.empty(self.rows, dtype=np.float32)
+        out = self._out
         if _LIB is not None:
             packed_c = np.ascontiguousarray(self.packed)
             scales_c = np.ascontiguousarray(self.scales, dtype=np.float32)
@@ -103,7 +118,9 @@ class PackedLinear:
                     )
                     acc += float(seg.sum()) * float(self.scales[n, g])
                 out[n] = acc * x_scale
-        return out
+        # Copie : le buffer interne est réutilisé à chaque appel, l'appelant
+        # garde un tableau stable (ex. empilement de plusieurs forwards).
+        return out.copy()
 
 
 def _quant_act(x: np.ndarray) -> tuple[np.ndarray, float]:
@@ -144,8 +161,13 @@ def write_bin(path: str, meta: dict, tensors: list[np.ndarray]) -> None:
             f.write(np.ascontiguousarray(t).tobytes())
 
 
-def read_bin(path: str) -> tuple[dict, list[np.ndarray]]:
-    """Lit un .bin. Retourne (meta, [tenseurs...]) sans les shapes (voir Engine)."""
+def read_bin(path: str) -> tuple[dict, list]:
+    """Lit un .bin. Retourne (meta, [mmap]) sans les shapes (voir Engine).
+
+    Le blob est un np.memmap en lecture seule : aucune copie, les pages
+    sont chargées à la demande par l'OS. L'objet retourné doit rester
+    vivant tant que l'Engine l'utilise (l'Engine le garde en self._mmap).
+    """
     with open(path, "rb") as f:
         raw = f.read(HEADER_SIZE)
         parts = struct.unpack(HEADER_FMT, raw)
@@ -156,9 +178,9 @@ def read_bin(path: str) -> tuple[dict, list[np.ndarray]]:
             raise ValueError(f"Version {ver} non supportée (attendue {VERSION}).")
         keys = ["vocab", "d", "L", "Hq", "Hkv", "ffn", "seq_max", "group", "head_dim"]
         meta = dict(zip(keys, parts[2:]))
-        blob = f.read()
+    blob = np.memmap(path, dtype=np.uint8, mode="r", offset=HEADER_SIZE)
     # Les shapes sont reconstruites par l'Engine (ordre fixe, voir save order).
-    return meta, [blob]  # blob brut, découpé dans Engine._parse
+    return meta, [blob]  # blob mappé, découpé en vues dans Engine._parse
 
 
 # ---------------------------------------------------------------------------
@@ -171,6 +193,7 @@ class Engine:
 
     def __init__(self, path: str):
         meta, (blob,) = read_bin(path)
+        self._mmap = blob  # garde le memmap vivant (vues zéro-copie)
         self.meta = meta
         V, D, L = meta["vocab"], meta["d"], meta["L"]
         Hq, Hkv, Dh = meta["Hq"], meta["Hkv"], meta["head_dim"]
@@ -178,9 +201,12 @@ class Engine:
         off = 0
 
         def take(n: int, dt: np.dtype) -> np.ndarray:
+            """Vue zéro-copie (lecture seule) sur le blob mappé."""
             nonlocal off
-            arr = np.frombuffer(blob, dtype=dt, count=n, offset=off).copy()
-            off += n * np.dtype(dt).itemsize
+            nbytes = n * np.dtype(dt).itemsize
+            arr = np.frombuffer(blob, dtype=dt, count=n, offset=off)
+            arr.flags.writeable = False
+            off += nbytes
             return arr
 
         self.embed_q = take(V * D, np.int8).reshape(V, D)
@@ -219,6 +245,8 @@ class Engine:
         self.k_scales = np.ones((L, S, Hkv), dtype=np.float32)
         self.v_scales = np.ones((L, S, Hkv), dtype=np.float32)
         self.pos = 0
+        # Buffer de logits préalloué (réutilisé à chaque step).
+        self._logits = np.empty(V, dtype=np.float32)
         # Fréquences RoPE pré-calculées.
         inv = 1.0 / (10000.0 ** (np.arange(0, Dh, 2) / Dh))
         self.rope_angles = np.outer(np.arange(S), inv)  # (S, Dh/2)
@@ -236,11 +264,28 @@ class Engine:
     def reset(self) -> None:
         self.pos = 0
 
+    def _head_logits(self, x: np.ndarray) -> np.ndarray:
+        """Logits x @ E^T par blocs (E reste en int8, jamais de fp32 complète).
+
+        Temporaire max : LOGIT_BLOCK x D fp32 (6 Mo en base), écrit dans le
+        buffer de logits préalloué.
+        """
+        out = self._logits
+        V = self.meta["vocab"]
+        Eq, Es = self.embed_q, self.embed_s
+        for b in range(0, V, LOGIT_BLOCK):
+            nb = min(LOGIT_BLOCK, V - b)
+            # Seul le bloc courant est déquantifié (int8 -> fp32).
+            Eb = Eq[b : b + nb].astype(np.float32) * Es[b : b + nb, None]
+            out[b : b + nb] = x @ Eb.T
+        return out
+
     # -- forward un pas --
     def step(self, tok: int) -> np.ndarray:
-        """Avance d'un token, retourne les logits (V,) fp32."""
+        """Avance d'un token, retourne les logits (V,) fp32 (buffer réutilisé)."""
         m = self.meta
         D, Dh, Hq, Hkv = m["d"], m["head_dim"], m["Hq"], m["Hkv"]
+        # Seule la ligne d'embedding du token courant est déquantifiée.
         x = self.embed_q[tok].astype(np.float32) * float(self.embed_s[tok])
         p = self.pos
         for li in range(m["L"]):
@@ -290,9 +335,8 @@ class Engine:
             dq, ds = _quant_act(down_in.astype(np.float32))
             x = x + d_l.forward(dq, ds)
         x = rmsnorm(x, self.final_norm)
-        E = self.embed_q.astype(np.float32) * self.embed_s[:, None]
         self.pos += 1
-        return x @ E.T
+        return self._head_logits(x)
 
     # -- génération --
     def generate(
