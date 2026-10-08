@@ -82,6 +82,30 @@ def cmd_infer(a: argparse.Namespace) -> None:
     ids = D.encode_mapped(tok, vocab, a.prompt, add_eos=False)
     ids = ids[-eng.meta["seq_max"] :]
     t0 = time.time()
+    if a.think:
+        out = eng.generate_think(
+            ids,
+            max_new=a.max_new,
+            temperature=a.temperature if a.temperature > 0 else 0.7,
+            top_k=a.top_k if a.top_k > 0 else 40,
+            top_p=a.top_p if a.top_p < 1.0 else 0.9,
+        )
+        dt = time.time() - t0
+        text = decode_ids(tok, vocab, out)
+        parsed = E.parse_think(text)
+        if parsed:
+            think, response = parsed
+            print(f"=== RAISONNEMENT ===\n{think}\n")
+            print(f"=== RÉPONSE ===\n{response}")
+        else:
+            print("[infer] Format think non détecté ; texte brut :")
+            print(text)
+        print(
+            f"[infer] mode think : {len(out)} tokens en {dt:.2f}s = "
+            f"{len(out) / max(dt, 1e-6):.1f} tok/s",
+            file=sys.stderr,
+        )
+        return
     out = eng.generate(
         ids,
         max_new=a.max_new,
@@ -421,6 +445,11 @@ def build_parser() -> argparse.ArgumentParser:
     pi.add_argument("--temperature", type=float, default=0.0)
     pi.add_argument("--top-k", type=int, default=0)
     pi.add_argument("--top-p", type=float, default=1.0)
+    pi.add_argument(
+        "--think",
+        action="store_true",
+        help="Parse une trace <think>...</think> et une réponse finale.",
+    )
 
     pt = sub.add_parser("train", help="Distillation parent -> enfant.")
     pt.add_argument(

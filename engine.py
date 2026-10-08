@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import ctypes
 import os
+import re
 import struct
 
 import numpy as np
@@ -375,6 +376,25 @@ class Engine:
             logits = self.step(nxt)
         return out
 
+    def generate_think(
+        self,
+        ids: list[int],
+        max_new: int = 512,
+        temperature: float = 0.7,
+        top_k: int = 40,
+        top_p: float = 0.9,
+        rng: np.random.Generator | None = None,
+    ) -> list[int]:
+        """Génère une trace think ; le parsing se fait après décodage."""
+        return self.generate(
+            ids,
+            max_new=max_new,
+            temperature=temperature,
+            top_k=top_k,
+            top_p=top_p,
+            rng=rng,
+        )
+
 
 def sample(
     logits: np.ndarray,
@@ -406,3 +426,16 @@ def sample(
         p = mask / mask.sum()
     rng = rng or np.random.default_rng()
     return int(rng.choice(len(p), p=p))
+
+
+def parse_think(text: str) -> tuple[str, str] | None:
+    """Extrait le raisonnement et la réponse au format d'entraînement."""
+    think_match = re.search(r"<think>(.*?)</think>", text, re.DOTALL)
+    response_match = re.search(
+        r"^\s*Reponse\s*:\s*(.+?)\s*$", text, re.MULTILINE
+    )
+    if not think_match or not response_match:
+        return None
+    think = think_match.group(1).strip()
+    response = response_match.group(1).strip()
+    return (think, response) if think and response else None

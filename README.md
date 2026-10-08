@@ -38,6 +38,11 @@ python main.py export --ckpt checkpoints/m.pt --out exports/m.bin
 python main.py bench --model exports/m.bin --bench-tokens 64
 python main.py infer --model exports/m.bin --prompt "Paris est la capitale" \
     --max-new 60 --temperature 0.7 --top-k 40 --top-p 0.9
+
+# Modèle expérimental entraîné sur des traces de raisonnement
+python main.py infer --model exports/enfant_think.bin \
+    --prompt "Question : Quelle est la capitale du Japon ?" \
+    --think --max-new 120 --temperature 0.2 --top-k 20 --top-p 0.9
 ```
 
 ## Architecture
@@ -51,11 +56,16 @@ python main.py infer --model exports/m.bin --prompt "Paris est la capitale" \
   (pas de `batchmean`), garde `0·log(0)=0`, arrêt propre si loss non finie.
 - **Données** : split train/val reproductible (seed fixe), vocabulaire
   réduit (12000) reconstruit par tranche, refus si incompatibilité.
+- **Mode think** : option `--think` et extraction de
+  `<think>...</think>` suivie de `Reponse :`; ce mode dépend d'un modèle
+  entraîné sur ce format et ne transforme pas un modèle général en moteur de
+  raisonnement.
 
 ## Chiffres mesurés (Mac mini M4, 8 oct 2026)
 
 Sources : `main.py bench`, `tools/bench_train.md`, `checkpoints/*.log`.
-Aucun chiffre du run en cours tant qu'il n'est pas fini.
+Les chiffres du modèle think expérimental sont détaillés dans la section
+qui lui est consacrée ci-dessous.
 
 | Mesure | tiny | base | Source |
 |---|---|---|---|
@@ -77,6 +87,23 @@ Débit d'entraînement mesuré (`tools/bench_train.py`, seq 128, 30 steps) :
 - Autocast fp16 sur le parent : +26 % (1093 vs 869 tok/s), logits finis.
 - Généralisation (mini-run tiny, 3 Mo) : train-PPL 55.7 vs val-PPL 60.9
   (ratio 1.09, sain) — `checkpoints/train_mini.log`.
+
+## Modèle think expérimental
+
+Un premier modèle `tiny` a été entraîné le 8 octobre 2026 sur 278 traces
+françaises nettoyées (134 pays + 144 Wikipedia), avec
+`HuggingFaceTB/SmolLM-135M` comme parent, 8 epochs maximum, `seq_len=128`,
+micro-batch 1 et accumulation 16. Le run a duré 420 s et s'est terminé sans
+NaN ni OOM. La dernière mesure donne train-PPL 35.3 contre val-PPL 94.1 :
+le surapprentissage est probable.
+
+L'export `exports/enfant_think.bin` fait 12.13 Mo. Le benchmark NEON mesure
+un delta RSS de +27.6 Mo après génération et 68.5 tok/s, donc reste sous le
+budget mémoire de 100 Mo. En revanche, les deux prompts de contrôle testés
+ont produit des sorties répétitives et tronquées avant `</think>`. Le modèle
+est donc un prototype du format think, pas encore un modèle de raisonnement
+fiable. Il faut augmenter et diversifier les données, puis augmenter le
+contexte avant de revendiquer une amélioration qualitative.
 
 ## Évaluation
 

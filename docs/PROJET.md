@@ -42,8 +42,8 @@ uv run python main.py cache-logits --data ... --parent ... --out-dir caches/x
 - slices/slice_00..09.jsonl : ~105 Mo chacune (hash md5 déterministe).
 - data_clean/monde_fr.txt : 245 phrases pays FR (5 territoires sans
   capitale dans monde_missing.txt, jamais inventés).
-- think_pays.jsonl 250 traces (phi4-mini), think_wiki.jsonl 242/300
-  (58 ignorées : serveur fatigué, pas de troncature).
+- think_pays.clean.jsonl 134 traces, think_wiki.clean.jsonl 144 traces
+  retenues après validation stricte du format (278 au total).
 - Ancien mix EN/RFC abandonné (69 % anglais -> boucles "fréquence").
 
 ## 4. Runs (historique)
@@ -57,6 +57,11 @@ uv run python main.py cache-logits --data ... --parent ... --out-dir caches/x
 - tranche00 EN COURS : tiny + 135M + bs16 + fp16 + direct, slice_00
   (107 Mo), 2 epochs max, val 5 %, eval/200, patience 3.
   runs/2026-10-08-tranche00/config.json. (Chiffres à la fin seulement.)
+- think tiny TERMINÉ : 278 traces, parent SmolLM-135M, seq 128,
+  micro-batch 1, accumulation 16, 2048 steps maximum, 420 s.
+  Train-PPL 35.3, val-PPL 94.1 (surapprentissage probable). Export
+  12.13 Mo, delta RSS +27.6 Mo, 68.5 tok/s. Les sorties de contrôle sont
+  répétitives et parfois tronquées avant `</think>`.
 
 ## 5. Benchmarks mesurés (mini M4 16 Go)
 
@@ -81,12 +86,13 @@ Entraînement tok/s (seq 128, 30 steps + 5 warmup) :
   tranche00 : ~2400 tok/s réel).
 
 Éval : 20 prompts FR (eval/), PPL .bin sur 2 Mo mis de côté (en cours),
+deux prompts think de contrôle testés ; le format n'est pas encore fiable,
 courbes docs/img/, tableau docs/RUNS.md.
 
 ## 6. État et règles
 
-- En cours : run tranche00 + eval PPL mini (détachés, veilleurs armés).
-- 30/30 tests verts. Push bloqué (réseau/Keychain) : 8 commits en avance.
+- En cours : aucune longue tâche ; le run think est terminé et exporté.
+- 33/33 tests verts. Le mode think est intégré dans `main`.
 - Règles : pas de GPU/Ollama pendant mesures et runs ; pas de kill de
   process d'autrui ; pas de train long sans "go" ; pas de fichier > 1 Mo
   commité (eval < 200 Ko, PNG petits) ; jamais de --force.
