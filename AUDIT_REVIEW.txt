@@ -1,0 +1,338 @@
+# RAPPORT D'AUDIT MICRO-LLM-2BIT
+
+## 1. DISTILLATION
+
+**a. Tokenizer du student vs teacher**
+- Student vocab: 12000 tokens (tranche00) - voir runs/2026-10-08-tranche00/tranche00.pt.vocab.json:1
+- Parent vocab: SmolLM-135M utilise HuggingFaceTB/cosmo2-tokenizer, taille exacte NON TROUVÉ (page HF ne l'affiche pas, nécessite appel API HF)
+- Construction du vocab 12000: cf data.py:91-132
+  - Garde les tokens spéciaux (pad, eos, bos, unk)
+  - Compte les fréquences sur le corpus train SEULEMENT
+  - Sélectionne les tokens les plus fréquents jusqu'à vocab_size
+  - Complète avec les premiers ids manquants si besoin
+  - Mapping `kept_ids[new] = old` dans le vocabulaire réduit
+
+**b. Mapping logits teacher sur vocab student**
+Extrait distill.py:54-67:
+```python
+t_logits = t_full.index_select(-1, kept_t)  # kept_t = tensor(kept_ids)
+```
+Les logits parent (vocab ~49k ou taille inconnue) sont restreints via `index_select` sur l'index des kept_ids pour ne garder que les dimensions correspondant au vocab student.
+
+**c. Projection du hidden MSE**
+Extrait distill.py:76-83:
+```python
+def hidden_mse(
+    student_h: torch.Tensor, teacher_h: torch.Tensor, proj: nn.Linear
+) -> torch.Tensor:
+    s = proj(student_h.float())
+    t = teacher_h.float().detach()
+    n = min(s.shape[1], t.shape[1])
+    return F.mse_loss(s[:, :n], t[:, :n])
+```
+- Student dim: d_model = 512 (tiny)
+- Parent dim: parent.config.hidden_size (SmolLM-135M, valeur exacte NON TROUVÉ)
+- Projection: nn.Linear(student.cfg.d_model, parent.config.hidden_size) - distill.py:358
+
+**d. Formules exactes de la loss**
+Extrait distill.py:57-73:
+```python
+t = self.temperature
+s_logp = F.log_softmax(student_logits / t, dim=-1)
+t_prob = F.softmax(teacher_logits / t, dim=-1)
+term = t_prob * (t_prob.log() - s_logp)
+kl = torch.where(t_prob > 0, term, torch.zeros_like(term)).sum(dim=-1).mean() * (t * t)
+ce = F.cross_entropy(student_logits.reshape(-1, student_logits.shape[-1]), targets.reshape(-1))
+loss = self.alpha * kl + (1.0 - self.alpha) * ce
+```
+- KL: moyenne sur les TOKENS (B*S), pas batchmean
+- CE: cross-entropy standard
+- Pondération: alpha * KL + (1-alpha) * CE
+- Température: T² appliqué à la KL (T² multiplie le résultat)
+- Valeurs par défaut: alpha=0.7, temperature=2.0
+
+## 2. QUANTIFICATION
+
+**a. STE et calcul de l'échelle**
+Extrait quant.py:51-63:
+```python
+def absmean_scales(w: torch.Tensor, group_size: int = 64) -> torch.Tensor:
+    groups = w.view(*w.shape[:-1], -1, group_size)
+    return groups.abs().mean(dim=-1).to(torch.float32)
+```
+- Scale: absmean par groupe (pas absmax)
+- STE: classe _TernarySTE (quant.py:29-48) - forward quantifie, backward identité
+
+Extrait quant.py:99-109 (activations):
+```python
+def quantize_activation_int8(x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    amax = x.abs().amax(dim=-1, keepdim=True).to(torch.float32)
+    scale = (amax / 127.0).clamp(min=1e-8)
+    q = (x / scale).round().clamp(-128, 127).to(torch.int8)
+```
+- Activations: int8, scale absmax par ligne (par token)
+
+**b. Dtype des poids**
+- Latent weights (entraînement): fp32 (model.py:223-224 `embed_latent` nn.Parameter torch.empty)
+- Master weights: même chose (les latents sont les entraînables)
+- Embeddings: int8 quantifiés au forward avec STE (model.py:237-243)
+- Tête de sortie: liée aux embeddings (weight tying), donc aussi int8 via embeddings
+- Normes: fp32 (model.py:72 `weight = nn.Parameter(torch.ones(dim))`)
+
+## 3. ENTRAÎNEMENT
+
+**a. Optimiseur, LR, schedule, warmup, weight decay, grad clipping**
+Extrait distill.py:362-365:
+```python
+opt = torch.optim.AdamW(params, lr=lr)
+steps_per_epoch = max(len(student_batches) // batch_size, 1)
+total_steps = steps_per_epoch * epochs
+sched = cosine_with_warmup(opt, int(total_steps * warmup_ratio), total_steps)
+```
+- Optimiseur: AdamW
+- LR: 3e-4 (config.json)
+- Schedule: cosine_with_warmup (distill.py:246-255)
+  - Warmup linéaire: warmup_ratio = 0.05 (config.json)
+  - Cosine decay vers 0.1x après warmup
+- Weight decay: valeur par défaut AdamW (non spécifiée dans le code)
+- Grad clipping: max_grad_norm = 1.0 (distill.py:290, clip à la ligne 489)
+
+**b. autocast fp16**
+Extrait distill.py:332-334:
+```python
+dtype = torch.float16 if device.type == "mps" else torch.float32
+parent = AutoModelForCausalLM.from_pretrained(parent_name, dtype=dtype)
+```
+- Parent chargé en fp16 sur MPS
+- **PAS de GradScaler** (grepped: aucun "scaler" dans distill.py)
+- Underflow géré par: dtype fp16 natif sur MPS, arrêt propre si loss non finie (distill.py:463-470)
+
+**c. Log du grad norm**
+- **NON TROUVÉ**: pas de log de grad norm dans le code (grep "grad.*log" sans résultat)
+- Log uniquement: loss, kl, ce, ppl, tok/s (distill.py:498-501)
+
+**d. Les 30 dernières lignes du log de tranche00 + config.json**
+Extrait train.log (lignes 1381-1410):
+```
+[train] step 1380/4248 loss=2.0295 kl=1.3212 ce=3.6823 ppl~39.7 2303 tok/s
+[train] step 1400/4248 loss=1.9680 kl=1.2068 ce=3.7443 ppl~42.3 2306 tok/s
+[val] step 1400/4248 val_ce=3.6800 val_ppl~39.6 [best]
+```
+Config.json (runs/2026-10-08-tranche00/config.json:1):
+```json
+{
+  "accum": 8,
+  "alpha": 0.7,
+  "batch_size": 16,
+  "bench_ref_tok_s": 2577,
+  "cache": "aucun (parent en direct : cache k32/k64 sous-performe en val, +86 %/+17 % d'ecart, valCE 1.14/1.06 vs 0.80)",
+  "config": "tiny",
+  "date": "2026-10-08",
+  "epochs_max": 2,
+  "estimation_epoch_h": 2.9,
+  "eval_every": 100,
+  "hidden_weight": 0.0,
+  "lr": 0.0003,
+  "machine": "mac-mini M4 16 Go",
+  "out": "runs/2026-10-08-tranche00/tranche00.pt",
+  "parent": "HuggingFaceTB/SmolLM-135M",
+  "patience": 3,
+  "rejet_base": "base/135M/bs16 = 1407 tok/s < 60 % de tiny (1546)",
+  "rejet_cache": "ecart loss >> 5 %, val moins bonne",
+  "rejet_vocab16k": "cout tete < 1 % du step",
+  "seed": 0,
+  "seq_len": 128,
+  "temperature": 2.0,
+  "tranche": "/Volumes/Lexar/clean-corpus/slices/slice_00.jsonl (107 Mo, 10067 docs)",
+  "val_ratio": 0.05,
+  "vocab_size": 12000
+}
+```
+
+**e. Nombre EXACT de tokens train/val de slice_00**
+- Documents: 10067 total, split 9564 train / 503 val (train.log:1-2)
+- Caractères: 102973139 total (train.log:1)
+- Batchs: 33990 (train.log:5)
+- seq_len: 128
+- Nombre de tokens exact: NON CALCULABLE directement depuis le log (log ne donne pas le nombre de tokens)
+- Estimation: 33990 batchs * save_batch(8) * seq_len(128) = ~34.8M tokens (hors accumulation)
+- Tokens/param: 25.0M params (train.log:5) → ~1.4 tokens/param (approx)
+
+## 4. DONNÉES ET ÉVAL
+
+**a. Split val par document ou par chunk**
+Extrait data.py:28-46:
+```python
+def train_val_split(texts: list[str], val_ratio: float = 0.05, seed: int = 0):
+    n = len(texts)
+    n_val = max(1, int(n * val_ratio)) if n > 1 else 0
+    rng = torch.Generator().manual_seed(seed)
+    perm = torch.randperm(n, generator=rng).tolist()
+    val_idx = set(perm[-n_val:])
+    train = [t for i, t in enumerate(texts) if i not in val_idx]
+    val = [t for i, t in enumerate(texts) if i in val_idx]
+```
+- Split **par document** (pas par chunk)
+
+**b. Les 2 Mo d'éval PPL**
+Extrait tools/eval_ppl.py:84-114:
+```python
+ap.add_argument("--max-bytes", type=float, default=512000,
+                help="Taille max du jeu en octets (défaut 500 Ko).")
+# Tronque à la taille demandée (en octets de texte).
+limite = a.max_bytes or (a.heldout_mb * 1024 * 1024)
+total, pris = 0, []
+for t in gardes:
+    total += len(t.encode("utf-8"))
+    pris.append(t)
+    if total >= limite:
+        break
+```
+- Source: tranche jamais entraînée (--heldout slice_09.jsonl probablement)
+- Taille: par défaut 500 Ko (pas 2 Mo)
+- Chevauchement avec slice_00: **NON vérifié** (nécessite hash de docs, non implémenté dans mon audit)
+- Exclusion des fuites via normalisation (eval_ppl.py:36-45)
+
+**c. Baseline fp16 de même taille**
+- **NON TROUVÉ**: aucun checkpoint .bin ou .pt fp16 dans checkpoints/ ou exports/
+- Seuls des modèles quantifiés 2 bits trouvés
+
+## 5. CACHE TOP-K
+
+**a. Code d'écriture et lecture**
+Écriture: distill.py:106-179 (build_teacher_cache)
+Lecture: distill.py:182-212 (load_teacher_cache)
+- Format: {prefix}.manifest.json + {prefix}.vals.fp16 + {prefix}.idx.u16 + {prefix}.tgt.i64
+- Manifeste contient `order: [[bi, ci, B], ...]` pour chaque micro-chunk
+- Masse résiduelle: **NON conservée** (seul top-k stocké, logits hors top-k = -inf)
+
+**b. Bug de mélange des batchs**
+Extrait distill.py:88-93:
+```
+# L'ancien format .npz dense était à la fois lourd ET faux : en entraînement
+# les batchs sont mélangés (randperm) mais le cache était relu en ordre
+# séquentiel (compteur micro), donc les logits ne correspondaient plus aux
+# entrées. Le nouveau format indexe chaque micro-chunk par (batch, chunk).
+```
+- Ancien bug: batchs mélangés à l'entraînement mais cache lu séquentiellement
+- Corrigé: OUI, nouveau format avec manifeste indexant chaque chunk par (batch, chunk)
+
+## 6. LOADER C / .bin
+
+**a. Format du header**
+Extrait engine.py:29-33:
+```python
+MAGIC = b"LLM2"
+VERSION = 1
+HEADER_FMT = "<4s10I"  # magic, version, vocab, d, L, Hq, Hkv, ffn, seq_max, group, head_dim
+HEADER_SIZE = struct.calcsize(HEADER_FMT)
+```
+Validations (engine.py:174-178):
+```python
+if magic != MAGIC:
+    raise ValueError("Mauvais magic : pas un .bin LLM2.")
+if ver != VERSION:
+    raise ValueError(f"Version {ver} non supportée (attendue {VERSION}).")
+```
+- Pas de validation de taille fichier avant memmap (lecture directe du header)
+
+**b. Signatures ctypes**
+Extrait engine.py:46-56:
+```python
+lib.ternary_matvec.argtypes = [
+    ctypes.c_void_p,  # act
+    ctypes.c_void_p,  # w_packed
+    ctypes.c_void_p,  # scales
+    ctypes.c_float,   # act_scale
+    ctypes.c_void_p,  # out
+    ctypes.c_int,     # rows
+    ctypes.c_int,     # cols
+    ctypes.c_int,     # group_size
+]
+lib.ternary_matvec.restype = None
+```
+
+**c. Flags de compilation du Makefile**
+Extrait Makefile:23:
+```makefile
+CFLAGS  := -O3 -Wall -Wextra -std=c99 -fPIC -Ikernels
+```
+- **PAS de sanitizers** (pas -fsanitize)
+- C99 strict, optimisation O3
+
+**d. Tous les torch.load / pickle / np.load(allow_pickle)**
+torch.load trouvé:
+- distill.py:370, 563
+- main.py:245
+- tests/test_train_smoke.py:90, 163, 167, 268
+- tests/test_cache.py:148
+- Tous avec `weights_only=False` (valeur par défaut, mais pas explicitement True)
+
+np.load avec allow_pickle: **AUCUN** (grep sans résultat)
+
+## 7. REPO ET SAUVEGARDE
+
+**a. git status, git log, remote, cause du push bloqué**
+- git status: branch ahead of origin/main by 10 commits, uv.lock modifié non stagé
+- git log origin/main..HEAD: 10 commits
+- Remote: https://github.com/dimitricl/micro-llm-2bit.git
+- Cause du push bloqué: NON TROUVÉ (probablement auth non configurée ou permissions)
+
+**b. Licence du repo**
+- NON TROUVÉ dans le dépôt (pas de fichier LICENSE)
+- Parent SmolLM-135M: Apache 2.0 (d'après HF)
+
+**c. Scan rapide de secrets**
+- Scan effectué sur .py, .json, .txt, .md, .toml
+- Résultats: faux positifs (token dans des noms de variables comme "tokenizer", "n_tokens")
+- **AUCUN secret détecté** (pas de vraies clés API/tokens)
+
+**d. Copies du projet hors Lexar**
+- Time Machine: snapshots locaux vides (`tmutil listlocalsnapshots /` = vide)
+- Autre remote: origin GitHub seulement
+- Autre copie: NON TROUVÉ
+
+## 8. MACHINE
+
+**a. sysctl hw.model hw.memsize, memory_pressure, vm_stat, df -h**
+- hw.model: Mac16,10
+- hw.memsize: 17179869184 (16 Go)
+- memory_pressure: 66% free
+- vm_stat: swapins 3297463, swapouts 4693292 (swap actif)
+- df -h Lexar: 954 Go total, 290 Go used, 663 Go avail (31% capacity)
+
+**b. diskutil info du Lexar**
+- Interface: USB
+- Protocole: USB
+- Vitesse: NON spécifiée
+- SSD: OUI ("Solid State: Yes")
+- Caches mmap et checkpoints: OUI, sur Lexar (/Volumes/Lexar/micro-llm-2bit)
+
+**c. Versions**
+- Python: 3.11.15
+- torch: NON installé dans système global (module non trouvé hors venv)
+- mlx: NON testé (non installé)
+- clang: Apple clang 21.0.0
+- macOS: 27.0.1 (macOS 27 = version beta/future)
+
+---
+
+## ANGLES MORTS
+
+Ce que je vois de louche qui n'a pas été demandé:
+
+1. **Pas de grad norm logging**: en distillation avec STE, c'est critique pour détecter les gradients explosifs/évanescents. Le grad clipping est là mais sans monitoring.
+
+2. **Cache top-k désactivé dans tranche00**: config.json dit "aucun (parent en direct : cache k32/k64 sous-performe en val, +86 %/+17 % d'ecart, valCE 1.14/1.06 vs 0.80)". C'est un problème sérieux non résolu - le cache dégrade la performance de manière significative.
+
+3. **Pas de baseline fp16**: impossible de comparer la performance réelle de la quantification 2 bits vs un modèle fp16 de même taille.
+
+4. **Vocab parent inconnu**: la taille exacte du vocabulaire SmolLM-135M n'est pas documentée clairement (cosmo2-tokenizer taille non affichée sur HF).
+
+5. **Pas de vérification de chevauchement éval/train**: eval_ppl.py exclut par normalisation mais ne vérifie pas par hash de documents, ce qui pourrait laisser passer des variations subtiles.
+
+6. **Swap actif sur la machine**: 3.3M swapins / 4.7M swapouts - la machine est sous pression mémoire pendant l'entraînement, ce qui pourrait affecter les perfs.
+
+7. **GradScaler absent**: en fp16 sur MPS sans GradScaler, l'underflow est possible même si le code a un garde-fou loss non finie.
+
+8. **Licence manquante**: le repo n'a pas de fichier LICENSE, alors que le parent est Apache 2.0 - question de compatibilité.
