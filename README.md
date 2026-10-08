@@ -1,118 +1,94 @@
-# Micro-LLM 2 bits — inférence CPU < 100 Mo + distillation parent → enfant
+# Micro-LLM 2 bits — LLM ternaire sur CPU en moins de 100 Mo
 
 Petit Transformer decoder-only dont les linéaires sont **ternaires 2 bits**
-`{-1, 0, +1}` (façon BitNet b1.58), qui tourne sur CPU Mac dans **moins de
-100 Mo** (poids packés + KV cache + activations), entraîné par **distillation**
-depuis un parent Hugging Face (ou assisté par Ollama en mode texte).
+`{-1, 0, +1}` (façon BitNet b1.58), qui tourne sur CPU Apple Silicon dans
+**moins de 100 Mo de delta RSS**, entraîné par **distillation** depuis un
+parent Hugging Face (SmolLM). Deux tailles : `tiny` (~23M, 9.6 Mo) et
+`base` (~73M, 28 Mo).
 
-## Installation (macOS)
+## Installation (macOS Apple Silicon)
 
 ```bash
-# 1. Outils Apple + Homebrew
-xcode-select --install
-brew install mise uv ollama
-
-# 2. Projet (Python 3.11 épinglé via mise, venv + deps via uv)
+brew install mise uv
 cd micro-llm-2bit
-mise trust && mise install
-uv sync
-
-# 3. Noyau C (clang Apple, détection arm64/x86_64, sortie .dylib)
-make
-# Variante portable si besoin : make portable
-
-# 4. (Optionnel) modèle Ollama pour distill-loop
-ollama pull smollm2:360m
+mise trust && mise install   # Python 3.11 épinglé
+uv sync                      # venv + dépendances
+make                         # noyau C NEON -> build/libmicro2bit.dylib
 ```
 
-> Clang Apple ne fournit pas OpenMP : le multithread passe par Grand Central
-> Dispatch (`dispatch_apply`), sans dépendance. `brew install libomp` reste
-> possible pour expérimenter, mais n'est pas requis.
-
-## Usage
+## Usage CLI
 
 ```bash
-# Entraînement par distillation (texte/jsonl, parent HF en logits)
-python main.py train --data ./data --parent HuggingFaceTB/SmolLM-360M \
-    --out checkpoints/enfant.pt
+# Distillation parent -> enfant (logits HF en local)
+python main.py train --data ./corpus --parent HuggingFaceTB/SmolLM-360M \
+    --out checkpoints/enfant.pt --config base --epochs 3
 
-# Quantifie + packe en .bin maison (header + poids + scales)
-python main.py export --ckpt checkpoints/enfant.pt --out exports/enfant.bin
+# Avec split validation + early stopping
+python main.py train --data ... --val-ratio 0.05 --eval-every 200 \
+    --patience 3 --out checkpoints/m.pt
 
-# Inférence sur vos données (noyau C, KV cache pré-alloué, sampling)
-python main.py infer --model exports/enfant.bin --prompt "Explique la photosynthèse"
+# Pré-calcul des logits parent (mmap + manifeste, refus si incompatible)
+python main.py cache-logits --data ... --parent ... --out-dir caches/s0 \
+    --batch-size 16
+python main.py train --data ... --top-k-cache 1 --cache caches/s0/train \
+    --batch-size 16 ...
 
-# Bench : RAM réelle (RSS), tok/s, vérification du budget 100 Mo
-python main.py bench --model exports/enfant.bin
-
-# Boucle : l'enfant génère, Ollama corrige, on réentraîne (cycles)
-python main.py distill-loop --data ./data --parent HuggingFaceTB/SmolLM-360M \
-    --ollama-model smollm2:360m --cycles 2
+# Export packé, bench mémoire, inférence
+python main.py export --ckpt checkpoints/m.pt --out exports/m.bin
+python main.py bench --model exports/m.bin --bench-tokens 64
+python main.py infer --model exports/m.bin --prompt "Paris est la capitale" \
+    --max-new 60 --temperature 0.7 --top-k 40 --top-p 0.9
 ```
 
-## Quantification 2 bits (ternaire)
+## Architecture
 
-Chaque groupe de 64 poids d'entrée partage une **scale absmean**
-`scale = mean(|w|)`. Le poids quantifié vaut `clip(round(w/scale), -1, +1)`.
-Les **activations** sont en **int8** (`absmax / 127` par token).
-À l'entraînement, les poids latents restent fp32 et sont quantifiés au
-forward, avec **Straight-Through Estimator** au backward (poids et
-activations). Les embeddings sont int8 (1 scale fp32 par token), les normes
-fp32, la tête de sortie est **liée** aux embeddings (0 paramètre en plus).
+- **Quantification** : groupes de 64 poids, scale absmean, STE à
+  l'entraînement ; activations int8 ; embeddings int8 + tête liée.
+- **Inférence** : noyau C NEON (additions/soustractions, GCD), `.bin`
+  lu en **memmap zéro-copie**, logits par blocs de 2048 lignes,
+  KV cache int8 pré-alloué. Fallbacks : `avx2.c`, `portable.c`, NumPy.
+- **Distillation** : `Loss = α·KL·T² + (1-α)·CE` moyennée sur les tokens
+  (pas de `batchmean`), garde `0·log(0)=0`, arrêt propre si loss non finie.
+- **Données** : split train/val reproductible (seed fixe), vocabulaire
+  réduit (12000) reconstruit par tranche, refus si incompatibilité.
 
-Packing : 4 poids par octet (`00=0, 01=+1, 11=-1`, premier poids en bits
-faibles). Le matmul int8 × ternaire n'utilise **que des additions et
-soustractions** (zéros ignorés), accumulation entière int32 exacte puis
-pondération par `scale_poids × scale_act`. Trois noyaux C : `neon.c` (Apple
-Silicon), `avx2.c` (Intel), `portable.c` (secours), + fallback NumPy si la
-`.dylib` est absente.
+## Chiffres mesurés (Mac mini M4, 8 oct 2026)
 
-## Distillation parent → enfant
+Sources : `main.py bench`, `tools/bench_train.md`, `checkpoints/*.log`.
+Aucun chiffre du run en cours tant qu'il n'est pas fini.
 
-`Loss = α·KL(logits_parent/T ‖ logits_enfant/T)·T² + (1-α)·CE`, avec `α` et
-`T` configurables. Le parent est en **inférence seule** (`no_grad`), ses
-logits sont restreints au vocabulaire réduit (`kept_ids`) et peuvent être
-**pré-calculés en top-k sur disque** (`.npz`). Bonus : `--hidden-weight`
-ajoute une MSE entre le dernier caché enfant (via projection apprise) et celui
-du parent. Entraînement : AdamW, warmup + cosine decay, gradient clipping,
-checkpoints reprenables, logs (loss, perplexité, tok/s), accumulation de
-gradient (la RAM Mac est unifiée : micro-batch 2 × accum 8 par défaut).
-Fonctionne sur **MPS** (avec fallback CPU auto) et CPU seul.
+| Mesure | tiny | base | Source |
+|---|---|---|---|
+| Poids packés (.bin) | 9.6 Mo | 28 Mo | bench |
+| Budget structurel total / 100 Mo | 10.14 Mo OK | 30.21 Mo OK | bench |
+| Delta RSS chargement | +0.2 Mo | +0.5 Mo | bench |
+| Delta RSS après génération | +26 Mo | +51 Mo | bench |
+| Inférence (greedy) | ~110 tok/s | ~50 tok/s | bench/infer |
 
-**Rôle d'Ollama** : Ollama n'expose pas les logits, il ne peut donc pas servir
-à la distillation KL (qui exige un parent HF). Il sert dans `distill-loop` à
-générer des données et à **corriger les réponses** de l'enfant en texte.
+Débit d'entraînement mesuré (`tools/bench_train.py`, seq 128, 30 steps) :
 
-## Vocabulaire réduit (choix documenté)
+| Enfant | Parent | bs 2 | bs 8 | bs 16 |
+|---|---|---|---|---|
+| tiny | 135M | 555 | 2311 | **2577 tok/s** |
+| tiny | 360M | 900 | 1641 | 1748 tok/s |
+| base | 135M | 666 | 1239 | 1407 tok/s |
+| base | 360M | 503 | 828 | 1086 tok/s |
 
-Le parent fait 50–150k tokens : à 512 dims, 150k × 512 int8 = 77 Mo à lui
-seul. On réduit à **8000** (tiny) : spéciaux conservés, puis tokens les plus
-fréquents du corpus, le reste rabattu sur `unk`. Fichier `*.vocab.json`
-(`kept_ids`, `unk`, `eos`) sauvegardé au `train`, réutilisé par
-`infer`/`export`. Élargir le vocab rapproche du budget : chaque +1000 tokens
-coûte ~0.5 Mo.
-
-## Budget mémoire (tiny, exact)
-
-| Poste | Calcul | Taille |
-|---|---|---|
-| Linéaires packés | 18 874 368 / 4 | 4.72 Mo |
-| Scales fp32 | 294 912 × 4 | 1.18 Mo |
-| Embeddings int8 + scales | 4 096 000 + 32 000 | 4.13 Mo |
-| Normes fp32 | 8 704 × 4 | 0.03 Mo |
-| KV cache int8 (2·8·2048·256) | 8 388 608 | 8.39 Mo |
-| Activations (pire cas fp32) | — | ~0.04 Mo |
-| **Total** | | **~18.5 Mo < 100 Mo** |
-
-`python main.py bench` recalcule ce budget depuis le `.bin` et mesure la RSS
-réelle (`psutil`, sinon `resource.getrusage` — octets sur macOS, Ko sur Linux).
+- Autocast fp16 sur le parent : +26 % (1093 vs 869 tok/s), logits finis.
+- Généralisation (mini-run tiny, 3 Mo) : train-PPL 55.7 vs val-PPL 60.9
+  (ratio 1.09, sain) — `checkpoints/train_mini.log`.
 
 ## Limites honnêtes
 
-- Modèle minuscule (~23M équivalents) + vocab 8k : français correct sur des
-  textes simples, pas de raisonnement poussé, hallucinations possibles.
-- Mots hors top-8k → `unk` : les textes techniques/specialisés se dégradent.
-- Distillation KL exige le parent HF en local (~1 Go MPS pour 360M) ;
-  `distill-loop` Ollama seul n'apprend que du texte (pas de KL).
-- Noyau C : matvec optimisé, le reste (normes, softmax, attention) en NumPy.
-- Entraînement QAT complet sur CPU seul : lent ; préférez MPS (Apple Silicon).
+- Modèle minuscule : le motif appris par cœur est parfait (fiches pays),
+  mais le français libre reste fragmentaire sans grand corpus (400k chars
+  × 40 epochs : CE 0.59 d'entraînement = surapprentissage prouvé).
+- La PPL d'entraînement seule ne veut rien dire : toujours regarder la
+  val-PPL (`--val-ratio`, `--eval-every`).
+- 1 Go de Wikipédia ≈ 250M tokens : à ~750-2500 tok/s selon config, on
+  entraîne par tranches de ~100 Mo (≈ 3-10h/epoch), pas en une fois.
+- Mac mini peu doté en RAM unifiée : base + hidden + seq 256 fait OOM GPU
+  (loss NaN) — réduire (`--batch-size 1 --seq-len 128`, sans hidden).
+- **Anomalie connue** : le cache top-k des logits entraîne moins bien que
+  le parent en direct (valCE 1.14/1.06 vs 0.80 à steps égaux, k=32/64).
+  Cause en cours d'investigation (voir `tools/bench_train.md`).
