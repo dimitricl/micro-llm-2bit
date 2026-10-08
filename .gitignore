@@ -4,14 +4,35 @@ __pycache__/
 .venv/
 uv.lock
 
+# Notes de travail locales (IP, chemins perso) : voir docs/NOTES.md (public)
+MEMO.local.md
+
 # Artefacts modèle (lourds, régénérables)
 *.bin
 *.pt
 *.safetensors
+*.gguf
+*.npz
 checkpoints/
 exports/
+
+# Corpus, caches de logits et données générées (volumineux, régénérables)
+*.jsonl
+data_clean/*.txt
 data/cache/
-*.gguf
+caches/
+
+# Runs : tout ignoré SAUF la config reproductible
+runs/*/*
+!runs/*/config.json
+
+# Logs et rapports locaux
+*.log
+RAPPORT_*.txt
+
+# Secrets (par sécurité, même si aucun n'existe)
+.env
+*.env
 
 # macOS / build C
 *.dylib
