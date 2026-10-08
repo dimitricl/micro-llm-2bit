@@ -33,6 +33,7 @@ RAPPORT_*.txt
 # Secrets (par sécurité, même si aucun n'existe)
 .env
 *.env
+.env.local
 
 # macOS / build C
 *.dylib
