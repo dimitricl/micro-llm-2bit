@@ -31,6 +31,7 @@ différence inférieure n'est pas un résultat.
 | V3-lr1e3 | lr 1e-3 | 0 | 305 | 4997120 | 245.7 | 82.8 | 63.9 | 2.9331 | 2.3533 | 2.2151 | 72.47/2.1924 | 72.78/2.1946 | 2465 | 2064 | pas de divergence, meilleur à 5M |
 | V4-subln | subln (normes o/down) | 0 | 305 | 4997120 | 424.3 | 167.1 | 129.9 | 3.2242 | 2.7276 | 2.5933 | 148.51/2.5597 | 145.85/2.5504 | 2334 | 2179 | légèrement mieux que V0, à confirmer vs bruit |
 | V5-seq256 | seq 256, 16384 tok/step | 0 | 305 | 4997120 | 528.8 | 192.0 | 146.6 | 3.3396 | 2.8001 | 2.6564 | 174.19/2.6413 | 165.63/2.6155 | 2351 | 2165 | fenêtres longues moins bonnes à tokens égaux |
+| V6-ce-lr1e3 | CE seule + lr 1e-3 | 0 | 305 | 4997120 | 156.4 | 57.9 | 46.3 | 2.6922 | 2.1631 | 2.0434 | 55.23/2.0534 | 55.60/2.0568 | 4468 | 1158 | combine V1a et V3 ; meilleur réglage 5M |
 
 Bruit inter-runs (jeux communs) : |V0a − V0b| = 9,07 PPL (128) / 8,86 (256),
 soit ~0,028 BPC. Toute différence inférieure n'est pas un résultat.
@@ -45,6 +46,11 @@ soit ~0,028 BPC. Toute différence inférieure n'est pas un résultat.
   Δ −29,9 vs V0 (≫ bruit). RÉSULTAT : baisser alpha aide ; 0,3 ≈ 0 à 5M.
 - V3 (lr 1e-3) : 72,47, Δ −89 ≫ bruit, aucune divergence (loss finie,
   val monotone). RÉSULTAT FORT : le LR compte plus qu'alpha à 5M.
+- V6 (CE seule + lr 1e-3) : 55,23, soit Δ −74,4 vs V1a et Δ −17,2 vs V3
+  (≫ bruit). RÉSULTAT FORT : les gains se cumulent ; meilleur réglage 5M,
+  devant même V1b-10M (59,93, budget double — écart −4,7 < bruit, donc
+  pas de supériorité revendiquée à budget double, mais égalé avec 2×
+  moins de tokens). Nouveau réglage de base recommandé.
 - V4 (subln) : 148,51, Δ −13,4 vs V0a (bruit 9,07). Signal faible,
   au-dessus du bruit mais non répliqué : PAS DE RÉSULTAT revendiqué,
   pas d'adoption (export non supporté sans accord).
