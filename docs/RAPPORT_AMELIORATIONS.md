@@ -21,16 +21,20 @@ du comportement instructionnel avant d'augmenter la taille du modèle.
 
 ## 2. Résultats actuellement établis
 
-### Modèle Wikipedia
+### Modèle Wikipedia (référence : tranche00, pas wiki_slice00)
 
 - Configuration : `tiny`, 25.0M paramètres latents, vocabulaire 12 000,
   `seq_len=128`, parent `HuggingFaceTB/SmolLM-135M`.
 - Données : une tranche Wikipedia française d'environ 107 Mo.
-- Entraînement : 2 124 steps, 1 epoch, 7 927 secondes.
-- Train-PPL : 39.2.
-- Val-PPL : 37.3.
-- Export : 12.13 Mo.
-- Inférence : +27.3 Mo RSS et 76 tok/s au benchmark.
+- Entraînement tranche00 : 4 248 steps, 1 epoch complète (34,8M tokens),
+  15 668 secondes.
+- Train-PPL : ~30.8 (50 batchs). Val-PPL : 29,7.
+- Export : 12.13 Mo (ordre de grandeur, à refaire depuis tranche00).
+- Inférence : +27.3 Mo RSS et 76 tok/s au benchmark (mesurés sur l'export
+  wiki_slice00, à refaire).
+- L'ancien run wiki_slice00 (2 124 steps, val-PPL 37,3) n'est PAS la
+  référence : bug de décompte B1, il n'a vu qu'une DEMI-epoch (17,4M
+  tokens). Voir `docs/RUNS.md`.
 - Contrôle qualitatif : génération libre incohérente et sujette aux boucles.
 
 ### Modèle think
@@ -88,8 +92,11 @@ chaque tranche au lieu de lancer dix entraînements aveuglément.
 
 La stratégie recommandée est :
 
-1. conserver `wiki_slice00_bestval.pt` comme point de départ ;
-2. réutiliser son vocabulaire ;
+1. conserver `runs/2026-10-08-tranche00/tranche00.pt` comme point de départ
+   (1 epoch complète, val-PPL 29,7 — PAS `wiki_slice00_bestval.pt`, demi-epoch) ;
+2. réutiliser son vocabulaire (ancien format sans unk distinct, toujours
+   supporté ; conversion optionnelle vers unk distinct via
+   `tools/convert_vocab.py`, avec reprise à val-PPL comparable à vérifier) ;
 3. entraîner une tranche supplémentaire ;
 4. évaluer PPL et génération ;
 5. conserver le checkpoint seulement si la validation et la qualité
