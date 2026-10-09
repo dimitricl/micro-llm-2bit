@@ -1,0 +1,21 @@
+{
+ "run": "V2-alpha03",
+ "variante": "alpha 0.3",
+ "date": "2026-10-09",
+ "config": "tiny",
+ "parent": "HuggingFaceTB/SmolLM-135M",
+ "data": "runs/abl_data/train_5M.jsonl",
+ "vocab_from": "runs/abl_data/vocab.json",
+ "seed": 0,
+ "alpha": 0.3,
+ "lr": 0.0003,
+ "seq_len": 128,
+ "save_batch": 8,
+ "batch_size": 8,
+ "accum": 16,
+ "epochs": 1,
+ "temperature": 2.0,
+ "eval_every": 50,
+ "ckpt_every": 100,
+ "extra": ""
+}
