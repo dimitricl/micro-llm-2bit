@@ -45,3 +45,69 @@ soit ~0,028 BPC. Toute différence inférieure n'est pas un résultat.
   tokens égaux ; rester en seq 128.
 - Le jeu 256 confirme le même ordre que le 128 (V3 < V1b < V1a ≈ V2 <
   V4 < V0a ≈ V0b ≈ V5).
+
+## Éléments créés (phase D)
+
+- Données `runs/abl_data/` (non committées, régénérables) :
+  `train_5M.jsonl` (806 docs, ~5,2M tokens), `val.jsonl` (503 docs val),
+  `vocab.json` (12000, unk distinct, unk=11999, eos=0),
+  `val_128.pt` (13 374 fenêtres) + `val_256.pt` (6 687) + `meta.json`.
+  Générateur committé : `tools/make_ablation_data.py`.
+- Outils committés : `tools/eval_common.py` (PPL+BPC post-hoc 128/256),
+  `tools/run_ablations.sh` (chaîne exacte : précheck GPU, budgets, purge).
+- Par run `runs/2026-10-09-abl-<nom>/` : `config.json` (committé),
+  `model.pt` + `_bestval.pt` (locaux), `train.log` + `eval.json` (locaux).
+- Métriques : tableau ci-dessus ; verdicts : section Analyse.
+
+## Commandes exactes (générées depuis les config.json, une par run)
+
+### V0-seed0
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V0-seed0/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.7 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+### V0-seed1
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V0-seed1/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 1 --alpha 0.7 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+### V1a-alpha0
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V1a-alpha0/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.0 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+### V1b-temps-egal
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V1b-temps-egal/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 2 --seed 0 --alpha 0.0 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+### V2-alpha03
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V2-alpha03/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.3 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+### V3-lr1e3
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V3-lr1e3/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.7 --lr 0.001 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+### V4-subln
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V4-subln/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.7 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100 --subln
+```
+
+### V5-seq256
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V5-seq256/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 256 --save-batch 4 --batch-size 4 --accum 16 --epochs 1 --seed 0 --alpha 0.7 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+Budget V1b : mur V0-seed0 (2 145 s), débit V1a (305 steps en 1 146 s) →
+epochs = ceil(2145×300/(1146×318)) = 2 (voir `tools/run_ablations.sh`).
