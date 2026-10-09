@@ -147,4 +147,17 @@ capacité (préfill + génération bornés par seq_max), sans fenêtre glissante
   (loss NaN) — réduire (`--batch-size 1 --seq-len 128`, sans hidden).
 - **Anomalie connue** : le cache top-k des logits entraîne moins bien que
   le parent en direct (valCE 1.14/1.06 vs 0.80 à steps égaux, k=32/64).
-  Cause en cours d'investigation (voir `tools/bench_train.md`).
+  Cause établie (phase C) : à T=2, le top-32 ne couvre que ~18 % de la
+  masse (voir `docs/DIAGNOSTICS.md`). Parent en direct recommandé.
+- **Profil inférence** (phase F, `tranche00.bin`, 7,68 ms/token) : 56
+  matvecs C 47,3 %, tête logits 28,7 %, attention+normes+quant 24,0 %.
+  Tête < 30 % : pas de noyau C supplémentaire, moteur inchangé.
+
+## Résultats phases C/D (9 oct 2026)
+
+- Diagnostics (`docs/DIAGNOSTICS.md`) : BPC 135M 1,5357 / tranche00 1,5676,
+  vocab 12000 à 1,0 % unk, débit 2 221 tok/s effectifs.
+- Ablations (`docs/ABLATIONS.md`, 8 runs × 5M tokens, bruit ±9 PPL) :
+  lr 1e-3 gagne le plus (72,5 vs 161,9), CE seule > KD 0,7 à tokens égaux,
+  seq 128 gardée. Recette du run principal : KD α0,7, lr 1e-3, seq 128,
+  reprise `tranche00.pt` (en attente de validation, ~40 h pour 9 tranches).
