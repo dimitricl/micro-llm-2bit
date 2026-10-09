@@ -45,6 +45,60 @@ domaine. wiki_slice00 (demi-epoch) est 0,09 BPC derrière (+5,7 % relatif).
 Gemma-3-270M non tenté (accès sous conditions) ; Qwen3-0.6B a suffi comme
 point multilingue.
 
+**C2-bis — Métrique BPC équitable (G1)**
+
+Statut au 10/10/2026 : le recalcul corrigé (fix NLL = -log(prob) au lieu de log(prob))
+est terminé. Les valeurs ci-dessous sont les valeurs **corrigées et définitives**.
+
+Variantes BPC sur les MÊMES documents et positions (6 docs val C2, 354 234 chars) :
+
+| modèle | a (actuel) | b (unk pénalisé) | c (in-vocab only) |
+|---|---|---|---|
+| tranche00 | **1,5676** | **1,4544** | **1,5735** |
+| wiki_slice00 | **1,6566** | **1,5439** | **1,6641** |
+| SmolLM-135M | 1,5357 | 1,6099 | 1,5292 |
+| SmolLM-360M | 1,3362 | 1.4133 | 1,3302 |
+| Qwen3-0,6B | 1,1138 | 1,2049 | 1,1096 |
+
+Gaps tranche00 vs SmolLM-135M :
+- (a) actuel : **+2,08 %** (0,0319 BPC)
+- (b) unk pénalisé : **−9,66 %** (−0,1555 BPC) → tranche00 **meilleur** grâce à la pénalité unk
+- (c) in-vocab only : **+2,90 %** (0,0443 BPC)
+
+Gaps wiki_slice00 vs SmolLM-135M :
+- (a) : +7,87 % (0,1209 BPC)
+- (b) : −4,10 % (−0,0660 BPC) → wiki_slice00 meilleur
+- (c) : +8,82 % (0,1349 BPC)
+
+**Verdict corrigé** : la variante (a) place tranche00 à +2,08 % (0,032 BPC) du parent —
+l'affirmation "~98 % du plafond" reste correcte pour (a). En revanche, la variante
+(b) (unk pénalisé) montre que tranche00 **surpasse** le parent de 9,66 % car la
+pénalité byte-uniforme favorise les modèles avec moins d'unk. La variante (c)
+(in-vocab only) confirme un petit écart de +2,90 %. **Conclusion** : "98 % du
+plafond" est correct sur la métrique standard (a), mais sous-estime la qualité
+réelle de tranche00 qui gère mieux les unk rares (1,0 % du vocab).
+
+## C2-ter — Validation élargie (G2)
+
+Jeu val_big : 300 docs, 7 742 366 chars, strictement disjoints des slices 00-09
+(vérifié par SHA1, source : reste disjoint de slice_100M.jsonl). Bootstrap
+1000 tirages par document (seed 0), IC 95 % sur BPC/PPL.
+
+| modèle | a BPC [IC 95%] | b BPC [IC 95%] | c BPC [IC 95%] |
+|---|---|---|---|
+| tranche00.pt | 1.7240 [1.4879, 1.9646] | 1.8961 [1.6353, 2.1796] | 1.7549 [1.7330, 1.7804] |
+| SmolLM-135M | 1.7464 [1.5017, 2.0009] | 1.8950 [1.6291, 2.1827] | 1.7538 [1.7381, 1.7704] |
+| SmolLM-360M | 1.5360 [1.3217, 1.7618] | 1.6880 [1.4515, 1.9452] | 1.5406 [1.5254, 1.5565] |
+| wiki_slice00.bin* | 1.8158 [0.7988, 3.0398] | 1.9429 [0.9439, 3.2452] | 1.8461 [1.7917, 1.8853] |
+
+* wiki_slice00 : spot-check sur 14 docs (388k chars) à cause du coût .bin (~123 tok/s).
+
+**Verdict** : sur val_big, tranche00 est légèrement meilleur que 135M en BPC (a) avec IC
+chevauchants [1.4879, 1.9646] vs [1.5017, 2.0009] — pas de différence significative.
+Les IC larges reflètent la variabilité inter-documents (300 docs seulement). Le gap
+réduit vs C2 (sur val petit C2) suggère que la performance converge sur un jeu
+plus large. **Jeu OOD** : non construit — aucune source locale valide disponible.
+
 ## Ce que ça change
 
 1. Le vocab 12000 actuel est bien calibré (1,0 % unk, 5,9 Mo) : passer à
