@@ -212,6 +212,8 @@ def cmd_train(a: argparse.Namespace) -> None:
         cache_path=cache if a.top_k_cache > 0 else "",
         cache_k=getattr(a, "cache_k", 32),
         resume=a.resume,
+        seed=a.seed,
+        ckpt_every=getattr(a, "ckpt_every", 500),
         device=None,
         val_parent_batches=vpb,
         val_student_batches=vsb,
@@ -481,6 +483,9 @@ def build_parser() -> argparse.ArgumentParser:
                     help="Top-k stocké dans le cache mmap (défaut 32).")
     pt.add_argument("--cache", default="")
     pt.add_argument("--resume", default="")
+    pt.add_argument("--ckpt-every", type=int, default=500,
+                    help="Checkpoint périodique complet tous les N steps "
+                    "(0 = désactivé, 2 derniers gardés).")
     pt.add_argument("--seed", type=int, default=0)
     pt.add_argument("--val-ratio", type=float, default=0.0,
                     help="Part des docs en validation (0 = désactivé).")
@@ -550,6 +555,7 @@ def build_parser() -> argparse.ArgumentParser:
         "cache_k",
         "cache",
         "resume",
+        "ckpt_every",
         "seed",
         "vocab_out",
         "val_ratio",
@@ -573,6 +579,7 @@ def build_parser() -> argparse.ArgumentParser:
             "cache_k": 32,
             "cache": "",
             "resume": "",
+            "ckpt_every": 500,
             "seed": 0,
             "vocab_out": "",
             "val_ratio": 0.0,

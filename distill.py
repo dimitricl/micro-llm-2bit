@@ -14,7 +14,9 @@
 from __future__ import annotations
 
 import math
+import glob
 import os
+import random
 import time
 
 import numpy as np
@@ -283,6 +285,59 @@ def plan_epoch(student_batches: list, batch_size: int, accum: int) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# Reprise robuste : snapshots RNG (B4)
+# ---------------------------------------------------------------------------
+
+
+def _rng_snapshot(device) -> dict:
+    """Capture les états RNG (reprise bit-reproductible)."""
+    import numpy as _np
+
+    snap = {
+        "torch": torch.get_rng_state(),
+        "python": random.getstate(),
+        "numpy": _np.random.get_state(),
+    }
+    if device.type == "mps":
+        try:
+            snap["mps"] = torch.mps.get_rng_state()
+        except (AttributeError, RuntimeError):
+            pass
+    return snap
+
+
+def _rng_restore(snap: dict | None, device) -> None:
+    """Restaure les états RNG (best-effort : clés manquantes ignorées)."""
+    import numpy as _np
+
+    if not snap:
+        return
+    if snap.get("torch") is not None:
+        torch.set_rng_state(snap["torch"].cpu())
+    if snap.get("python") is not None:
+        random.setstate(snap["python"])
+    if snap.get("numpy") is not None:
+        _np.random.set_state(snap["numpy"])
+    if snap.get("mps") is not None and device.type == "mps":
+        try:
+            torch.mps.set_rng_state(snap["mps"])
+        except (AttributeError, RuntimeError):
+            pass
+
+
+def _epoch_order(n: int, seed: int, epoch: int) -> list[int]:
+    """Permutation des batchs déterministe en (seed, epoch).
+
+    Remplace le randperm non seedé : une reprise repart exactement au même
+    endroit, et deux runs avec le même seed voient les données dans le même
+    ordre (bruit inter-runs mesurable en variant le seed).
+    """
+    g = torch.Generator().manual_seed(
+        (seed * 1000003 + epoch * 7919 + 1) & 0xFFFFFFFFFFFFFFFF)
+    return torch.randperm(n, generator=g).tolist()
+
+
+# ---------------------------------------------------------------------------
 # Boucle d'entraînement
 # ---------------------------------------------------------------------------
 
@@ -337,6 +392,8 @@ def train(
     cache_k: int = 32,  # top-k stocké (uint16 + float16, mmap)
     resume: str = "",
     log_every: int = 20,
+    seed: int = 0,  # B4 : ordre des batchs déterministe par (seed, epoch)
+    ckpt_every: int = 500,  # B4 : >0 : checkpoint périodique tous les N steps
     device: torch.device | None = None,
     val_parent_batches: list | None = None,  # batchs val parent (même format)
     val_student_batches: list | None = None,  # batchs val enfant alignés
@@ -417,6 +474,7 @@ def train(
     criterion = DistillationLoss(alpha, temperature, hidden_weight)
 
     start_step, global_step = 0, 0
+    start_epoch, resume_micro, resume_order = 0, 0, None
     if resume and os.path.exists(resume):
         ckpt = torch.load(resume, map_location=device, weights_only=False)
         # Enchaînement de tranches : le vocab ne doit pas avoir bougé.
@@ -455,6 +513,15 @@ def train(
         start_step = ckpt["step"]
         global_step = start_step
         print(f"[train] reprise depuis {resume} (step {start_step})")
+        # B4 : reprise positionnelle (epoch + micro + ordre + RNG). Les
+        # anciens checkpoints (sans ces clés) repartent à l'epoch 0 comme avant.
+        start_epoch = ckpt.get("epoch", 0)
+        resume_micro = ckpt.get("micro", 0)
+        resume_order = ckpt.get("order")
+        if ckpt.get("rng") is not None:
+            _rng_restore(ckpt["rng"], device)
+            print(f"[train] états RNG restaurés (epoch {start_epoch}, "
+                  f"micro {resume_micro}).")
 
     n_params = sum(p.numel() for p in student.parameters())
     print(
@@ -479,7 +546,44 @@ def train(
     t0 = time.time()
     tok_total = 0
 
-    def _opt_step(loss_val: float, last_parts: dict) -> bool:
+    def _prune_periodic() -> None:
+        # Ne garde que les 2 derniers checkpoints périodiques (B4).
+        base = out[:-3] if out.endswith(".pt") else out
+        cands = sorted(glob.glob(base + "_ckpt*.pt"))
+        for old in cands[:-2]:
+            try:
+                os.remove(old)
+            except OSError:
+                pass
+
+    def _save_periodic(epoch: int, micro: int, order: list) -> str:
+        base = out[:-3] if out.endswith(".pt") else out
+        path = f"{base}_ckpt{global_step:07d}.pt"
+        torch.save(
+            {
+                "model": student.state_dict(),
+                "proj": proj.state_dict() if proj is not None else None,
+                "opt": opt.state_dict(),
+                "sched": sched.state_dict(),
+                "step": global_step,
+                "epoch": epoch,
+                "micro": micro,
+                "order": list(order),
+                "rng": _rng_snapshot(device),
+                "cfg": student.cfg,
+                "vocab": vocab,
+                "parent": parent_name,
+                "hidden_weight": hidden_weight,
+            },
+            path,
+        )
+        _prune_periodic()
+        print(f"[train] checkpoint périodique : {path} "
+              f"(epoch {epoch}, micro {micro}).")
+        return path
+
+    def _opt_step(loss_val: float, last_parts: dict, epoch: int, micro: int,
+                  order: list) -> bool:
         """Applique un pas optimiseur (+ scheduler). Retourne True = arrêter.
 
         Factorise le pas "tous les `accum` micros" ET le pas de fin d'epoch
@@ -533,17 +637,36 @@ def train(
                     f"progrès (best step {best_step})."
                 )
                 stopped_early = True
+        if (ckpt_every > 0 and micro % accum == 0
+                and global_step % ckpt_every == 0
+                and global_step < total_steps):
+            # Checkpoint périodique UNIQUEMENT sur frontière d'accumulation
+            # (micro % accum == 0) : les gradients sont à zéro, la reprise
+            # retrouve exactement la même trajectoire (B4).
+            _save_periodic(epoch, micro, order)
         return stopped_early or global_step >= total_steps
 
-    for epoch in range(epochs):
-        order = torch.randperm(len(student_batches)).tolist()
+    for epoch in range(start_epoch, epochs):
+        if epoch == start_epoch and resume_order is not None:
+            order = list(resume_order)
+            skip = resume_micro
+            print(f"[train] reprise mid-epoch {epoch} : {skip} micros sautés.")
+        else:
+            order = _epoch_order(len(student_batches), seed, epoch)
+            skip = 0
         micro = 0
+        skip0 = skip  # micros déjà consommés avant reprise (B4)
         opt.zero_grad(set_to_none=True)
         for bi in order:
             sb = student_batches[bi]
             pb = parent_batches[bi]
             # Micro-batch : découpe le batch stocké si besoin.
             for off in range(0, sb.shape[0], batch_size):
+                if skip > 0:
+                    # Micros déjà vus avant l'interruption : on les saute
+                    # (leurs gradients ont été appliqués avant le checkpoint).
+                    skip -= 1
+                    continue
                 x = sb[off : off + batch_size][:, :-1].to(device)
                 y = sb[off : off + batch_size][:, 1:].to(device)
                 px = pb[off : off + batch_size][:, :-1].to(device)
@@ -597,7 +720,7 @@ def train(
                 tok_total += x.numel()
                 micro += 1
                 if micro % accum == 0:
-                    if _opt_step(loss.item(), parts):
+                    if _opt_step(loss.item(), parts, epoch, skip0 + micro, order):
                         break
                 if stopped_early or global_step >= total_steps:
                     break
@@ -607,8 +730,11 @@ def train(
             # Reste de fin d'epoch : on applique l'optimiseur au lieu de
             # jeter les gradients accumulés (B1). L'arrêt éventuel
             # (patience / total_steps) est géré par le test sous le checkpoint.
-            _opt_step(loss.item(), parts)
+            _opt_step(loss.item(), parts, epoch, skip0 + micro, order)
         ckpt_path = out.replace(".pt", f"_e{epoch}.pt")
+        # B4 : position exacte. Epoch complète -> reprise à epoch+1 ; arrêt
+        # précoce mid-epoch -> reprise au même (epoch, micro, ordre).
+        epoch_done = (skip0 + micro) >= plan["micros"]
         torch.save(
             {
                 "model": student.state_dict(),
@@ -616,6 +742,10 @@ def train(
                 "opt": opt.state_dict(),
                 "sched": sched.state_dict(),
                 "step": global_step,
+                "epoch": epoch + 1 if epoch_done else epoch,
+                "micro": 0 if epoch_done else skip0 + micro,
+                "order": None if epoch_done else list(order),
+                "rng": _rng_snapshot(device),
                 "cfg": student.cfg,
                 "vocab": vocab,
                 "parent": parent_name,
