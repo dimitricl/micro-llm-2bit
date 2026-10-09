@@ -116,3 +116,20 @@ aucun test à mettre à jour.
   directe car outil intégré sans token, `.env.local` hors dépôt).
 - En attente de go : `go tranche01` (recommandé : 1 tranche + revalidation)
   ou `go E` (chaîne 9 tranches) ; accord conversion unk-distinct (oui/non).
+
+## Tableau de correspondance (demandé → livré → où)
+
+| Demandé | Livré | Où |
+|---|---|---|
+| Règles (uv, tests+fix, pas de KL-bug, atomiques, GPU exclusif, détaché+veilleur, pas de --force, <1 Mo) | Toutes tenues, E non lancé | commits |
+| A1–A4 + mini-rapport, défaut faux signalé | ✓ (RUNS périmé = le seul point infirmé) | chat + logs |
+| B1→B6 dans l'ordre, B2 dernier, rapport B | ✓ +10/1/2/6/3/12 tests | `distill.py`, `tests/` |
+| Stash pop, matplotlib dev, uv.lock | ✓ (conflit résolu : HEAD déjà à jour) | — |
+| RUNS.md + RAPPORT_AMELIORATIONS corrigés | ✓ (tranche00 référence) | `docs/` |
+| save==bs partout | ✓ (+ `run_slices.sh`, THINK_MODE, bench sentinelle) | README/docs/tools |
+| C1–C4 + eval_fixed côte à côte + rapport C | ✓, comparaison autorisée (vocabs identiques vérifiés) | `docs/DIAGNOSTICS.md` |
+| D : protocole, 1 à la fois, ABLATIONS.md progressif, tokens corrigés au log | ✓ 9 runs (V0×2→V6), veilleur, préchecks | `docs/ABLATIONS.md` |
+| E : config, tokens, temps, commande, rien lancé | ✓ (V6 : CE+lr1e-3, ~20 h) | chat + README |
+| F : profil + tableau, noyau si >30 %, préfill si local | ✓ mesuré 28,7 % → **pas de noyau** (condition non remplie), préfill écarté (non local) | chat + Telegram |
+| Livraison : tests, README/MEMO FR, NOTES, push, rapport | ✓ 69+1, NOTES déjà propre vérifié | GitHub |
+| Telegram | Réparé (API directe), 4 rapports (2160–2163) | — |
