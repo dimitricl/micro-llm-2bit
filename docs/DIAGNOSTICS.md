@@ -1,5 +1,17 @@
 # Diagnostics (phase C)
 
+## Récapitulatif
+
+| mesure | résultat |
+|---|---|
+| C1 unk 8000 / 12000 / 16000 | 2,14 % / 1,00 % / 0,45 % — embeddings tiny : 3,94 / 5,91 / 7,87 Mo |
+| C2 BPC 135M / 360M / Qwen3-0.6B | 1,5357 / 1,3362 / 1,1138 (même 354 Ko val, fp32) |
+| C2 BPC tranche00.bin / wiki.bin | 1,5676 (PPL 25,88) / 1,6566 (PPL 31,12) |
+| C3 masse hors top-k T=1, k=32/64/128/512 (moy) | 0,249 / 0,193 / 0,145 / 0,070 (p95 jusqu'à 0,66) |
+| C3 idem T=2 | 0,816 / 0,775 / 0,726 / 0,594 |
+| C4 tok/s réel | 2 221 effectifs (34,8M/15 668 s) ; micro-batch effectif 8, 8 192 tok/step ; bench bs16 réel : 2 577 |
+| eval_fixed greedy répétition / boucle | tranche00 : 0,299 / 1,1 — wiki : 0,454 / 4,9 |
+
 Validation commune : 6 premiers docs val de `slice_00` (split seed 0,
 `val_ratio` 0,05), 354 234 caractères, jamais vus à l'entraînement.
 Limites communes : textes avec eos ajouté par doc (comme l'entraînement) ;
