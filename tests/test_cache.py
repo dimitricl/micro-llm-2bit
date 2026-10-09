@@ -147,3 +147,46 @@ def test_garde_fou_nonfinite(tmp_path):
     assert os.path.exists(bad), "checkpoint de sauvegarde manquant"
     ckpt = torch.load(bad, map_location="cpu", weights_only=False)
     assert ckpt["reason"] == "loss non finie" and "model" in ckpt
+
+
+def test_train_construit_cache_sans_hidden(tmp_path):
+    """B3 : construire le cache DANS train() avec hidden_weight=0 ne lève
+    plus UnboundLocalError sur `proj` ; le parent est déchargé ensuite."""
+    import dataclasses
+
+    from model import TINY, TinyTransformer
+
+    torch.manual_seed(0)
+    p_full, v = 256, 64
+    kept = list(range(v))
+    vocab = {"parent": "fake", "vocab_size": v, "kept_ids": kept,
+             "unk_new": 0, "eos_new": 1}
+    stream = torch.randint(0, p_full, (257,)).tolist()
+    pb = make_batches(stream, 16, 4, shuffle=False, seed=0)
+    sb = make_batches([t % v for t in stream], 16, 4, shuffle=False, seed=0)
+    cfg = dataclasses.replace(TINY, vocab_size=v, d_model=64, n_layers=2,
+                              n_heads_q=4, n_heads_kv=2, ffn_dim=128,
+                              seq_max=32, group_size=32)
+    student = TinyTransformer(cfg)
+
+    import transformers
+    real_pre = transformers.AutoModelForCausalLM.from_pretrained
+
+    @classmethod
+    def fake_from_pretrained(cls, *a, **k):
+        return _fake_parent(p_full)
+
+    transformers.AutoModelForCausalLM.from_pretrained = fake_from_pretrained
+    try:
+        out = str(tmp_path / "enfant.pt")
+        prefix = str(tmp_path / "cache")
+        final = dist.train(student, pb, sb, vocab, "fake-parent", out,
+                           epochs=1, batch_size=2, accum=2, log_every=1000,
+                           top_k_cache=1, cache_path=prefix, cache_k=8,
+                           device=torch.device("cpu"))
+    finally:
+        transformers.AutoModelForCausalLM.from_pretrained = real_pre
+    for ext in (".manifest.json", ".vals.fp16", ".idx.u16", ".tgt.i64"):
+        assert os.path.exists(prefix + ext), ext
+    ckpt = torch.load(final, map_location="cpu", weights_only=False)
+    assert ckpt["step"] > 0

@@ -358,6 +358,10 @@ def train(
     # --- Parent (inférence seule) ou cache mmap (parent non chargé). ---
     cache = None
     parent = None
+    # La projection cachée est créée ici (None par défaut) AVANT toute
+    # construction du cache : le test `if proj is None` ci-dessous la lit
+    # (B3 : UnboundLocalError si créée après).
+    proj = None
     if top_k_cache > 0 and cache_path:
         try:
             cache = load_teacher_cache(
@@ -397,7 +401,6 @@ def train(
     kept_t = torch.tensor(kept, device=device)
     # La projection cachée doit exister AVANT l'optimiseur et le scheduler
     # (le scheduler fige le nombre de groupes de paramètres).
-    proj = None
     if hidden_weight > 0:
         if parent is None:
             raise ValueError(
