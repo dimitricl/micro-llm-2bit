@@ -10,7 +10,7 @@ PARENT=HuggingFaceTB/SmolLM-135M
 DATA=runs/abl_data/train_5M.jsonl
 VOCAB=runs/abl_data/vocab.json
 ABL=docs/ABLATIONS.md
-SPE_SUBSET=318  # steps/epoch du subset (save8/bs8/accum16/seq128, ceil)
+SPE_SUBSET=305  # steps/epoch du subset (save8/bs8/accum16/seq128, seed 0 ; 303 en seed 1)
 
 precheck() {
   # 1) Pas d'autre train (hors descendants de ce shell).
@@ -36,11 +36,17 @@ precheck() {
   return 0
 }
 
-ligne_md() {  # $1=log $2=dir $3=nom $4=label $5=seed $6=steps $7=tokens
-  LOG=$1; D=$2
+ligne_md() {  # $1=log $2=dir $3=nom $4=label $5=seed $6=steps $7=tokens $8=note $9=facteur BPC
+  LOG=$1; D=$2; K=${9:-0.53288}  # BPC = val_ce * K (K = tok/char du val in-run / ln2 ; 0.51815 en seed 1)
   V100=$(grep -E "^\[val\] step 100/" "$LOG" | tail -1 | sed -E 's/.*val_ppl~([0-9.]+).*/\1/')
+  C100=$(grep -E "^\[val\] step 100/" "$LOG" | tail -1 | sed -E 's/.*val_ce=([0-9.]+).*/\1/')
   V200=$(grep -E "^\[val\] step 200/" "$LOG" | tail -1 | sed -E 's/.*val_ppl~([0-9.]+).*/\1/')
+  C200=$(grep -E "^\[val\] step 200/" "$LOG" | tail -1 | sed -E 's/.*val_ce=([0-9.]+).*/\1/')
   V300=$(grep -E "^\[val\] step 300/" "$LOG" | tail -1 | sed -E 's/.*val_ppl~([0-9.]+).*/\1/')
+  C300=$(grep -E "^\[val\] step 300/" "$LOG" | tail -1 | sed -E 's/.*val_ce=([0-9.]+).*/\1/')
+  B100=$(awk "BEGIN{printf \"%.4f\", ${C100:-0} * $K}")
+  B200=$(awk "BEGIN{printf \"%.4f\", ${C200:-0} * $K}")
+  B300=$(awk "BEGIN{printf \"%.4f\", ${C300:-0} * $K}")
   TOKS=$(grep -E "^\[train\] step " "$LOG" | tail -1 | sed -E 's/.* ([0-9]+) tok\/s.*/\1/')
   WALL=$(grep -E "terminé en" "$LOG" | tail -1 | sed -E 's/.*terminé en ([0-9]+)s.*/\1/')
   EV=$($V -c "
@@ -52,7 +58,7 @@ try:
 except Exception:
     print('?/?|?/?')
 ")
-  echo "| $3 | $4 | $5 | $6 | $7 | ${V100:--} | ${V200:--} | ${V300:--} | ${EV%%|*} | ${EV##*|} | ${TOKS:--} | ${WALL:--} | |"
+  echo "| $3 | $4 | $5 | $6 | $7 | ${V100:--} | ${V200:--} | ${V300:--} | $B100 | $B200 | $B300 | ${EV%%|*} | ${EV##*|} | ${TOKS:--} | ${WALL:--} | $8 |"
 }
 
 lancer() {  # $1=nom $2=label $3=seed $4=alpha $5=lr $6=seq $7=bs $8=accum $9=epochs $10=extra
@@ -75,9 +81,13 @@ lancer() {  # $1=nom $2=label $3=seed $4=alpha $5=lr $6=seq $7=bs $8=accum $9=ep
   fi
   grep -q "terminé en" "$D/train.log" || { echo "[abl] ANOMALIE run incomplet ($NOM) -> arret"; return 1; }
   $V tools/eval_common.py "$D/model.pt" "$D/eval.json" 2>&1 | tee -a "$D/train.log"
-  ST=$(grep -oE "step [0-9]+/[0-9]+" "$D/train.log" | grep -v "\[val\]" | tail -1 | sed -E 's|step ([0-9]+)/.*|\1/')
+  # Steps totaux = second nombre de "step X/Y" (le dernier [train] affiche X < Y).
+  ST=$(grep -oE "step [0-9]+/[0-9]+" "$D/train.log" | grep -v "\[val\]" | tail -1 | sed -E 's|step [0-9]*/([0-9]+)|\1|')
   TV=$((ST * BS * ACC * SEQ))
-  ligne_md "$D/train.log" "$D" "$NOM" "$LABEL" "$SEED" "$ST" "$TV" >> "$ABL"
+  K=0.53288; [ "$SEED" -eq 1 ] && K=0.51815  # facteur BPC du split val in-run
+  [ "$NOM" = "V5-seq256" ] && K=0.53258  # seq 256 : ratio tok/char du val in-run légèrement différent
+  NOTE=""; [ "$NOM" = "V1b-temps-egal" ] && NOTE="@100/200/300 = mi-parcours (610 steps), non comparables"
+  ligne_md "$D/train.log" "$D" "$NOM" "$LABEL" "$SEED" "$ST" "$TV" "$NOTE" "$K" >> "$ABL"
   echo "[abl] $NOM termine : steps=$ST tokens=$TV"
   rm -f "$D"/model_ckpt*.pt "$D"/model_e*.pt
   return 0
@@ -88,7 +98,7 @@ lancer V0-seed1 "baseline KD, seed bruit" 1 0.7 3e-4 128 8 16 1 "" || exit 1
 lancer V1a-alpha0 "CE seule, memes tokens" 0 0.0 3e-4 128 8 16 1 "" || exit 1
 # V1b : budget temps = mur de V0-seed0, debit = V1a (meme config CE seule).
 W0=$(grep -E "terminé en" runs/$DATE-abl-V0-seed0/train.log | tail -1 | sed -E 's/.*terminé en ([0-9]+)s.*/\1/')
-S1=$(grep -oE "step [0-9]+/[0-9]+" runs/$DATE-abl-V1a-alpha0/train.log | grep -v "\[val\]" | tail -1 | sed -E 's|step ([0-9]+)/.*|\1|')
+S1=$(grep -oE "step [0-9]+/[0-9]+" runs/$DATE-abl-V1a-alpha0/train.log | grep -v "\[val\]" | tail -1 | sed -E 's|step [0-9]*/([0-9]+)|\1|')
 W1=$(grep -E "terminé en" runs/$DATE-abl-V1a-alpha0/train.log | tail -1 | sed -E 's/.*terminé en ([0-9]+)s.*/\1/')
 EP1B=$(( (W0 * S1 + W1 * SPE_SUBSET - 1) / (W1 * SPE_SUBSET) ))
 [ "$EP1B" -lt 1 ] && EP1B=1
