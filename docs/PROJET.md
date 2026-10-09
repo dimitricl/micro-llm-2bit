@@ -62,6 +62,10 @@ uv run python main.py cache-logits --data ... --parent ... --out-dir caches/x
   Train-PPL 35.3, val-PPL 94.1 (surapprentissage probable). Export
   12.13 Mo, delta RSS +27.6 Mo, 68.5 tok/s. Les sorties de contrôle sont
   répétitives et parfois tronquées avant `</think>`.
+- tranche00 Wikipedia TERMINÉ : tiny, parent SmolLM-135M, 2 124 steps,
+  1 epoch en 7 927 s, train-PPL 39.2 et val-PPL 37.3. Export bestval
+  12.13 Mo, delta RSS +27.3 Mo, 76.0 tok/s. La génération libre de contrôle
+  reste incohérente malgré la PPL.
 
 ## 5. Benchmarks mesurés (mini M4 16 Go)
 
@@ -91,7 +95,8 @@ courbes docs/img/, tableau docs/RUNS.md.
 
 ## 6. État et règles
 
-- En cours : aucune longue tâche ; le run think est terminé et exporté.
+- En cours : aucune longue tâche ; les runs think et Wikipedia sont terminés
+  et exportés.
 - 33/33 tests verts. Le mode think est intégré dans `main`.
 - Règles : pas de GPU/Ollama pendant mesures et runs ; pas de kill de
   process d'autrui ; pas de train long sans "go" ; pas de fichier > 1 Mo

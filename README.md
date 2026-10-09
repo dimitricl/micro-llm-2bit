@@ -105,6 +105,13 @@ est donc un prototype du format think, pas encore un modèle de raisonnement
 fiable. Il faut augmenter et diversifier les données, puis augmenter le
 contexte avant de revendiquer une amélioration qualitative.
 
+Le premier run Wikipedia `slice_00` est également terminé avec `tiny`,
+`SmolLM-135M`, `seq_len=128` et une epoch. Il atteint train-PPL 39.2 et
+val-PPL 37.3 (2 124 steps, 7 927 s). L'export du meilleur checkpoint fait
+12.13 Mo ; le benchmark mesure +27.3 Mo de delta RSS et 76.0 tok/s. La
+PPL est encourageante, mais un prompt libre de contrôle reste incohérent :
+la PPL ne garantit donc pas à elle seule une bonne qualité conversationnelle.
+
 ## Évaluation
 
 ```bash
