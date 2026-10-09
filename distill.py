@@ -31,10 +31,17 @@ os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
 
 
 def pick_device() -> torch.device:
-    """MPS si dispo, sinon CPU. Pas de CUDA sur Mac."""
+    """ cuda > MPS > CPU (B5 : aucun changement sur Mac mps/cpu)."""
+    if torch.cuda.is_available():
+        return torch.device("cuda")
     if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
         return torch.device("mps")
     return torch.device("cpu")
+
+
+def parent_dtype(device: torch.device) -> torch.dtype:
+    """Précision du parent en inférence : fp16 sur accélérateur, fp32 sur CPU."""
+    return torch.float16 if device.type in ("mps", "cuda") else torch.float32
 
 
 class DistillationLoss(nn.Module):
@@ -438,7 +445,7 @@ def train(
     if cache is None:
         from transformers import AutoModelForCausalLM
 
-        dtype = torch.float16 if device.type == "mps" else torch.float32
+        dtype = parent_dtype(device)
         parent = AutoModelForCausalLM.from_pretrained(parent_name, dtype=dtype)
         parent.to(device).eval()
         for p in parent.parameters():

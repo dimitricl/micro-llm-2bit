@@ -245,7 +245,7 @@ def cmd_cache_logits(a: argparse.Namespace) -> None:
     print(f"[cache-logits] device={device} parent={a.parent}")
     from transformers import AutoModelForCausalLM
 
-    dtype = torch.float16 if device.type == "mps" else torch.float32
+    dtype = dist.parent_dtype(device)
     parent = AutoModelForCausalLM.from_pretrained(a.parent, dtype=dtype)
     parent.to(device).eval()
     for p in parent.parameters():
