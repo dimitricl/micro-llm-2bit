@@ -108,4 +108,5 @@ lancer V2-alpha03 "alpha 0.3" 0 0.3 3e-4 128 8 16 1 "" || exit 1
 lancer V3-lr1e3 "lr 1e-3" 0 0.7 1e-3 128 8 16 1 "" || exit 1
 lancer V4-subln "subln (normes o/down)" 0 0.7 3e-4 128 8 16 1 "--subln" || exit 1
 lancer V5-seq256 "seq 256, 16384 tok/step" 0 0.7 3e-4 256 4 16 1 "" || exit 1
+lancer V6-ce-lr1e3 "CE seule + lr 1e-3" 0 0.0 1e-3 128 8 16 1 "" || exit 1
 echo "[abl] CHAINE TERMINEE"

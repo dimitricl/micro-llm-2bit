@@ -118,6 +118,12 @@ uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent Hugging
 uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V5-seq256/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 256 --save-batch 4 --batch-size 4 --accum 16 --epochs 1 --seed 0 --alpha 0.7 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
 ```
 
+### V6-ce-lr1e3
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V6-ce-lr1e3/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.0 --lr 0.001 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
 Budget V1b : mur V0-seed0 (2 145 s), débit V1a (305 steps en 1 146 s) →
 epochs = ceil(2145×305/(1146×305)) = ceil(2145/1146) = 2
 (voir `tools/run_ablations.sh` ; `SPE_SUBSET=305`).
