@@ -239,6 +239,50 @@ def teacher_logits_from_cache(cache: dict, bi: int, ci: int, vocab: int,
 
 
 # ---------------------------------------------------------------------------
+# Plan d'epoch : décompte exact des micros et steps (B1)
+# ---------------------------------------------------------------------------
+
+
+def plan_epoch(student_batches: list, batch_size: int, accum: int) -> dict:
+    """Plan exact d'une epoch : micros, steps optimiseur, tokens.
+
+    - micros = somme sur les batchs stockés de ceil(lignes / batch_size)
+      (le dernier batch stocké peut être partiel : il compte pour
+      ceil(lignes_restantes / batch_size) micros).
+    - steps = ceil(micros / accum) : le reste de fin d'epoch est APPLIQUÉ
+      (pas d'optimiseur jeté), contrairement à l'ancien calcul qui perdait
+      les micro-batchs restants (ex. 6 chez tranche00).
+    - tokens = fenêtres totales x seq_len.
+    - Refuse (ValueError) si batch_size dépasse le plus gros batch stocké :
+      le micro-batch réel serait alors save_batch (< demandé). Dans ce cas,
+      utilisez --batch-size <= lignes stockées (ou reconstruisez les batchs
+      avec --save-batch >= --batch-size).
+    """
+    if batch_size < 1 or accum < 1:
+        raise ValueError("batch_size et accum doivent être >= 1.")
+    if not student_batches:
+        raise ValueError("Aucun batch d'entraînement.")
+    rows = [b.shape[0] for b in student_batches]
+    seq_len = student_batches[0].shape[1] - 1
+    if batch_size > max(rows):
+        raise ValueError(
+            f"--batch-size ({batch_size}) > batch stocké ({max(rows)} lignes, "
+            f"--save-batch ?) : le micro-batch réel serait {max(rows)}. "
+            f"Utilisez --batch-size <= {max(rows)} ou reconstruisez les "
+            f"batchs avec --save-batch >= {batch_size}."
+        )
+    micros = sum((r + batch_size - 1) // batch_size for r in rows)
+    steps = max((micros + accum - 1) // accum, 1)
+    return {
+        "micros": micros,
+        "steps": steps,
+        "tokens": sum(rows) * seq_len,
+        "seq_len": seq_len,
+        "eff_micro": min(batch_size, max(rows)),
+    }
+
+
+# ---------------------------------------------------------------------------
 # Boucle d'entraînement
 # ---------------------------------------------------------------------------
 
@@ -307,6 +351,10 @@ def train(
     kept = vocab["kept_ids"]
     student.to(device).train()
 
+    # --- Plan d'epoch AVANT tout chargement parent (échec rapide, sans
+    # télécharger 135M de poids si --batch-size est incohérent). ---
+    plan = plan_epoch(student_batches, batch_size, accum)
+
     # --- Parent (inférence seule) ou cache mmap (parent non chargé). ---
     cache = None
     parent = None
@@ -360,7 +408,7 @@ def train(
         list(proj.parameters()) if proj is not None else []
     )
     opt = torch.optim.AdamW(params, lr=lr)
-    steps_per_epoch = max(len(student_batches) // batch_size, 1)
+    steps_per_epoch = plan["steps"]
     total_steps = steps_per_epoch * epochs
     sched = cosine_with_warmup(opt, int(total_steps * warmup_ratio), total_steps)
     criterion = DistillationLoss(alpha, temperature, hidden_weight)
@@ -408,7 +456,10 @@ def train(
     n_params = sum(p.numel() for p in student.parameters())
     print(
         f"[train] enfant: {n_params / 1e6:.1f}M params latents, "
-        f"{len(student_batches)} batchs, {total_steps} steps"
+        f"{len(student_batches)} batchs, {plan['micros']} micros/epoch, "
+        f"{steps_per_epoch} steps/epoch x {epochs} epochs = {total_steps} steps, "
+        f"{plan['tokens'] / 1e6:.1f}M tokens/epoch, "
+        f"micro-batch effectif {plan['eff_micro']}"
     )
     use_val = (
         eval_every > 0
@@ -424,6 +475,63 @@ def train(
 
     t0 = time.time()
     tok_total = 0
+
+    def _opt_step(loss_val: float, last_parts: dict) -> bool:
+        """Applique un pas optimiseur (+ scheduler). Retourne True = arrêter.
+
+        Factorise le pas "tous les `accum` micros" ET le pas de fin d'epoch
+        sur les micros restants (B1 : plus aucun gradient jeté).
+        """
+        nonlocal global_step, best_val, best_step, no_improve, stopped_early
+        nn.utils.clip_grad_norm_(params, max_grad_norm)
+        opt.step()
+        sched.step()
+        opt.zero_grad(set_to_none=True)
+        global_step += 1
+        if global_step % log_every == 0 and global_step > start_step:
+            dt = time.time() - t0
+            ppl = math.exp(min(last_parts["ce"].item(), 20))
+            print(
+                f"[train] step {global_step}/{total_steps} "
+                f"loss={loss_val:.4f} kl={last_parts['kl'].item():.4f} "
+                f"ce={last_parts['ce'].item():.4f} ppl~{ppl:.1f} "
+                f"{tok_total / dt:.0f} tok/s",
+                flush=True,
+            )
+        if use_val and global_step % eval_every == 0:
+            # Éval val (CE enfant seule, sans parent) + best + patience.
+            val_ce = eval_loss(student, val_student_batches, device)
+            val_ppl = math.exp(min(val_ce, 20))
+            tag = ""
+            if val_ce < best_val:
+                best_val, best_step, no_improve = val_ce, global_step, 0
+                torch.save(
+                    {
+                        "model": student.state_dict(),
+                        "cfg": student.cfg,
+                        "vocab": vocab,
+                        "parent": parent_name,
+                        "val_ce": val_ce,
+                        "step": global_step,
+                    },
+                    best_path,
+                )
+                tag = " [best]"
+            else:
+                no_improve += 1
+            print(
+                f"[val] step {global_step}/{total_steps} "
+                f"val_ce={val_ce:.4f} val_ppl~{val_ppl:.1f}{tag}",
+                flush=True,
+            )
+            if patience > 0 and no_improve >= patience:
+                print(
+                    f"[val] early stopping : {patience} evals sans "
+                    f"progrès (best step {best_step})."
+                )
+                stopped_early = True
+        return stopped_early or global_step >= total_steps
+
     for epoch in range(epochs):
         order = torch.randperm(len(student_batches)).tolist()
         micro = 0
@@ -486,60 +594,17 @@ def train(
                 tok_total += x.numel()
                 micro += 1
                 if micro % accum == 0:
-                    nn.utils.clip_grad_norm_(params, max_grad_norm)
-                    opt.step()
-                    sched.step()
-                    opt.zero_grad(set_to_none=True)
-                    global_step += 1
-                    if global_step % log_every == 0 and global_step > start_step:
-                        dt = time.time() - t0
-                        ppl = math.exp(min(parts["ce"].item(), 20))
-                        print(
-                            f"[train] step {global_step}/{total_steps} "
-                            f"loss={loss.item():.4f} kl={parts['kl'].item():.4f} "
-                            f"ce={parts['ce'].item():.4f} ppl~{ppl:.1f} "
-                            f"{tok_total / dt:.0f} tok/s",
-                            flush=True,
-                        )
-                    if use_val and global_step % eval_every == 0:
-                        # Éval val (CE enfant seule, sans parent) + best + patience.
-                        val_ce = eval_loss(student, val_student_batches, device)
-                        val_ppl = math.exp(min(val_ce, 20))
-                        tag = ""
-                        if val_ce < best_val:
-                            best_val, best_step, no_improve = val_ce, global_step, 0
-                            torch.save(
-                                {
-                                    "model": student.state_dict(),
-                                    "cfg": student.cfg,
-                                    "vocab": vocab,
-                                    "parent": parent_name,
-                                    "val_ce": val_ce,
-                                    "step": global_step,
-                                },
-                                best_path,
-                            )
-                            tag = " [best]"
-                        else:
-                            no_improve += 1
-                        print(
-                            f"[val] step {global_step}/{total_steps} "
-                            f"val_ce={val_ce:.4f} val_ppl~{val_ppl:.1f}{tag}",
-                            flush=True,
-                        )
-                        if patience > 0 and no_improve >= patience:
-                            print(
-                                f"[val] early stopping : {patience} evals sans "
-                                f"progrès (best step {best_step})."
-                            )
-                            stopped_early = True
-                            break
-                    if global_step >= total_steps:
+                    if _opt_step(loss.item(), parts):
                         break
                 if stopped_early or global_step >= total_steps:
                     break
             if stopped_early or global_step >= total_steps:
                 break
+        if micro % accum != 0 and not stopped_early and global_step < total_steps:
+            # Reste de fin d'epoch : on applique l'optimiseur au lieu de
+            # jeter les gradients accumulés (B1). L'arrêt éventuel
+            # (patience / total_steps) est géré par le test sous le checkpoint.
+            _opt_step(loss.item(), parts)
         ckpt_path = out.replace(".pt", f"_e{epoch}.pt")
         torch.save(
             {
