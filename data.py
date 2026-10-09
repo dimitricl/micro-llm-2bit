@@ -93,6 +93,13 @@ def build_reduced_vocab(tokenizer, texts: list[str], vocab_size: int = 8000) -> 
 
     Descripteur : {"parent": name, "kept_ids": [...], "new_of_old": {old: new},
     "special": {...}}. `kept_ids[new] = old`.
+
+    B2 (unk distinct) : `eos` garde son id, et une ligne dédiée `unk`
+    (sentinelle -1 dans kept_ids, aucun ancien id) reçoit la masse hors
+    vocabulaire. La taille totale est inchangée : la ligne unk prend la
+    place du dernier token (le moins fréquent). Champs : `unk_distinct True`,
+    `vocab_version` 2. Les anciens vocabulaires (sans ces champs) gardent
+    l'ancien comportement (unk rabattu sur eos).
     """
     # 1) Spéciaux toujours gardés.
     specials = set()
@@ -122,13 +129,27 @@ def build_reduced_vocab(tokenizer, texts: list[str], vocab_size: int = 8000) -> 
             if cand not in have:
                 kept.append(cand)
             cand += 1
-    new_of_old = {old: new for new, old in enumerate(kept)}
+    # 4) Ligne unk dédiée : remplace le dernier token non spécial
+    # (le moins fréquent) par la sentinelle -1 (aucun ancien id).
+    victim = next(
+        (j for j in range(len(kept) - 1, -1, -1) if kept[j] not in specials),
+        None,
+    )
+    if victim is None:
+        raise ValueError(
+            "Vocabulaire trop petit pour un unk distinct "
+            "(que des tokens spéciaux)."
+        )
+    kept[victim] = -1
+    new_of_old = {old: new for new, old in enumerate(kept) if old >= 0}
     return {
         "parent": getattr(tokenizer, "name_or_path", "parent"),
         "vocab_size": len(kept),
         "kept_ids": kept,
-        "unk_new": new_of_old[int(unk_id)],
-        "eos_new": new_of_old.get(int(tokenizer.eos_token_id), new_of_old[int(unk_id)]),
+        "unk_new": victim,
+        "eos_new": new_of_old.get(int(tokenizer.eos_token_id), victim),
+        "unk_distinct": True,
+        "vocab_version": 2,
     }
 
 
@@ -142,6 +163,17 @@ def check_vocab_compatible(vocab: dict, ckpt_vocab: dict) -> None:
     a, b = vocab.get("kept_ids"), (ckpt_vocab or {}).get("kept_ids")
     if a is None or b is None:
         raise ValueError("Vocabulaire incomplet : kept_ids manquant.")
+    # B2 : on refuse de mélanger un vocab à unk distinct et un ancien
+    # vocab (unk rabattu sur eos) : les lignes d'embedding n'ont pas le
+    # même sens (la ligne unk dédiée n'existe que dans le nouveau format).
+    if vocab.get("unk_distinct", False) != (ckpt_vocab or {}).get(
+        "unk_distinct", False
+    ):
+        raise ValueError(
+            "Vocabulaire incompatible avec le checkpoint (unk distinct "
+            "d'un côté seulement). Convertissez le checkpoint "
+            "(tools/convert_vocab.py) ou réutilisez le même format."
+        )
     if list(a) != list(b):
         raise ValueError(
             "Vocabulaire incompatible avec le checkpoint "

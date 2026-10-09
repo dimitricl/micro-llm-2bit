@@ -98,6 +98,35 @@ def hidden_mse(
     return F.mse_loss(s[:, :n], t[:, :n])
 
 
+def teacher_small_logits(full: torch.Tensor, kept_ids: list[int]) -> torch.Tensor:
+    """Logits parent restreints au vocab enfant (B2).
+
+    `full` : (..., P) fp32, logits parent complets. Retour (..., V).
+    - Ancien vocab (aucune sentinelle) : simple gather des colonnes gardées.
+    - Vocab à unk distinct : la colonne sentinelle (-1) reçoit, à chaque
+      position, le logsumexp (fp32) des logits de tous les tokens NON gardés
+      (masse hors vocabulaire).
+    """
+    real = [(j, o) for j, o in enumerate(kept_ids) if o >= 0]
+    if len(real) == len(kept_ids):
+        return full.index_select(
+            -1, torch.tensor(kept_ids, device=full.device, dtype=torch.long))
+    olds = torch.tensor([o for _, o in real],
+                        device=full.device, dtype=torch.long)
+    small_real = full.index_select(-1, olds)
+    keep_mask = torch.zeros(full.shape[-1], dtype=torch.bool, device=full.device)
+    keep_mask[olds] = True
+    rest = full.masked_fill(keep_mask, float("-inf")).logsumexp(
+        dim=-1, keepdim=True)
+    out = torch.empty(*full.shape[:-1], len(kept_ids),
+                      device=full.device, dtype=full.dtype)
+    out[..., [j for j, _ in real]] = small_real
+    for j, o in enumerate(kept_ids):
+        if o < 0:
+            out[..., j : j + 1] = rest
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Cache logits parent top-k sur disque (format mmap + manifeste)
 # ---------------------------------------------------------------------------
@@ -137,14 +166,15 @@ def build_teacher_cache(
     """
     import numpy as np
 
-    kept = torch.tensor(kept_ids, device=device)
-    V = len(kept_ids)
+    kept = list(kept_ids)
+    V = len(kept)
     if V > 65535:
         raise ValueError("Cache uint16 : vocab réduit > 65535 non supporté.")
     if not parent_batches:
         raise ValueError("Cache vide : aucun batch parent.")
     S = parent_batches[0].shape[1] - 1
     K = min(top_k, V)
+    unk_distinct = any(o < 0 for o in kept)
     order, rows_v, rows_i, rows_t = [], [], [], []
     parent.eval()
     with torch.no_grad():
@@ -153,7 +183,7 @@ def build_teacher_cache(
                 px = pb[off : off + micro_batch][:, :-1].to(device)
                 y = sb[off : off + micro_batch][:, 1:]
                 logits = parent(input_ids=px).logits.float()
-                small = logits.index_select(-1, kept)
+                small = teacher_small_logits(logits, kept)
                 v, i = small.topk(K, dim=-1)
                 B = v.shape[0]
                 order.append([bi, ci, B])
@@ -184,6 +214,7 @@ def build_teacher_cache(
         "seq_len": S,
         "k": K,
         "micro_batch": micro_batch,
+        "unk_distinct": unk_distinct,
         "n_chunks": len(order),
         "order": order,
         "slice_hash": _sha([len(parent_batches), first[:64].hex(), last[-64:].hex()]),
@@ -473,7 +504,6 @@ def train(
                 if device.type == "mps":
                     torch.mps.empty_cache()
 
-    kept_t = torch.tensor(kept, device=device)
     # La projection cachée doit exister AVANT l'optimiseur et le scheduler
     # (le scheduler fige le nombre de groupes de paramètres).
     if hidden_weight > 0:
@@ -697,7 +727,7 @@ def train(
                 elif parent is not None:
                     with torch.no_grad():
                         t_full = parent(input_ids=px).logits.float()
-                        t_logits = t_full.index_select(-1, kept_t)
+                        t_logits = teacher_small_logits(t_full, kept)
                     t_h = None
                 else:
                     # B6 : alpha=0, CE seule (parent jamais appelé).

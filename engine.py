@@ -353,6 +353,7 @@ class Engine:
         top_p: float = 1.0,
         stop: set[int] | None = None,
         rng: np.random.Generator | None = None,
+        mask_id: int = -1,  # B2 : >=0 : token interdit à l'échantillonnage (unk)
     ) -> list[int]:
         """Préfill puis génération. temperature=0 -> glouton.
 
@@ -366,10 +367,11 @@ class Engine:
             logits = self.step(t)
         out = []
         rng = rng or np.random.default_rng(0)
+        exclude = {mask_id} if mask_id is not None and mask_id >= 0 else None
         for _ in range(max_new):
             if self.pos >= S:
                 break
-            nxt = sample(logits, temperature, top_k, top_p, rng)
+            nxt = sample(logits, temperature, top_k, top_p, rng, exclude=exclude)
             out.append(nxt)
             if stop and nxt in stop:
                 break
@@ -384,6 +386,7 @@ class Engine:
         top_k: int = 40,
         top_p: float = 0.9,
         rng: np.random.Generator | None = None,
+        mask_id: int = -1,
     ) -> list[int]:
         """Génère une trace think ; le parsing se fait après décodage."""
         return self.generate(
@@ -393,6 +396,7 @@ class Engine:
             top_k=top_k,
             top_p=top_p,
             rng=rng,
+            mask_id=mask_id,
         )
 
 
@@ -402,9 +406,15 @@ def sample(
     top_k: int = 0,
     top_p: float = 1.0,
     rng: np.random.Generator | None = None,
+    exclude: set[int] | None = None,  # B2 : tokens interdits (ex. unk)
 ) -> int:
     """Échantillonne un token : glouton si temperature<=0."""
     z = logits.astype(np.float64)
+    if exclude:
+        valid = [i for i in exclude if 0 <= i < len(z)]
+        if valid:
+            z = z.copy()
+            z[valid] = -np.inf
     if temperature <= 0:
         return int(np.argmax(z))
     z = z / temperature

@@ -43,8 +43,34 @@ def load_tokenizer(parent: str):
     return tok
 
 
+#: Marqueur visible pour un token unk décodé (vocab à unk distinct, B2).
+UNK_MARKER = "\uFFFD"
+
+
 def decode_ids(tokenizer, vocab: dict, ids: list[int]) -> str:
     kept = vocab["kept_ids"]
+    if vocab.get("unk_distinct"):
+        # Unk distinct : jamais supprimé silencieusement. On décode par
+        # tronçons (la jointure BPE reste intra-tronçon) et on insère un
+        # marqueur visible à chaque unk (hors-vocab ou id invalide).
+        unk = vocab["unk_new"]
+        parts: list[str] = []
+        cur: list[int] = []
+
+        def flush() -> None:
+            if cur:
+                old = [kept[i] for i in cur]
+                parts.append(tokenizer.decode(old, skip_special_tokens=True))
+                cur.clear()
+
+        for i in ids:
+            if i == unk or not (0 <= i < len(kept)):
+                flush()
+                parts.append(UNK_MARKER)
+            else:
+                cur.append(i)
+        flush()
+        return "".join(parts)
     old = [kept[i] if 0 <= i < len(kept) else kept[vocab["unk_new"]] for i in ids]
     return tokenizer.decode(old, skip_special_tokens=True)
 
@@ -113,6 +139,11 @@ def cmd_infer(a: argparse.Namespace) -> None:
         top_k=a.top_k,
         top_p=a.top_p,
         stop={vocab["eos_new"]},
+        # B2 : unk masqué par défaut (ancien vocabs : unk == eos, on ne
+        # masque jamais pour ne pas bloquer l'arrêt).
+        mask_id=vocab["unk_new"]
+        if (vocab.get("unk_distinct") and not a.allow_unk)
+        else -1,
     )
     dt = time.time() - t0
     text = decode_ids(tok, vocab, out)
@@ -447,6 +478,11 @@ def build_parser() -> argparse.ArgumentParser:
     pi.add_argument("--temperature", type=float, default=0.0)
     pi.add_argument("--top-k", type=int, default=0)
     pi.add_argument("--top-p", type=float, default=1.0)
+    pi.add_argument(
+        "--allow-unk",
+        action="store_true",
+        help="Autorise la génération du token unk (masqué par défaut).",
+    )
     pi.add_argument(
         "--think",
         action="store_true",
