@@ -24,8 +24,26 @@ Coût embedding = V × (512 + 4) octets. Mimicry validée : sélection 12000
 | SmolLM-135M | 1,5357 |
 | SmolLM-360M | 1,3362 |
 | Qwen3-0.6B (multilingue, téléchargé sans effort : oui) | 1,1138 |
-| tranche00 (.bin quantifié) | en cours (moteur CPU, ~25 min) |
-| wiki_slice00 (.bin quantifié) | en cours |
+| tranche00 (.bin quantifié, PPL 25,88) | 1,5676 |
+| wiki_slice00 (.bin quantifié, PPL 31,12) | 1,6566 |
+
+tranche00 est à 0,03 BPC du parent 135M (1,5676 vs 1,5357) : la
+distillation d'une epoch transfère déjà ~98 % du plafond parent sur ce
+domaine. wiki_slice00 (demi-epoch) est 0,09 BPC derrière (+5,7 % relatif).
+Gemma-3-270M non tenté (accès sous conditions) ; Qwen3-0.6B a suffi comme
+point multilingue.
+
+## Ce que ça change
+
+1. Le vocab 12000 actuel est bien calibré (1,0 % unk, 5,9 Mo) : passer à
+   16000 ne gagne que 0,55 pt d'unk pour +2 Mo. Garder 12000 pour le run
+   principal.
+2. À T=2, le cache top-32/64/128 jette l'essentiel de la masse (82/78/73 %) :
+   préférer le parent en direct (décision tranche00 confirmée) ou un top-k
+   ≥ 512 si le cache revient.
+3. L'écart tranche00/wiki_slice00 (BPC, PPL, eval_fixed greedy) valide le
+   décompte corrigé comme cause : même données, même vocab, 2× tokens vus.
+4. Point de départ phase E : tranche00 (BPC 1,5676), pas wiki_slice00.
 
 Comparabilité tranche00 vs wiki_slice00 : vocabs `kept_ids` IDENTIQUES
 (12000, ancien format unk==eos==0), même parent, même config, même split

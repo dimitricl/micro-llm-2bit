@@ -14,10 +14,15 @@ model.load_state_dict(ckpt["model"])
 dev = torch.device("mps" if torch.backends.mps.is_available()
                    else "cpu")
 model.to(dev).eval()
+nv = ckpt["cfg"].vocab_size
 res = {}
 with torch.no_grad():
     for seq in (128, 256):
         wins = torch.load(f"{ROOT}/val_{seq}.pt", weights_only=True)
+        if int(wins.max()) >= nv or int(wins.min()) < 0:
+            raise ValueError(
+                "Jeu val incompatible avec le vocab du checkpoint "
+                f"(ids [{int(wins.min())}, {int(wins.max())}] vs V={nv}).")
         nll, n = 0.0, 0
         for i in range(0, len(wins), 16):
             b = wins[i:i + 16].to(dev)
