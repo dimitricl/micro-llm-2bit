@@ -27,13 +27,16 @@ V=.venv/bin/python
 TOK_S=750  # vitesse mesurée (tok/s) pour l'estimation
 CHARS_PER_TOK=4
 SEQ=256; BATCH=2; ACCUM=8
+SAVE=$BATCH  # B1 : --save-batch == --batch-size (micro-batch réel)
 
 echo "=== Estimation (aucun entraînement sans --go) ==="
 TOTAL_S=0
 for SL in "$DIR"/slice_*.jsonl; do
   CHARS=$(wc -c < "$SL")
+  # Décompte B1 : fenêtres = TOK/SEQ, 1 micro-batch par batch stocké
+  # (save == bs), 1 step par ACCUM micros.
   TOK=$((CHARS / CHARS_PER_TOK))
-  STEPS=$((TOK / SEQ / 8 / BATCH * EPOCHS))
+  STEPS=$((TOK / SEQ / BATCH / ACCUM * EPOCHS))
   SEC=$((TOK * EPOCHS / TOK_S))
   TOTAL_S=$((TOTAL_S + SEC))
   printf "%s : ~%d tokens, ~%d steps, ~%dm\n" "$(basename "$SL")" $((TOK * EPOCHS)) "$STEPS" $((SEC / 60))
@@ -48,13 +51,14 @@ PREV=""; VOCAB=""; PREV_STEPS=0
 for SL in "$DIR"/slice_*.jsonl; do
   NAME=$(basename "$SL" .jsonl)
   OUT="${PREFIX}_${NAME}.pt"
-  # Steps/epoch estimés pour cette tranche (batchs stockés de 8, micro-batch 2).
+  # Steps/epoch estimés pour cette tranche (décompte B1 : save == bs,
+  # steps = fenêtres / bs / accum).
   CHARS=$(wc -c < "$SL")
-  SPE=$((CHARS / CHARS_PER_TOK / (SEQ + 1) / 8 / BATCH))
+  SPE=$((CHARS / CHARS_PER_TOK / SEQ / BATCH / ACCUM))
   [ "$SPE" -lt 1 ] && SPE=1
   ARGS=(--data "$SL" --parent HuggingFaceTB/SmolLM-360M --out "$OUT"
         --config base --vocab-size 12000 --seq-len 256 --hidden-weight 0.0
-        --batch-size "$BATCH" --accum "$ACCUM"
+        --save-batch "$SAVE" --batch-size "$BATCH" --accum "$ACCUM"
         --val-ratio 0.05 --eval-every 200)
   if [ -z "$PREV" ]; then
     ARGS+=(--epochs "$EPOCHS")

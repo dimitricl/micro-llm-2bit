@@ -25,7 +25,7 @@ python main.py train \
     --config tiny \
     --vocab-size 12000 \
     --seq-len 128 \
-    --save-batch 2 \
+    --save-batch 1 \
     --batch-size 1 \
     --accum 16 \
     --epochs 8 \

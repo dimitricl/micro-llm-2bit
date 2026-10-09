@@ -257,7 +257,7 @@ def compare_cache(top_k: int = 32, steps: int = 30) -> dict:
     student = TinyTransformer(cfg).to(dev).train()
     opt = torch.optim.AdamW(student.parameters(), lr=3e-4)
     crit = DistillationLoss(0.7, 2.0)
-    kept_t = torch.tensor(kept, device=dev)
+    from distill import teacher_small_logits  # B2 : gère la sentinelle unk
     chunks = [(bi, k) for bi in range(len(pb))
               for k in range((pb[bi].shape[0] + MB - 1) // MB)][:steps]
     # 1) Écart de loss à entrées identiques.
@@ -269,7 +269,7 @@ def compare_cache(top_k: int = 32, steps: int = 30) -> dict:
             yb = sb[bi][off:off + MB][:, 1:].to(dev)
             t_full = parent(
                 input_ids=pb[bi][off:off + MB][:, :-1].to(dev)).logits.float()
-            ref = crit(student(xb), t_full.index_select(-1, kept_t), yb)[0].item()
+            ref = crit(student(xb), teacher_small_logits(t_full, kept), yb)[0].item()
             got = crit(student(xb),
                        teacher_logits_from_cache(cache, bi, k,
                                                  len(kept), dev),

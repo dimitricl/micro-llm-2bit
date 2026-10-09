@@ -28,10 +28,11 @@ python main.py train --data ... --val-ratio 0.05 --eval-every 200 \
     --patience 3 --out checkpoints/m.pt
 
 # Pré-calcul des logits parent (mmap + manifeste, refus si incompatible)
+# NB : --save-batch doit égaler --batch-size (B1 refuse bs > save).
 python main.py cache-logits --data ... --parent ... --out-dir caches/s0 \
-    --batch-size 16
+    --batch-size 16 --save-batch 16
 python main.py train --data ... --top-k-cache 1 --cache caches/s0/train \
-    --batch-size 16 ...
+    --batch-size 16 --save-batch 16 ...
 
 # Export packé, bench mémoire, inférence
 python main.py export --ckpt checkpoints/m.pt --out exports/m.bin
@@ -105,11 +106,13 @@ est donc un prototype du format think, pas encore un modèle de raisonnement
 fiable. Il faut augmenter et diversifier les données, puis augmenter le
 contexte avant de revendiquer une amélioration qualitative.
 
-Le premier run Wikipedia `slice_00` est également terminé avec `tiny`,
-`SmolLM-135M`, `seq_len=128` et une epoch. Il atteint train-PPL 39.2 et
-val-PPL 37.3 (2 124 steps, 7 927 s). L'export du meilleur checkpoint fait
-12.13 Mo ; le benchmark mesure +27.3 Mo de delta RSS et 76.0 tok/s. La
-PPL est encourageante, mais un prompt libre de contrôle reste incohérent :
+Le premier run Wikipedia `slice_00` (bug de décompte B1 : demi-epoch) est
+dépassé par `tranche00` : `tiny`, `SmolLM-135M`, `seq_len=128`, 1 epoch
+complète (4 248 steps, 34,8M tokens, 15 668 s), train-PPL ~30.8 et val-PPL
+29,7. L'export du meilleur checkpoint fait 12.13 Mo (ordre de grandeur) ;
+le benchmark mesure +27.3 Mo de delta RSS et 76.0 tok/s (mesurés sur
+l'export wiki_slice00, à refaire depuis tranche00). La PPL est
+encourageante, mais un prompt libre de contrôle reste incohérent :
 la PPL ne garantit donc pas à elle seule une bonne qualité conversationnelle.
 
 ## Évaluation
