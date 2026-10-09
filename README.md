@@ -157,7 +157,9 @@ capacité (préfill + génération bornés par seq_max), sans fenêtre glissante
 
 - Diagnostics (`docs/DIAGNOSTICS.md`) : BPC 135M 1,5357 / tranche00 1,5676,
   vocab 12000 à 1,0 % unk, débit 2 221 tok/s effectifs.
-- Ablations (`docs/ABLATIONS.md`, 8 runs × 5M tokens, bruit ±9 PPL) :
-  lr 1e-3 gagne le plus (72,5 vs 161,9), CE seule > KD 0,7 à tokens égaux,
-  seq 128 gardée. Recette du run principal : KD α0,7, lr 1e-3, seq 128,
-  reprise `tranche00.pt` (en attente de validation, ~40 h pour 9 tranches).
+- Ablations (`docs/ABLATIONS.md`, 9 runs × 5M tokens, bruit ±9 PPL) :
+  CE seule + lr 1e-3 gagne (V6 : 55,2 vs 161,9 baseline ; gains V1a+V3
+  cumulés), seq 128 gardée. Recette du run principal : CE seule
+  (sans parent, ~2× plus vite), lr 1e-3, seq 128,
+  reprise `tranche00.pt` (en attente de validation, ~20 h pour 9 tranches
+  au débit CE ~4 400 tok/s).
