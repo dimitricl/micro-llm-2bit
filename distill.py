@@ -60,10 +60,20 @@ class DistillationLoss(nn.Module):
     def forward(
         self,
         student_logits: torch.Tensor,  # (B, S, V)
-        teacher_logits: torch.Tensor,  # (B, S, V) déjà restreints au vocab enfant
+        teacher_logits: torch.Tensor | None,  # (B, S, V), None si alpha=0 (B6)
         targets: torch.Tensor,  # (B, S) ids réduits
     ) -> tuple[torch.Tensor, dict]:
         t = self.temperature
+        ce = F.cross_entropy(
+            student_logits.reshape(-1, student_logits.shape[-1]),
+            targets.reshape(-1),
+        )
+        if teacher_logits is None or self.alpha == 0.0:
+            # B6 : CE seule, le parent n'est ni chargé ni appelé.
+            if teacher_logits is None and self.alpha != 0.0:
+                raise ValueError("teacher_logits manquant avec alpha != 0.")
+            kl = torch.zeros((), device=student_logits.device)
+            return ce, {"kl": kl.detach(), "ce": ce.detach()}
         # KL avec température, moyennée sur les TOKENS (B*S) : somme sur le
         # vocab puis moyenne. (F.kl_div batchmean diviserait seulement par B,
         # ce qui gonflerait la KL d'un facteur seq_len.)
@@ -74,10 +84,6 @@ class DistillationLoss(nn.Module):
         term = t_prob * (t_prob.log() - s_logp)
         kl = torch.where(t_prob > 0, term, torch.zeros_like(term)).sum(
             dim=-1).mean() * (t * t)
-        ce = F.cross_entropy(
-            student_logits.reshape(-1, student_logits.shape[-1]),
-            targets.reshape(-1),
-        )
         loss = self.alpha * kl + (1.0 - self.alpha) * ce
         return loss, {"kl": kl.detach(), "ce": ce.detach()}
 
@@ -422,11 +428,16 @@ def train(
     # --- Parent (inférence seule) ou cache mmap (parent non chargé). ---
     cache = None
     parent = None
+    # B6 : alpha=0 (+ hidden désactivé) = vraie baseline CE seule : le parent
+    # n'est ni chargé ni appelé (ni forward, ni cache).
+    skip_parent = (alpha == 0.0 and hidden_weight == 0.0)
+    if skip_parent:
+        print("[train] alpha=0 : CE seule, parent ignoré (pas de chargement).")
     # La projection cachée est créée ici (None par défaut) AVANT toute
     # construction du cache : le test `if proj is None` ci-dessous la lit
     # (B3 : UnboundLocalError si créée après).
     proj = None
-    if top_k_cache > 0 and cache_path:
+    if top_k_cache > 0 and cache_path and not skip_parent:
         try:
             cache = load_teacher_cache(
                 cache_path, parent_name, kept,
@@ -442,7 +453,7 @@ def train(
             if os.path.exists(cache_path + ".manifest.json"):
                 raise  # cache existant mais incompatible : on refuse
             print(f"[train] pas de cache : {e}")
-    if cache is None:
+    if cache is None and not skip_parent:
         from transformers import AutoModelForCausalLM
 
         dtype = parent_dtype(device)
@@ -450,7 +461,7 @@ def train(
         parent.to(device).eval()
         for p in parent.parameters():
             p.requires_grad_(False)
-        if top_k_cache > 0 and cache_path:
+        if top_k_cache > 0 and cache_path and not skip_parent:
             cache = build_teacher_cache(
                 parent, parent_batches, student_batches, kept, cache_k,
                 device, batch_size, cache_path, parent_name=parent_name)
@@ -683,11 +694,14 @@ def train(
                     t_logits = teacher_logits_from_cache(
                         cache, bi, ci, len(kept), device)
                     t_h = None
-                else:
+                elif parent is not None:
                     with torch.no_grad():
                         t_full = parent(input_ids=px).logits.float()
                         t_logits = t_full.index_select(-1, kept_t)
                     t_h = None
+                else:
+                    # B6 : alpha=0, CE seule (parent jamais appelé).
+                    t_logits, t_h = None, None
                 if proj is not None:
                     # Distillation des états cachés : dernier caché enfant
                     # (projeté) vs dernier caché parent, MSE.
