@@ -223,6 +223,9 @@ def cmd_train(a: argparse.Namespace) -> None:
     import dataclasses
 
     cfg = dataclasses.replace(cfg, vocab_size=len(vocab["kept_ids"]), seq_max=a.seq_len)
+    if getattr(a, "subln", False):
+        cfg = dataclasses.replace(cfg, subln=True)
+        print("[train] ablation V4 : subln activé (RMSNorm avant o/down_proj).")
     student = TinyTransformer(cfg)
     cache = a.cache or (a.out + ".teacherk")
     dist.train(
@@ -301,6 +304,10 @@ def cmd_cache_logits(a: argparse.Namespace) -> None:
 def cmd_export(a: argparse.Namespace) -> None:
     ckpt = torch.load(a.ckpt, map_location="cpu", weights_only=False)
     cfg, vocab = ckpt["cfg"], ckpt["vocab"]
+    if getattr(cfg, "subln", False):
+        # V4 : l'export .bin ne connaît pas les normes supplémentaires.
+        raise SystemExit(
+            "[export] refusé : modèle subln (ablation V4, entraînement seul).")
     model = TinyTransformer(cfg)
     model.load_state_dict(ckpt["model"])
     model.eval()
@@ -514,6 +521,9 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--alpha", type=float, default=0.7)
     pt.add_argument("--temperature", type=float, default=2.0)
     pt.add_argument("--hidden-weight", type=float, default=0.0)
+    pt.add_argument("--subln", action="store_true",
+                    help="Ablation V4 : RMSNorm avant o_proj et down_proj "
+                    "(entraînement seul, export refusé).")
     pt.add_argument("--top-k-cache", type=int, default=0)
     pt.add_argument("--cache-k", type=int, default=32,
                     help="Top-k stocké dans le cache mmap (défaut 32).")

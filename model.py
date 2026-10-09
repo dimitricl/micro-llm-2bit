@@ -42,6 +42,7 @@ class ModelConfig:
     group_size: int = 64
     rope_theta: float = 10000.0
     norm_eps: float = 1e-6
+    subln: bool = False  # V4 (ablation) : RMSNorm avant o_proj et down_proj
 
 
 TINY = ModelConfig()
@@ -155,6 +156,10 @@ class GroupedQueryAttention(nn.Module):
         self.o_proj = TernaryLinear(
             cfg.n_heads_q * self.head_dim, cfg.d_model, cfg.group_size
         )
+        # V4 (ablation, défaut désactivé) : norme avant o_proj.
+        self.o_norm = None
+        if getattr(cfg, "subln", False):
+            self.o_norm = RMSNorm(cfg.d_model, cfg.norm_eps)
 
     def forward(
         self,
@@ -180,6 +185,8 @@ class GroupedQueryAttention(nn.Module):
             is_causal=(mask is None),
         )
         attn = attn.transpose(1, 2).reshape(b, s, -1)
+        if self.o_norm is not None:
+            attn = self.o_norm(attn)
         return self.o_proj(attn)
 
 
@@ -191,9 +198,16 @@ class SwiGLUMlp(nn.Module):
         self.gate = TernaryLinear(cfg.d_model, cfg.ffn_dim, cfg.group_size)
         self.up = TernaryLinear(cfg.d_model, cfg.ffn_dim, cfg.group_size)
         self.down = TernaryLinear(cfg.ffn_dim, cfg.d_model, cfg.group_size)
+        # V4 (ablation, défaut désactivé) : norme avant down_proj.
+        self.down_norm = None
+        if getattr(cfg, "subln", False):
+            self.down_norm = RMSNorm(cfg.ffn_dim, cfg.norm_eps)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.down(F.silu(self.gate(x)) * self.up(x))
+        h = F.silu(self.gate(x)) * self.up(x)
+        if self.down_norm is not None:
+            h = self.down_norm(h)
+        return self.down(h)
 
 
 class DecoderBlock(nn.Module):
