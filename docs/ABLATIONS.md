@@ -144,6 +144,11 @@ Configuration : CE seule (alpha=0), lr 3e-4, protocole identique à D (subset 5M
 | V7-ce-s1 | 1 | 303 | 2285 | 1318 | 134,73/2,5098 | 132,40/2,5009 | bruit inter-seeds |
 | Moyenne V7 | - | - | 2327 | 1297 | 133,37/2,5046 | 131,27/2,4965 | |
 
+Source des chiffres : `runs/2026-10-09-abl-V7-ce-s0/eval.json`
+(PPL 132,0133/130,1409) et `runs/2026-10-09-abl-V7-ce-s1/eval.json`
+(PPL 134,7316/132,4004) ; murs 1275 s / 1318 s lus dans les `train.log`
+respectifs (`terminé en`). Moyenne arithmétique des deux seeds.
+
 ### Commande (seed 0)
 
 ```bash

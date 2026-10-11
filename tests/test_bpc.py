@@ -72,6 +72,7 @@ def test_gap_relatif():
 
 
 @pytest.mark.slow
+@pytest.mark.timeout(3600)
 def test_bpc_reference_values():
     """Test à valeurs fixes pour les 5 BPC de référence à 4 décimales (G1).
 
@@ -92,17 +93,20 @@ def test_bpc_reference_values():
     Note : ce test est marqué @slow car il requiert le chargement des modèles
     parents et l'évaluation sur les 6 documents de validation. Pour lancer :
       pytest -m slow tests/test_bpc.py
+    (Qwen en lots de 2 fenêtres : pic MPS sinon swap sur 16 Go.)
     """
-    from tools.eval_bpc import collect_parent, collect_engine
+    from tools.eval_bpc import collect_parent, collect_engine, load_c2_texts
     from main import load_tokenizer
+    import gc
     import json
 
-    # Subset par défaut : les 6 docs val C2 (354 234 chars)
-    subset_path = "/tmp/c2_subset.json"
-    if not os.path.exists(subset_path):
-        pytest.skip(f"Subset {subset_path} non disponible")
-
-    texts = json.load(open(subset_path, encoding="utf-8"))
+    # Manifeste versionné : les 6 docs val C2 (354 234 chars).
+    # Lancer avec : pytest -m slow tests/test_bpc.py
+    # (désélectionné par défaut via addopts, c2_subset.json vérifié par SHA1)
+    try:
+        texts = load_c2_texts()
+    except (FileNotFoundError, ValueError) as e:
+        pytest.skip(f"C2 indisponible : {e}")
     vocab = json.load(open("exports/tranche00.bin.vocab.json", encoding="utf-8"))
     kept = set(vocab["kept_ids"])
     smol_tok = load_tokenizer("HuggingFaceTB/SmolLM-135M")
@@ -155,13 +159,17 @@ def test_bpc_reference_values():
     assert v_wiki["b"] == pytest.approx(expected_b["wiki"], abs=1e-4)
     assert v_wiki["c"] == pytest.approx(expected_c["wiki"], abs=1e-4)
 
-    # Collecte parents
+    # Collecte parents (nettoyage MPS entre chaque modèle).
     rec_135, chars = collect_parent("HuggingFaceTB/SmolLM-135M", texts, kept,
                                      smol_tok, device=dev)
     v_135 = variantes(rec_135, chars)
     assert v_135["a"] == pytest.approx(expected_a["smol135"], abs=1e-4)
     assert v_135["b"] == pytest.approx(expected_b["smol135"], abs=1e-4)
     assert v_135["c"] == pytest.approx(expected_c["smol135"], abs=1e-4)
+    del rec_135
+    gc.collect()
+    if dev == "mps":
+        torch.mps.empty_cache()
 
     rec_360, chars = collect_parent("HuggingFaceTB/SmolLM-360M", texts, kept,
                                      smol_tok, device=dev)
@@ -169,9 +177,13 @@ def test_bpc_reference_values():
     assert v_360["a"] == pytest.approx(expected_a["smol360"], abs=1e-4)
     assert v_360["b"] == pytest.approx(expected_b["smol360"], abs=1e-4)
     assert v_360["c"] == pytest.approx(expected_c["smol360"], abs=1e-4)
+    del rec_360
+    gc.collect()
+    if dev == "mps":
+        torch.mps.empty_cache()
 
-    rec_qwen, chars = collect_parent("Qwen/Qwen3-0.6B", texts, kept, smol_tok,
-                                     device=dev)
+    rec_qwen, chars = collect_parent("Qwen/Qwen3-0.6B", texts, kept,
+                                      smol_tok, bs=2, device=dev)
     v_qwen = variantes(rec_qwen, chars)
     assert v_qwen["a"] == pytest.approx(expected_a["qwen"], abs=1e-4)
     assert v_qwen["b"] == pytest.approx(expected_b["qwen"], abs=1e-4)

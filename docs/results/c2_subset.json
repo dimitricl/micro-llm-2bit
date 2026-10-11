@@ -1,0 +1,38 @@
+{
+ "source": "/Volumes/Lexar/clean-corpus/slices/slice_00.jsonl",
+ "regle": "train_val_split(val_ratio=0.05, seed=0), 6 premiers docs de la liste val (ordre d'origine filtre), cf data.py:train_val_split",
+ "n_total": 10067,
+ "docs": [
+  {
+   "slice_index": 75,
+   "chars": 2168,
+   "sha1": "7ccb1c4cce4da5b2d742c859e3ad1ecc54499108"
+  },
+  {
+   "slice_index": 82,
+   "chars": 9692,
+   "sha1": "99252a09df36fc056cfc0b796bc2af4968037631"
+  },
+  {
+   "slice_index": 143,
+   "chars": 6836,
+   "sha1": "395abe619c494d0bcfe5baff4761af9069ddebd9"
+  },
+  {
+   "slice_index": 146,
+   "chars": 133013,
+   "sha1": "8f881f2831b0ac9f776c647cc786a23a5da150fa"
+  },
+  {
+   "slice_index": 150,
+   "chars": 152046,
+   "sha1": "0b4d3e38c3365cc623d26d2e1e143041857accf1"
+  },
+  {
+   "slice_index": 162,
+   "chars": 50479,
+   "sha1": "c30abe2246cfc9515b16f9abcb4d7545053125c6"
+  }
+ ],
+ "chars_total": 354234
+}

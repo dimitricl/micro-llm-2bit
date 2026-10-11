@@ -37,9 +37,40 @@ import torch.nn.functional as F
 import data as D
 import engine as E
 
-SUBSET_DEFAULT = "/tmp/c2_subset.json"
+SUBSET_DEFAULT = "docs/results/c2_subset.json"
 VOCAB_PATH = "exports/tranche00.bin.vocab.json"
 LN2 = math.log(2)
+
+
+def _repo_root() -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+
+
+def load_c2_texts(manifest_path: str = SUBSET_DEFAULT) -> list[str]:
+    """Reconstruit les 6 textes G1 depuis le manifeste (IDs + SHA1).
+
+    Le manifeste ne contient pas le texte (pas de duplication) : les
+    textes sont relus dans la slice source aux indices documentés, et
+    chaque SHA1 est vérifié. Règle de sélection dans le manifeste.
+    """
+    import hashlib
+
+    if not os.path.isabs(manifest_path):
+        manifest_path = os.path.join(_repo_root(), manifest_path)
+    man = json.load(open(manifest_path, encoding="utf-8"))
+    import data as D
+
+    texts = D.load_texts(man["source"])
+    out = []
+    for d in man["docs"]:
+        t = texts[d["slice_index"]]
+        h = hashlib.sha1(t.encode("utf-8")).hexdigest()
+        if h != d["sha1"]:
+            raise ValueError(
+                f"SHA1 mismatch slice_index={d['slice_index']}: "
+                f"{h} != {d['sha1']}")
+        out.append(t)
+    return out
 
 
 def surfaces(tokenizer, ids: list[int]) -> dict[int, tuple[str, int, int]]:
@@ -71,7 +102,10 @@ def variantes(records: list[dict], chars: int) -> dict:
 def collect_parent(name: str, texts: list[str], kept: set[int],
                    smol_tok=None, S: int = 512, bs: int = 8,
                    device: str = "mps") -> tuple[list[dict], int]:
-    """NLL par position (parent HF, fp32). Retourne (records, chars)."""
+    """NLL par position (parent HF, fp32). Retourne (records, chars).
+
+    bs : fenêtres par lot (8 par défaut ; 2 pour Qwen-0.6B sur MPS 16 Go,
+    sinon pic mémoire + swap)."""
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     tok = AutoTokenizer.from_pretrained(name, trust_remote_code=True)
@@ -181,12 +215,19 @@ def collect_engine(model_path: str, vocab: dict, texts: list[str],
 def main() -> None:
     ap = argparse.ArgumentParser(description="BPC équitable a/b/c.")
     ap.add_argument("--subset", default=SUBSET_DEFAULT)
-    ap.add_argument("--out", default="/tmp/bpc.json")
+    ap.add_argument("--out", default="docs/results/bpc.json")
     ap.add_argument("--skip-parents", action="store_true")
     ap.add_argument("--skip-bins", action="store_true")
     a = ap.parse_args()
     t0 = time.time()
-    texts = json.load(open(a.subset, encoding="utf-8"))
+    if a.subset.endswith("c2_subset.json") or "results/c2_subset" in a.subset:
+        try:
+            texts = load_c2_texts(a.subset)
+        except (ValueError, KeyError):
+            # Ancien format : liste brute de textes.
+            texts = json.load(open(a.subset, encoding="utf-8"))
+    else:
+        texts = json.load(open(a.subset, encoding="utf-8"))
     print(f"[bpc] {len(texts)} docs", flush=True)
     vocab = json.load(open(VOCAB_PATH, encoding="utf-8"))
     kept = set(vocab["kept_ids"])

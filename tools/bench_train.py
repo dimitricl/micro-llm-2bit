@@ -251,8 +251,12 @@ def compare_cache(top_k: int = 32, steps: int = 30) -> dict:
     parent.to(dev).eval()
     for p in parent.parameters():
         p.requires_grad_(False)
+    import tempfile
     cache = build_teacher_cache(parent, pb, sb, kept, top_k, dev,
-                                micro_batch=MB, prefix="/tmp/cachetest")
+                                micro_batch=MB, prefix=os.path.join(
+                                    tempfile.mkdtemp(prefix="cachetest_",
+                                                     dir="runs"),
+                                    "cache"))
     cfg = dataclasses.replace(CONFIGS["tiny"], vocab_size=len(kept), seq_max=64)
     student = TinyTransformer(cfg).to(dev).train()
     opt = torch.optim.AdamW(student.parameters(), lr=3e-4)
