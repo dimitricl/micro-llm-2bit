@@ -55,3 +55,16 @@ def test_cli_codes(tmp_path):
     r = subprocess.run([sys.executable, "tools/watch_run.py", "--log", log],
                        capture_output=True, text=True, cwd=".")
     assert r.returncode == 0 and "GO" in r.stdout
+
+
+def test_log_only_rend_seuils_informatifs():
+    # P3 : 2× et 25 % ne bloquent plus, la divergence oui.
+    log = BASE + VAL.format(g=50, p=800.0) + VAL.format(g=100, p=900.0) \
+        + VAL.format(g=200, p=1700.0) + END
+    ok_strict, _ = surveiller(log)
+    assert not ok_strict
+    ok_lo, motifs = surveiller(log, log_only=True)
+    assert ok_lo and any("log-only" in m for m in motifs)
+    ok_div, _ = surveiller(
+        BASE + "[train] ARRÊT : loss non finie à step 3\n", log_only=True)
+    assert not ok_div

@@ -166,3 +166,24 @@ uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent Hugging
 Budget V1b : mur V0-seed0 (2 145 s), débit V1a (305 steps en 1 146 s) →
 epochs = ceil(2145×305/(1146×305)) = ceil(2145/1146) = 2
 (voir `tools/run_ablations.sh` ; `SPE_SUBSET=305`).
+
+## R1/R2 — Resume depuis tranche00 (décision P1, committée AVANT le run)
+
+Recette : `tools/run_resume.sh` (R1 : lr=lr-resume=1e-3 ; R2 : lr=lr-resume
+=3e-4, origine `runs/2026-10-08-tranche00/config.json` : `"lr": 0.0003`).
+Base `tranche00.pt` (step 4248) + son vocab, subset commun
+`runs/abl_data/resume_5M.jsonl` (835 premiers docs slice_01,
+5 005 775 tokens), CE seule, seq 128, `--epochs 15`, rewarmup 5 %,
+seed 0, ~20 min/run. Commandes exactes : voir le script.
+
+Règles de décision (appliquées après P5, sans dérogation) :
+- Mesure primaire : Δc apparié (estimateur ratio, bootstrap apparié,
+  1000 tirages, seed 0) sur val_big ET sur OOD, pour (R1−tranche00),
+  (R2−tranche00), (R1−R2). (a)/(b) en secondaire uniquement.
+- MDE calculé POUR CHAQUE PAIRE (demi-largeur IC95 du Δc de la paire).
+  Interdiction de réutiliser ε=0,03.
+- Si |Δc(R1−R2)| < MDE(R1−R2) → égalité → on retient R2 (lr 3e-4, sûr).
+- R1 retenu seulement si : Δc(R1−R2) < −MDE sur val_big ET
+  Δc_OOD(R1−R2) ≤ +MDE_OOD ET val in-run finale < val in-run initiale.
+- Si ni R1 ni R2 ne battent tranche00 au-delà de leur MDE : STOP,
+  la continuation sur Wikipédia seule n'apporte rien tel quel.

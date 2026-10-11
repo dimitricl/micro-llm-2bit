@@ -7,8 +7,10 @@
 # « subset » ci-dessous). CE seule (alpha 0, SANS parent, ~4 400 tok/s),
 # seq 128. R1 : lr 1e-3 (+lr-resume) ; R2 : lr d'origine tranche00 =
 # 3e-4 (config.json : "lr": 0.0003).
-# Steps : SPE=305 (formule run_tranche01.sh), E_CUMUL=15 → total 4 575 steps,
-# reprise à 4 248 ⇒ ~327 steps/run ≈ 5,4M tokens ≈ 20 min/run à 4 400 tok/s.
+# Steps (plan_epoch réel sur resume_5M.jsonl : 39 107 fenêtres, 4 889 micros,
+# 306 steps/epoch, 5 005 696 tokens) : E_CUMUL=15 → total 4 590 steps,
+# reprise à 4 248 ⇒ 342 steps/run ≈ 5,6M tokens ≈ 21 min/run à 4 400 tok/s.
+# Schedule : rewarmup 5 % (17 steps), cosine vers 0,1× (P2 vérifié).
 # Lancement : bash tools/run_resume.sh --go (R1 puis R2, séquentiels,
 # nohup + caffeinate + log + veilleur conseillés, GPU exclusif).
 set -u
@@ -55,7 +57,10 @@ run_one() {  # $1 tag, $2 lr
     --val-ratio 0.05 --eval-every 50 --ckpt-every 500 \
     --resume "$PREV_PT" --rewarmup-ratio 0.05 --lr-resume "$lr" \
     2>&1 | tee "runs/${tag}/train.log"
-  $V tools/watch_run.py --log "runs/${tag}/train.log"
+  # P3 : log-only (abort sur loss non finie seule ; seuils 2×/25 %
+  # informatifs — la récupération CE après reprise peut être non monotone).
+  # Val in-run toutes les 50 steps conservée (courbe de récupération).
+  $V tools/watch_run.py --log "runs/${tag}/train.log" --log-only
 }
 
 if [ "${1:-}" != "--go" ]; then
