@@ -6,6 +6,7 @@ import sys
 
 import numpy as np
 import pytest
+import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -68,3 +69,110 @@ def test_gap_relatif():
     gap = (a_tr - a_par) / a_par
     assert gap == pytest.approx(0.02)
     assert gap * 100 < 3.0  # ordre de grandeur du "0,03 BPC"
+
+
+@pytest.mark.slow
+def test_bpc_reference_values():
+    """Test à valeurs fixes pour les 5 BPC de référence à 4 décimales (G1).
+
+    Valeurs de référence (C2, variante a) :
+    - tranche00 : 1,5676
+    - wiki_slice00 : 1,6566
+    - SmolLM-135M : 1,5357
+    - SmolLM-360M : 1,3362
+    - Qwen3-0.6B : 1,1138
+
+    Valeurs variantes b/c du rapport :
+    - tranche00 b : 1,6536, c : 1,5735
+    - wiki_slice00 b : 1,7431, c : 1,6641
+    - SmolLM-135M b : 1,6099, c : 1,5292
+    - SmolLM-360M b : 1,4133, c : 1,3302
+    - Qwen3-0.6B b : 1,2049, c : 1,1096
+
+    Note : ce test est marqué @slow car il requiert le chargement des modèles
+    parents et l'évaluation sur les 6 documents de validation. Pour lancer :
+      pytest -m slow tests/test_bpc.py
+    """
+    from tools.eval_bpc import collect_parent, collect_engine
+    from main import load_tokenizer
+    import json
+
+    # Subset par défaut : les 6 docs val C2 (354 234 chars)
+    subset_path = "/tmp/c2_subset.json"
+    if not os.path.exists(subset_path):
+        pytest.skip(f"Subset {subset_path} non disponible")
+
+    texts = json.load(open(subset_path, encoding="utf-8"))
+    vocab = json.load(open("exports/tranche00.bin.vocab.json", encoding="utf-8"))
+    kept = set(vocab["kept_ids"])
+    smol_tok = load_tokenizer("HuggingFaceTB/SmolLM-135M")
+
+    dev = "mps" if torch.backends.mps.is_available() else "cpu"
+
+    # Résultats attendus (variante a)
+    expected_a = {
+        "tranche00": 1.5676,
+        "wiki": 1.6566,
+        "smol135": 1.5357,
+        "smol360": 1.3362,
+        "qwen": 1.1138,
+    }
+
+    # Résultats attendus (variantes b et c)
+    expected_b = {
+        "tranche00": 1.6536,
+        "wiki": 1.7431,
+        "smol135": 1.6099,
+        "smol360": 1.4133,
+        "qwen": 1.2049,
+    }
+
+    expected_c = {
+        "tranche00": 1.5735,
+        "wiki": 1.6641,
+        "smol135": 1.5292,
+        "smol360": 1.3302,
+        "qwen": 1.1096,
+    }
+
+    # Collecte .bin
+    parent_ids = []
+    for t in texts:
+        parent_ids += smol_tok.encode(t, add_special_tokens=False) + [
+            smol_tok.eos_token_id]
+
+    rec_tranche, chars = collect_engine("exports/tranche00.bin", vocab, texts,
+                                        parent_ids)
+    v_tranche = variantes(rec_tranche, chars)
+    assert v_tranche["a"] == pytest.approx(expected_a["tranche00"], abs=1e-4)
+    assert v_tranche["b"] == pytest.approx(expected_b["tranche00"], abs=1e-4)
+    assert v_tranche["c"] == pytest.approx(expected_c["tranche00"], abs=1e-4)
+
+    rec_wiki, chars = collect_engine("exports/wiki_slice00_bestval.bin", vocab,
+                                     texts, parent_ids)
+    v_wiki = variantes(rec_wiki, chars)
+    assert v_wiki["a"] == pytest.approx(expected_a["wiki"], abs=1e-4)
+    assert v_wiki["b"] == pytest.approx(expected_b["wiki"], abs=1e-4)
+    assert v_wiki["c"] == pytest.approx(expected_c["wiki"], abs=1e-4)
+
+    # Collecte parents
+    rec_135, chars = collect_parent("HuggingFaceTB/SmolLM-135M", texts, kept,
+                                     smol_tok, device=dev)
+    v_135 = variantes(rec_135, chars)
+    assert v_135["a"] == pytest.approx(expected_a["smol135"], abs=1e-4)
+    assert v_135["b"] == pytest.approx(expected_b["smol135"], abs=1e-4)
+    assert v_135["c"] == pytest.approx(expected_c["smol135"], abs=1e-4)
+
+    rec_360, chars = collect_parent("HuggingFaceTB/SmolLM-360M", texts, kept,
+                                     smol_tok, device=dev)
+    v_360 = variantes(rec_360, chars)
+    assert v_360["a"] == pytest.approx(expected_a["smol360"], abs=1e-4)
+    assert v_360["b"] == pytest.approx(expected_b["smol360"], abs=1e-4)
+    assert v_360["c"] == pytest.approx(expected_c["smol360"], abs=1e-4)
+
+    rec_qwen, chars = collect_parent("Qwen/Qwen3-0.6B", texts, kept, smol_tok,
+                                     device=dev)
+    v_qwen = variantes(rec_qwen, chars)
+    assert v_qwen["a"] == pytest.approx(expected_a["qwen"], abs=1e-4)
+    assert v_qwen["b"] == pytest.approx(expected_b["qwen"], abs=1e-4)
+    assert v_qwen["c"] == pytest.approx(expected_c["qwen"], abs=1e-4)
