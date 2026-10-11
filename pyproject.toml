@@ -18,9 +18,17 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "accelerate>=1.15.0",
+    "lm-eval>=0.4.13",
     "matplotlib>=3.11.2",
     "pytest>=8.0",
+    "pytest-timeout>=2.4.0",
 ]
 
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+markers = ["slow: tests lents (modeles, GPU)"]
+addopts = "-m 'not slow'"
+timeout = 120

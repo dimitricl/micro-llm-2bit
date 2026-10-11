@@ -134,6 +134,16 @@ de fidélité d'export. Les sorties `eval/` ne sont commitées que sous 200 Ko.
 Limite moteur : le KV cache est de taille fixe — `generate()` s'arrête à
 capacité (préfill + génération bornés par seq_max), sans fenêtre glissante.
 
+## Tests
+
+```bash
+pytest -q                  # suite rapide par défaut (slow désélectionnés)
+pytest -m slow -q          # test BPC à valeurs fixes (5 modèles, ~10 min, GPU)
+pytest -q -m "not slow" --durations=20   # diagnostic lenteurs
+```
+Marqueur `slow` déclaré dans `pyproject.toml` (`addopts = -m 'not slow'`,
+`timeout = 120` via pytest-timeout).
+
 ## Limites honnêtes
 
 - Modèle minuscule : le motif appris par cœur est parfait (fiches pays),
