@@ -130,6 +130,34 @@ uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent Hugging
 uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V6-ce-lr1e3/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.0 --lr 0.001 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
 ```
 
+## V7 — Désambiguïsation CE seule vs lr 1e-3 (G3)
+
+**Objectif** : séparer l'effet de CE seule de l'effet du lr 1e-3. V6 confond les deux.
+
+### V7 : CE seule, lr d'origine (3e-4)
+
+Configuration : CE seule (alpha=0), lr 3e-4, protocole identique à D (subset 5M, même seed 0).
+
+| run | seed | steps | tok/s | mur (s) | val_128 PPL/BPC | val_256 PPL/BPC | note |
+|---|---|---|---|---|---|---|---|
+| V7-ce-s0 | 0 | 305 | 2369 | 1275 | 132,01/2,4994 | 130,14/2,4921 | CE seule, lr 3e-4 |
+| V7-ce-s1 | 1 | 303 | 2285 | 1318 | 134,73/2,5098 | 132,40/2,5009 | bruit inter-seeds |
+| Moyenne V7 | - | - | 2327 | 1297 | 133,37/2,5046 | 131,27/2,4965 | |
+
+### Commande (seed 0)
+
+```bash
+uv run python main.py train --data runs/abl_data/train_5M.jsonl --parent HuggingFaceTB/SmolLM-135M --out runs/2026-10-09-abl-V7-ce-s0/model.pt --config tiny --vocab-size 12000 --vocab-from runs/abl_data/vocab.json --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 --epochs 1 --seed 0 --alpha 0.0 --lr 0.0003 --temperature 2.0 --val-ratio 0.05 --eval-every 50 --ckpt-every 100
+```
+
+### Analyse V7 vs V6
+
+- V7 (CE seule, lr 3e-4) : 133,37 PPL (moyenne seeds 0/1)
+- V6 (CE seule, lr 1e-3) : 55,23 PPL
+- Écart : +78,14 PPL ≫ bruit (9,07)
+
+**Verdict** : le lr 1e-3 compte plus que CE seule à 5M tokens. V7 a déjà isolé l'effet lr (V7 ≈ 133 PPL contre V6 55,2). Le design V6/V7/V8 mesure le from-scratch, pas le resume.
+
 Budget V1b : mur V0-seed0 (2 145 s), débit V1a (305 steps en 1 146 s) →
 epochs = ceil(2145×305/(1146×305)) = ceil(2145/1146) = 2
 (voir `tools/run_ablations.sh` ; `SPE_SUBSET=305`).

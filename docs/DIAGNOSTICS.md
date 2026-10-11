@@ -41,28 +41,29 @@ Coût embedding = V × (512 + 4) octets. Mimicry validée : sélection 12000
 
 tranche00 est à 0,03 BPC du parent 135M (1,5676 vs 1,5357) : la
 distillation d'une epoch transfère déjà ~98 % du plafond parent sur ce
-domaine. wiki_slice00 (demi-epoch) est 0,09 BPC derrière (+5,7 % relatif).
-Gemma-3-270M non tenté (accès sous conditions) ; Qwen3-0.6B a suffi comme
-point multilingue.
+domaine pour la métrique standard (a). Les variantes (b) et (c) montrent
+un écart plus important (+2,71 % et +2,90 %). wiki_slice00 (demi-epoch)
+est 0,09 BPC derrière (+5,7 % relatif). Gemma-3-270M non tenté (accès
+sous conditions) ; Qwen3-0.6B a suffi comme point multilingue.
 
 **C2-bis — Métrique BPC équitable (G1)**
 
-Statut au 10/10/2026 : le recalcul corrigé (fix NLL = -log(prob) au lieu de log(prob))
-est terminé. Les valeurs ci-dessous sont les valeurs **corrigées et définitives**.
+Statut au 10/10/2026 : le recalcul contrôlé avec `uv run` est terminé. Les
+valeurs ci-dessous sont les valeurs **corrigées et définitives**.
 
 Variantes BPC sur les MÊMES documents et positions (6 docs val C2, 354 234 chars) :
 
 | modèle | a (actuel) | b (unk pénalisé) | c (in-vocab only) |
 |---|---|---|---|
-| tranche00 | **1,5676** | **1,4544** | **1,5735** |
-| wiki_slice00 | **1,6566** | **1,5439** | **1,6641** |
+| tranche00 | **1,5676** | **1,6536** | **1,5735** |
+| wiki_slice00 | **1,6566** | **1,7431** | **1,6641** |
 | SmolLM-135M | 1,5357 | 1,6099 | 1,5292 |
 | SmolLM-360M | 1,3362 | 1.4133 | 1,3302 |
 | Qwen3-0,6B | 1,1138 | 1,2049 | 1,1096 |
 
 Gaps tranche00 vs SmolLM-135M :
 - (a) actuel : **+2,08 %** (0,0319 BPC)
-- (b) unk pénalisé : **−9,66 %** (−0,1555 BPC) → tranche00 **meilleur** grâce à la pénalité unk
+- (b) unk pénalisé : **+2,71 %** (+0,0437 BPC)
 - (c) in-vocab only : **+2,90 %** (0,0443 BPC)
 
 Gaps wiki_slice00 vs SmolLM-135M :
@@ -70,13 +71,10 @@ Gaps wiki_slice00 vs SmolLM-135M :
 - (b) : −4,10 % (−0,0660 BPC) → wiki_slice00 meilleur
 - (c) : +8,82 % (0,1349 BPC)
 
-**Verdict corrigé** : la variante (a) place tranche00 à +2,08 % (0,032 BPC) du parent —
-l'affirmation "~98 % du plafond" reste correcte pour (a). En revanche, la variante
-(b) (unk pénalisé) montre que tranche00 **surpasse** le parent de 9,66 % car la
-pénalité byte-uniforme favorise les modèles avec moins d'unk. La variante (c)
-(in-vocab only) confirme un petit écart de +2,90 %. **Conclusion** : "98 % du
-plafond" est correct sur la métrique standard (a), mais sous-estime la qualité
-réelle de tranche00 qui gère mieux les unk rares (1,0 % du vocab).
+**Verdict corrigé** : les variantes (b) et (c) montrent un écart supérieur à
+0,03 BPC (+2,71 % et +2,90 %). L'affirmation "~98 % du plafond" basée sur (a)
+seule est donc optimiste et ne doit pas être généralisée aux variantes
+équitablement pénalisées.
 
 ## C2-ter — Validation élargie (G2)
 
