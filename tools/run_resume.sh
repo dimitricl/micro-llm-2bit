@@ -7,9 +7,10 @@
 # « subset » ci-dessous). CE seule (alpha 0, SANS parent, ~4 400 tok/s),
 # seq 128. R1 : lr 1e-3 (+lr-resume) ; R2 : lr d'origine tranche00 =
 # 3e-4 (config.json : "lr": 0.0003).
-# Steps (plan_epoch réel sur resume_5M.jsonl : 39 107 fenêtres, 4 889 micros,
-# 306 steps/epoch, 5 005 696 tokens) : E_CUMUL=15 → total 4 590 steps,
-# reprise à 4 248 ⇒ 342 steps/run ≈ 5,6M tokens ≈ 21 min/run à 4 400 tok/s.
+# Steps (plan_epoch réel sur le TRAIN du subset, split seed 0 / val 0.05
+# répliqué : 860 docs train / 5 012 944 tokens → 306 steps/epoch) :
+# E_CUMUL=15 → total 4 590 steps, reprise à 4 248 ⇒ 342 steps/run
+# ≈ 5,6M tokens ≈ 21 min/run à 4 400 tok/s (débit réel mesuré au run).
 # Schedule : rewarmup 5 % (17 steps), cosine vers 0,1× (P2 vérifié).
 # Lancement : bash tools/run_resume.sh --go (R1 puis R2, séquentiels,
 # nohup + caffeinate + log + veilleur conseillés, GPU exclusif).
@@ -22,18 +23,10 @@ PREV_PT=runs/2026-10-08-tranche00/tranche00.pt
 VOCAB=runs/2026-10-08-tranche00/tranche00.pt.vocab.json
 EPOCHS=15
 
-#bloc subset (déjà exécuté, 835 docs / 5 005 775 tokens / 14 104 152 chars) :
-# .venv/bin/python -c "
-# import json,sys; sys.path.insert(0,'.'); from main import load_tokenizer
-# tok=load_tokenizer('HuggingFaceTB/SmolLM-135M'); tot,keep=0,[]
-# f=open('/Volumes/Lexar/clean-corpus/slices/slice_01.jsonl')
-# for line in f:
-#     t=json.loads(line).get('text','')
-#     if not t.strip(): continue
-#     tot+=len(tok.encode(t,add_special_tokens=False))+1; keep.append(t)
-#     if tot>=5_000_000: break
-# g=open('runs/abl_data/resume_5M.jsonl','w')
-# for t in keep: g.write(json.dumps({'text':t},ensure_ascii=False)+'\n')"
+#bloc subset : tools/make_resume_subset.py (exécuté : 905 premiers docs
+# slice_01, split train/val seed 0 / 0.05 répliqué → 860 docs train,
+# 5 012 944 tokens ; E_CUMUL=15, 342 steps restants).
+# Manifeste : runs/abl_data/resume_5M_manifest.json (test test_subset.py).
 
 [ -f "$PREV_PT" ] || { echo "[resume] MANQUANT : $PREV_PT"; exit 2; }
 [ -f "$VOCAB" ] || { echo "[resume] MANQUANT : $VOCAB"; exit 2; }
@@ -47,7 +40,9 @@ if curl -s --max-time 5 http://localhost:11434/api/ps 2>/dev/null | grep -q '"na
 fi
 
 run_one() {  # $1 tag, $2 lr
-  local tag="$1" lr="$2" out="runs/${tag}/model.pt"
+  local tag="$1"
+  local lr="$2"
+  local out="runs/${tag}/model.pt"
   mkdir -p "runs/${tag}"
   echo "[resume] === $tag (lr=$lr) ==="
   caffeinate -dims $V main.py train --data "$DATA" --parent "$PARENT" \
