@@ -63,14 +63,12 @@ Comparaison tranche00 vs wiki autorisée (vocabs `kept_ids` identiques vérifié
 
 - C1 : unk 8000/12000/16000 = 2,14 % / 1,00 % / 0,45 % (embeddings tiny
   3,94 / 5,91 / 7,87 Mo). Verdict : garder 12000.
-- C2 BPC : 135M 1,5357 / 360M 1,3362 / Qwen3-0.6B 1,1138 / tranche00.bin
-  1,5676 (PPL 25,88) / wiki.bin 1,6566 (PPL 31,12). tranche00 à 0,03 BPC
-  du parent. Variantes (b) unk pénalisé et (c) in-vocab only révèlent un gap
-  différent : (b) +2,71 % (+0,0437 BPC), et (c) +2,90 % (+0,0443 BPC) ;
-  ces variantes confirment que le gap dépasse 0,03 BPC,
-  (c) +2,90 %. L'affirmation "~98 % du plafond" basée sur (a) seule est
-  optimiste et ne doit pas être généralisée aux variantes équitablement
-  pénalisées. Gemma non tenté (accès sous conditions).
+- C2 BPC (comparaison sur b/c uniquement ; a affichée pour continuité,
+  jamais comme métrique de comparaison) : 135M 1,5357 / 360M 1,3362 /
+  Qwen3-0.6B 1,1138 / tranche00.bin 1,5676 (PPL 25,88) / wiki.bin 1,6566
+  (PPL 31,12). Variantes (b) unk pénalisé et (c) in-vocab only : (b) +2,71 %
+  (+0,0437 BPC), (c) +2,90 % (+0,0443 BPC). Aucune revendication de
+  pourcentage du plafond. Gemma non tenté (accès sous conditions).
   Limites notées (fp32 optimiste, fenêtres avec reset, unk inclus).
 - C3 : masse hors top-k T=1 : k32/64/128/512 = 0,249/0,193/0,145/0,070 ;
   à T=2 : 0,816/0,775/0,726/0,594. Le cache top-32 jette ~82 % de la masse
