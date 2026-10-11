@@ -12,6 +12,8 @@
 # E_CUMUL=15 → total 4 590 steps, reprise à 4 248 ⇒ 342 steps/run
 # ≈ 5,6M tokens ≈ 21 min/run à 4 400 tok/s (débit réel mesuré au run).
 # Schedule : rewarmup 5 % (17 steps), cosine vers 0,1× (P2 vérifié).
+# R1: 1e-3 -> 1e-4 final (warmup 17, 342 steps total)
+# R2: 3e-4 -> 3e-5 final (warmup 17, 342 steps total)
 # Lancement : bash tools/run_resume.sh --go (R1 puis R2, séquentiels,
 # nohup + caffeinate + log + veilleur conseillés, GPU exclusif).
 set -u
@@ -58,6 +60,38 @@ run_one() {  # $1 tag, $2 lr
   $V tools/watch_run.py --log "runs/${tag}/train.log" --log-only
 }
 
+if [ "${1:-}" = "--dry-run" ]; then
+  .venv/bin/python - <<'PYEOF'
+import sys, math; sys.path.insert(0,'.')
+import data as D, json, torch
+from main import load_tokenizer
+from distill import plan_epoch
+tok = load_tokenizer('HuggingFaceTB/SmolLM-135M')
+with open('runs/abl_data/resume_5M.jsonl', encoding='utf-8') as f:
+    texts = [json.loads(l).get('text','') for l in f if l.strip()]
+tr, va = D.train_val_split(texts, 0.05, 0)
+stream = []
+for t in tr:
+    stream += tok.encode(t, add_special_tokens=False) + [tok.eos_token_id]
+wins = [stream[i:i+129] for i in range(0, len(stream)-1, 128)]
+wins = [w for w in wins if len(w)==129]
+batches = [torch.tensor(wins[i:i+8], dtype=torch.long) for i in range(0, len(wins), 8)]
+plan = plan_epoch(batches, batch_size=8, accum=16)
+PREV, EPOCHS = 4248, 15
+E = math.ceil((PREV + plan['steps']) / plan['steps'])
+remaining = E*plan['steps'] - PREV
+warm = max(1, int(remaining*0.05))
+def lr_fn(step, lr0):
+    if step < warm: return lr0*(step+1)/warm
+    prog = (step-warm)/max(remaining-warm,1)
+    return lr0*(0.1+0.9*0.5*(1+math.cos(math.pi*min(prog,1))))
+print(f"E_CUMUL={E} total={E*plan['steps']} remaining={remaining} warmup={warm}")
+for tag, lr0 in (('R1',1e-3),('R2',3e-4)):
+    pts = [(0,'start'),(warm-1,'warmup-end'),(warm,'cosine-start'),(remaining//2,'mid'),(remaining-1,'final')]
+    print(f'{tag} (lr={lr0}):', ' '.join(f'{k}={lr_fn(k,lr0):.2e}' for k,_ in pts))
+PYEOF
+  exit 0
+fi
 if [ "${1:-}" != "--go" ]; then
   echo "[resume] PRÉPARÉ (rien lancé). Relancer avec --go."
   echo "[resume] R1 : lr 1e-3 ; R2 : lr 3e-4 (origine tranche00) ; ~20 min/run."
