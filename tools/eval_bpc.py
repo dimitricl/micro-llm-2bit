@@ -167,7 +167,7 @@ def collect_engine(model_path: str, vocab: dict, texts: list[str],
             z -= z.max()
             e = np.exp(z)
             s = e.sum()
-            nll = float(np.log(e[win[i]] / s))
+            nll = float(np.log(s) - np.log(e[win[i]]))
             pid = pw[i]
             _, nc, nb = surf[pid]
             records.append({"nll": nll, "unk": pid not in kept,
