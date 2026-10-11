@@ -2,8 +2,8 @@
 # Runs R1/R2 de RESUME (H5.1) — PRÉPARÉS, NE PAS LANCER sans "go resume".
 # Base : runs/2026-10-08-tranche00/tranche00.pt (step 4248) + son vocab
 # (ancien format unk==eos==0, supporté). Sous-ensemble COMMUN aux deux runs :
-# runs/abl_data/resume_5M.jsonl (835 premiers docs de slice_01, ordre
-# d'origine, seed 0 ; 5 005 775 tokens ; régénérable : voir le bloc
+# runs/abl_data/resume_5M.jsonl (905 premiers docs de slice_01, ordre
+# d'origine, seed 0 ; 5 012 944 tokens train ; régénérable : voir le bloc
 # « subset » ci-dessous). CE seule (alpha 0, SANS parent, ~4 400 tok/s),
 # seq 128. R1 : lr 1e-3 (+lr-resume) ; R2 : lr d'origine tranche00 =
 # 3e-4 (config.json : "lr": 0.0003).

@@ -172,9 +172,12 @@ epochs = ceil(2145×305/(1146×305)) = ceil(2145/1146) = 2
 Recette : `tools/run_resume.sh` (R1 : lr=lr-resume=1e-3 ; R2 : lr=lr-resume
 =3e-4, origine `runs/2026-10-08-tranche00/config.json` : `"lr": 0.0003`).
 Base `tranche00.pt` (step 4248) + son vocab, subset commun
-`runs/abl_data/resume_5M.jsonl` (835 premiers docs slice_01,
-5 005 775 tokens), CE seule, seq 128, `--epochs 15`, rewarmup 5 %,
-seed 0, ~20 min/run. Commandes exactes : voir le script.
+`runs/abl_data/resume_5M.jsonl` (905 premiers docs slice_01, split
+train/val seed 0 / 0.05 répliqué → 860 docs train, 5 012 944 tokens ;
+générateur `tools/make_resume_subset.py`, manifeste
+`runs/abl_data/resume_5M_manifest.json`), CE seule, seq 128,
+`--epochs 15` (342 steps restants), rewarmup 5 %, seed 0, ~20 min/run.
+Commandes exactes : voir le script.
 
 Règles de décision (appliquées après P5, sans dérogation) :
 - Mesure primaire : Δc apparié (estimateur ratio, bootstrap apparié,
