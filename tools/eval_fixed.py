@@ -1,6 +1,7 @@
 """Évaluation fixe et reproductible d'un .bin (CPU, noyau NEON).
 
-20 prompts FR versionnés (5 pays, 5 wiki, 5 courants, 5 factuels).
+32 prompts FR versionnés (v2 : 8 pays, 8 wiki, 8 courants, 8 factuels ;
+v1 = les 20 premiers, inchangés et dans le même ordre).
 Par prompt : greedy + sampling (T=0.7, seed fixe), 60 tokens.
 Métriques AUTOMATIQUES, sans jugement de qualité : taux de répétition
 (4-grammes), plus longue boucle d'un même token, mots distincts.
@@ -8,6 +9,7 @@ Sorties écrites telles quelles (ni corrigées ni triées).
 
 Usage : nice -n 10 .venv/bin/python tools/eval_fixed.py
             --model exports/mini_test.bin --out eval/mini_test/samples.md
+            --metrics-out eval/mini_test/metrics.json
 """
 
 from __future__ import annotations
@@ -26,6 +28,8 @@ import numpy as np
 
 import data as D
 import engine as E
+
+PROMPTS_VERSION = 2
 
 PROMPTS = [
     ("pays", "Le Japon est un pays"),
@@ -48,6 +52,19 @@ PROMPTS = [
     ("factuel", "Deux plus deux égale"),
     ("factuel", "Le plus grand océan est"),
     ("factuel", "Paris se trouve en"),
+    # v2 : +12 (8/catégorie, S5.6 : >= 30 prompts fixes).
+    ("pays", "La Norvège est un pays"),
+    ("pays", "Le Maroc est un pays"),
+    ("pays", "L'Argentine est un pays"),
+    ("wiki", "La gravité a été décrite"),
+    ("wiki", "Le Moyen Âge"),
+    ("wiki", "La Grande Muraille"),
+    ("courant", "Ce soir nous mangeons"),
+    ("courant", "Le train arrive à"),
+    ("courant", "Elle lit un livre"),
+    ("factuel", "Le soleil se lève à"),
+    ("factuel", "L'oxygène est un"),
+    ("factuel", "Napoléon est né en"),
 ]
 
 MAX_NEW = 60
@@ -82,6 +99,9 @@ def main() -> None:
     ap.add_argument("--out", required=True)
     ap.add_argument("--vocab", default="")
     ap.add_argument("--parent", default="")
+    ap.add_argument("--metrics-out", default="",
+                    help="JSON {prompt: {greedy: {...}, sampling: {...}}} "
+                         "pour le gate boucles (S5.6).")
     a = ap.parse_args()
     from main import load_tokenizer, decode_ids
 
@@ -90,6 +110,7 @@ def main() -> None:
     eng = E.Engine(a.model)
     print(f"[eval] noyau={E.KERNEL_NAME} prompts={len(PROMPTS)}", flush=True)
     lignes = [f"# Éval {a.model}", ""]
+    metrics = {}
     for cat, prompt in PROMPTS:
         ids = D.encode_mapped(tok, vocab, prompt, add_eos=False)
         ids = ids[-eng.meta["seq_max"]:]
@@ -104,10 +125,17 @@ def main() -> None:
                    f"greedy ({metriques(out_g, txt_g)}) :", "", txt_g, "",
                    "sampling T=0.7 "
                    f"({metriques(out_s, txt_s)}) :", "", txt_s, ""]
+        metrics[prompt] = {"greedy": metriques(out_g, txt_g),
+                           "sampling": metriques(out_s, txt_s)}
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     with open(a.out, "w", encoding="utf-8") as f:
         f.write("\n".join(lignes) + "\n")
     print(f"[eval] -> {a.out}")
+    if a.metrics_out:
+        json.dump({"version": PROMPTS_VERSION,
+                   "metrics": metrics},
+                  open(a.metrics_out, "w"), indent=1)
+        print(f"[eval] metrics -> {a.metrics_out}")
 
 
 if __name__ == "__main__":

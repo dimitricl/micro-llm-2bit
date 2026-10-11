@@ -14,11 +14,11 @@ eval_fixed (boucles). Le critère tranche01 (G4) compare du .pt au .pt.
 Usage :
   uv run python tools/eval_valbig.py --ckpt runs/.../tranche00.pt \\
       --docs runs/abl_data/val_big.jsonl --vocab exports/tranche00.bin.vocab.json \\
-      --out /tmp/vb_tr.json
+      --out docs/results/vb_tr.json
   uv run python tools/eval_valbig.py --parent HuggingFaceTB/SmolLM-135M \\
-      --docs ... --vocab ... --out /tmp/vb_par.json
+      --docs ... --vocab ... --out docs/results/vb_par.json
   uv run python tools/eval_valbig.py --bin exports/wiki_slice00_bestval.bin \\
-      --docs ... --vocab ... --max-chars 350000 --out /tmp/vb_bin.json
+      --docs ... --vocab ... --max-chars 350000 --out docs/results/vb_bin.json
 """
 
 from __future__ import annotations
@@ -52,9 +52,15 @@ def load_docs(path: str) -> list[str]:
     return out
 
 
-def doc_windows(ids: list[int]) -> list[list[int]]:
+def doc_windows(ids: list[int], S: int = S) -> list[list[int]]:
     wins = [ids[i:i + S + 1] for i in range(0, len(ids) - 1, S)]
     return [w for w in wins if len(w) == S + 1]
+
+
+def set_win(w: int) -> None:
+    """Remplace la fenêtre globale (contrôle ctx32 du gate, S5)."""
+    global S
+    S = w
 
 
 def variant_sums(nll: np.ndarray, unk: np.ndarray, nbytes: np.ndarray,
@@ -120,8 +126,11 @@ def collect_pt(ckpt_path: str, docs: list[str], vocab: dict,
 
 
 def collect_parent(name: str, docs: list[str], kept: set[int],
-                   device: str) -> list[dict]:
-    """Par doc : sommes NLL a/b/c (parent HF fp32, S=128 comme les .pt)."""
+                   device: str, pb: int = 16) -> list[dict]:
+    """Par doc : sommes NLL a/b/c (parent HF fp32, S=128 comme les .pt).
+
+    pb : nb de fenêtres S par lot (16 par défaut ; 4 si OOM MPS sur 360M).
+    """
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     tok = AutoTokenizer.from_pretrained(name, trust_remote_code=True)
@@ -138,9 +147,9 @@ def collect_parent(name: str, docs: list[str], kept: set[int],
                     s = tok.decode([pid], clean_up_tokenization_spaces=False)
                     surf[pid] = (len(s), len(s.encode("utf-8")))
             nll_all, unk_all, nb_all, nc_all = [], [], [], []
-            for i in range(0, len(pids) - 1, 16 * S):
+            for i in range(0, len(pids) - 1, pb * S):
                 chunk = [pids[j:j + S + 1]
-                         for j in range(i, min(i + 16 * S, len(pids) - 1), S)]
+                         for j in range(i, min(i + pb * S, len(pids) - 1), S)]
                 chunk = [w for w in chunk if len(w) == S + 1]
                 if not chunk:
                     continue
@@ -266,8 +275,21 @@ def main() -> None:
                     help="0 = tous les docs, sinon tronque à N chars.")
     ap.add_argument("--draws", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--win", type=int, default=128,
+                    help="fenêtre de contexte S (128 = protocole, "
+                         "32 = contrôle dégradé du gate S5)")
+    ap.add_argument("--pb", type=int, default=16,
+                    help="fenêtres S par lot pour --parent (16 par défaut ; "
+                         "4 si OOM MPS, ex. 360M fp32)")
+    ap.add_argument("--dump-per-doc", default="",
+                    help="chemin JSON : persists par document "
+                         "(nll_a/b/c, chars, chars_c, n, n_unk) pour le "
+                         "gate apparié (S5).")
     a = ap.parse_args()
     t0 = time.time()
+    if a.win != 128:
+        set_win(a.win)
+        print(f"[valbig] fenêtre S={S} (non standard)", flush=True)
     docs = load_docs(a.docs)
     if a.max_chars > 0:
         sub, tot = [], 0
@@ -285,7 +307,7 @@ def main() -> None:
     if a.ckpt:
         per_doc = collect_pt(a.ckpt, docs, vocab, dev)
     elif a.parent:
-        per_doc = collect_parent(a.parent, docs, kept, dev)
+        per_doc = collect_parent(a.parent, docs, kept, dev, a.pb)
     else:
         per_doc = collect_bin(a.bin, vocab, docs)
     res = bootstrap(per_doc, chars, a.draws, a.seed)
@@ -300,6 +322,16 @@ def main() -> None:
               f"[{r['ppl_ci'][0]:.2f}, {r['ppl_ci'][1]:.2f}]", flush=True)
     json.dump(res, open(a.out, "w"), indent=2)
     print(f"[valbig] TERMINE en {time.time()-t0:.0f}s -> {a.out}", flush=True)
+    if a.dump_per_doc:
+        dump = {"docs": [
+            {"nll_a": d["nll_a"], "nll_b": d["nll_b"], "nll_c": d["nll_c"],
+             "chars": len(t), "chars_c": d["chars_c"], "n": d["n"],
+             "n_unk": d["n_unk"]} for d, t in zip(per_doc, docs)],
+            "chars": chars, "win": S, "seed": a.seed, "draws": a.draws,
+            "source": a.docs, "model": a.ckpt or a.parent or a.bin}
+        json.dump(dump, open(a.dump_per_doc, "w"))
+        print(f"[valbig] per-doc -> {a.dump_per_doc} "
+              f"({os.path.getsize(a.dump_per_doc)} o)", flush=True)
 
 
 if __name__ == "__main__":
