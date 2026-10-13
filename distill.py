@@ -546,11 +546,12 @@ def train(
                 g["lr"] = lr_resume
             print(f"[train] LR reprise forcé : {lr_resume}")
         if rewarmup_ratio and rewarmup_ratio > 0:
-            # Scheduler reconstruit sur les steps restants (warmup frais),
+            # Scheduler reconstruit sur les steps du nouveau run (warmup frais),
             # adapté à l'enchaînement sur nouvelles données.
-            remaining = max(total_steps - ckpt["step"], 1)
+            # total_steps = steps pour ce run seulement ; ckpt["step"] est l'absolu du run précédent.
+            remaining = total_steps
             sched = cosine_with_warmup(opt, int(remaining * rewarmup_ratio), remaining)
-            print(f"[train] scheduler reconstruit : {remaining} steps restants")
+            print(f"[train] scheduler reconstruit : {remaining} steps pour ce run")
         elif ckpt.get("sched") is not None:
             sched.load_state_dict(ckpt["sched"])
         else:
@@ -558,18 +559,18 @@ def train(
             sched = cosine_with_warmup(opt, int(total_steps * warmup_ratio),
                                        total_steps)
             print("[train] scheduler reconstruit (défaut, pas d'état).")
-        start_step = ckpt["step"]
-        global_step = start_step
-        print(f"[train] reprise depuis {resume} (step {start_step})")
+        # Pour un nouveau run avec nouveau parent, on repart de step 0 pour ce run.
+        # L'ancien step est gardé pour référence mais global_step repart à 0.
+        old_step = ckpt["step"]
+        global_step = 0
+        print(f"[train] reprise depuis {resume} (ancien step {old_step}, nouveau run step 0)")
         # B4 : reprise positionnelle (epoch + micro + ordre + RNG). Les
         # anciens checkpoints (sans ces clés) repartent à l'epoch 0 comme avant.
-        start_epoch = ckpt.get("epoch", 0)
-        resume_micro = ckpt.get("micro", 0)
-        resume_order = ckpt.get("order")
-        if ckpt.get("rng") is not None:
-            _rng_restore(ckpt["rng"], device)
-            print(f"[train] états RNG restaurés (epoch {start_epoch}, "
-                  f"micro {resume_micro}).")
+        # Pour un nouveau run avec nouveau parent, on repart de l'epoch 0.
+        start_epoch = 0
+        resume_micro = 0
+        resume_order = None
+        # On ne restaure PAS le RNG pour un nouveau parent (distribution différente)
 
     n_params = sum(p.numel() for p in student.parameters())
     print(
