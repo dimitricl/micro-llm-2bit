@@ -71,9 +71,10 @@ Tranche 100 Mo (~25M tokens) : 2.7h/epoch.
 | SmolLM-135M | 2062 | 169 | 123 | 496 | 720 | oui | référence, plus rapide |
 | SmolLM-360M | 1385 | 372 | 123 | 739 | 1175 | oui | +35 % qualité distillation |
 | Qwen3-0.6B | 961 | 653 | 123 | 1065 | 2035 | oui | +1.7× RAM vs 360M, +2.8× vs 135M |
+| **Qwen3-0.6B-Base** | **897** | **699** | **132** | **1142** | **2023** | **oui** | **base non-chat, logits propres** |
 
-**Critères D5** : bench ≥ 700 tok/s ✅, logits finis ✅, RAM < 12 Go ✅ (2035 Mo < 12 Go).
-**Décision D5** : Qwen3-0.6B **RENNÉ** pour le parent switch — respecte les seuils.
+**Critères D5** : bench ≥ 700 tok/s ✅ (897), logits finis ✅, RAM < 12 Go ✅ (2023 Mo < 12 Go).
+**Décision D5** : Qwen3-0.6B-Base **RETENU** pour le parent switch — respecte les seuils.
 
 ## Fichiers à modifier pour le switch parent Qwen3-0.6B (D5.c)
 

@@ -200,28 +200,28 @@ Règles de décision (appliquées après P5, sans dérogation) :
 
 ### D5.a — ID repo Qwen3-0.6B-Base + hash
 
-- **Repo HF exact** : `Qwen/Qwen3-0.6B` (pas `Qwen/Qwen3-0.6B-Base` — le repo officiel est `Qwen/Qwen3-0.6B`)
-- **Revision (snapshot)** : `c1899de289a04d12100db370d81485cdf75e47ca`
-- **Taille snapshot** : 1,4 Go (model.safetensors BF16, 596M params)
+- **Repo HF exact** : `Qwen/Qwen3-0.6B-Base` (modèle de base non-chat, logits propres pour distillation)
+- **Revision (snapshot)** : `da87bfb608c14b7cf20ba1ce41287e8de496c0cd`
+- **Taille snapshot** : 1,1 Go (model.safetensors BF16, 596M params)
 - **HF_HOME** : `/Volumes/Lexar/hf_cache` (déjà présent, déjà téléchargé)
-- **SHA256 model.safetensors** : `f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b` (via symlink `model.safetensors -> ../../blobs/f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b`)
+- **SHA256 model.safetensors** : `2c465b10ceca99084a7d3d8451bd593ac1ea835f3516b7ccc7279b177351021f` (via symlink `model.safetensors -> ../../blobs/2c/2c465b10ceca99084a7d3d8451bd593ac1ea835f3516b7ccc7279b177351021f`)
 
-### D5.b — Bench Qwen3-0.6B vs SmolLM-135M/360M (tiny, bs 8, 30 steps, MPS fp16)
+### D5.b — Bench Qwen3-0.6B-Base vs SmolLM-135M/360M (tiny, bs 8, 30 steps, MPS fp16)
 
 | parent | tok/s | parent_ms | child_ms | total_ms | RAM max Mo | logits finis | note |
 |---|---|---|---|---|---|---|---|
 | SmolLM-135M | 2062 | 169 | 123 | 496 | 720 | oui | référence |
 | SmolLM-360M | 1385 | 372 | 123 | 739 | 1175 | oui | +35 % qualité distillation |
-| **Qwen3-0.6B** | **961** | **653** | **123** | **1065** | **2035** | **oui** | **+1,7× RAM vs 360M** |
+| **Qwen3-0.6B-Base** | **897** | **699** | **132** | **1142** | **2023** | **oui** | **base non-chat, logits propres** |
 
 Autocast parent (tiny, bs 2) : fp32 800 tok/s, fp16 980 tok/s, bf16 880 tok/s — logits finis ✅.
 
 **Critères D5** (committés ci-dessous) :
-- bench ≥ 700 tok/s ✅ (961)
+- bench ≥ 700 tok/s ✅ (897)
 - logits finis ✅
-- RAM < 12 Go ✅ (2035 Mo < 12 Go)
+- RAM < 12 Go ✅ (2023 Mo < 12 Go)
 
-**Verdict** : Qwen3-0.6B **RENNÉ** pour le parent switch — respecte les seuils.
+**Verdict** : Qwen3-0.6B-Base **RETENU** pour le parent switch — respecte les seuils.
 
 ### D5.c — Fichiers à modifier pour le switch parent (sans les modifier)
 
@@ -247,16 +247,26 @@ Fichiers déjà dynamiques (OK) : `main.py`, `distill.py`, `tools/eval_valbig.py
 ### D5.e — Commandes exactes du futur run R3 (Qwen3-0.6B)
 
 ```bash
+### D5.e — Commande exacte du futur run R3 (Qwen3-0.6B-Base, KD D3)
+
+```bash
 uv run python main.py train --data runs/abl_data/resume_5M.jsonl \
-  --parent Qwen/Qwen3-0.6B --out runs/R3-qwen3-0.6b/model.pt \
+  --parent Qwen/Qwen3-0.6B-Base --out runs/R3-qwen3-0.6b-base/model.pt \
   --config tiny --vocab-size 12000 --vocab-from runs/abl_data/resume_5M_manifest.json \
   --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 \
-  --epochs 15 --seed 0 --alpha 0.0 --lr 1e-3 --temperature 2.0 \
+  --epochs 15 --seed 0 --alpha 0.7 --lr 3e-4 --temperature 2.0 \
   --val-ratio 0.05 --eval-every 50 --ckpt-every 500 \
-  --resume runs/R2-ce-lr3e4/model.pt --rewarmup-ratio 0.05 --lr-resume 1e-3
+  --resume runs/2026-10-08-tranche00/tranche00.pt --rewarmup-ratio 0.05 --lr-resume 3e-4
 ```
 
-**Estimation temps** (basé sur R2 : 1305 s / 342 steps = 3,8 s/step → ~1300 s ≈ 22 min pour 342 steps). Plus lent que R2 (~1,4×) à cause du parent plus gros (653 ms vs 372 ms parent forward).
+**Règle D3 respectée** : KD (alpha 0.7), lr 3e-4, resume depuis tranche00.pt (step 4248), parent = Qwen3-0.6B-Base, schedule 342 steps, seed 0, subset 905 docs. Pas de CE (alpha > 0 charge le parent). R2b inchangé (copie exacte R2, seed 1).
+
+**Estimation temps** (basée sur bench Qwen3-0.6B-Base KD) :
+- total_step_ms = 1142 ms (bench C1, KD alpha=0.7, bs=8)
+- Facteur backward+optim mesuré sur R1 : (145.5+34.9)/1142 ≈ 0,16 (source: logs/bench_qwen_base.log)
+- Facteur observé sur R1 CE : total_step_ms / parent_ms = 496/169 ≈ 2,93
+- Estimation KD Qwen : 1142 × 2,93 / 1,0 ≈ 3346 ms/step (facteur KD≈2,9 vs CE)
+- 342 steps × 3,35 s/step ≈ **1145 s ≈ 19 min**
 
 ### D5.f — Fallback SmolLM2-360M (si Qwen échoue)
 
