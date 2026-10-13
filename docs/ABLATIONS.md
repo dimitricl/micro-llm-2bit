@@ -167,6 +167,11 @@ Budget V1b : mur V0-seed0 (2 145 s), débit V1a (305 steps en 1 146 s) →
 epochs = ceil(2145×305/(1146×305)) = ceil(2145/1146) = 2
 (voir `tools/run_ablations.sh` ; `SPE_SUBSET=305`).
 
+## Skills (référence)
+
+Skills opencode via plugin `@opencode-ai/plugin:1.16.2` (pas de commit git individuel par skill) :
+- `using-superpowers`, `verifying-before-completion`, `systematic-debugging`, `test-driven-development`, `code-reviewer` (subagent), `internet-researcher` (web search direct).
+
 ## R1/R2 — Resume depuis tranche00 (décision P1, committée AVANT le run)
 
 Recette : `tools/run_resume.sh` (R1 : lr=lr-resume=1e-3 ; R2 : lr=lr-resume
@@ -190,3 +195,69 @@ Règles de décision (appliquées après P5, sans dérogation) :
   Δc_OOD(R1−R2) ≤ +MDE_OOD ET val in-run finale < val in-run initiale.
 - Si ni R1 ni R2 ne battent tranche00 au-delà de leur MDE : STOP,
   la continuation sur Wikipédia seule n'apporte rien tel quel.
+
+## Parent switch — D5 (préparation, non lancé)
+
+### D5.a — ID repo Qwen3-0.6B-Base + hash
+
+- **Repo HF exact** : `Qwen/Qwen3-0.6B` (pas `Qwen/Qwen3-0.6B-Base` — le repo officiel est `Qwen/Qwen3-0.6B`)
+- **Revision (snapshot)** : `c1899de289a04d12100db370d81485cdf75e47ca`
+- **Taille snapshot** : 1,4 Go (model.safetensors BF16, 596M params)
+- **HF_HOME** : `/Volumes/Lexar/hf_cache` (déjà présent, déjà téléchargé)
+- **SHA256 model.safetensors** : `f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b` (via symlink `model.safetensors -> ../../blobs/f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b`)
+
+### D5.b — Bench Qwen3-0.6B vs SmolLM-135M/360M (tiny, bs 8, 30 steps, MPS fp16)
+
+| parent | tok/s | parent_ms | child_ms | total_ms | RAM max Mo | logits finis | note |
+|---|---|---|---|---|---|---|---|
+| SmolLM-135M | 2062 | 169 | 123 | 496 | 720 | oui | référence |
+| SmolLM-360M | 1385 | 372 | 123 | 739 | 1175 | oui | +35 % qualité distillation |
+| **Qwen3-0.6B** | **961** | **653** | **123** | **1065** | **2035** | **oui** | **+1,7× RAM vs 360M** |
+
+Autocast parent (tiny, bs 2) : fp32 800 tok/s, fp16 980 tok/s, bf16 880 tok/s — logits finis ✅.
+
+**Critères D5** (committés ci-dessous) :
+- bench ≥ 700 tok/s ✅ (961)
+- logits finis ✅
+- RAM < 12 Go ✅ (2035 Mo < 12 Go)
+
+**Verdict** : Qwen3-0.6B **RENNÉ** pour le parent switch — respecte les seuils.
+
+### D5.c — Fichiers à modifier pour le switch parent (sans les modifier)
+
+| fichier | changement requis |
+|---|---|
+| `tools/bench_train.py` lignes 230, 342, 372 | parents hardcodés → ajouter `"Qwen/Qwen3-0.6B"` |
+| `tools/make_ablation_data.py:30` | `load_tokenizer("HuggingFaceTB/SmolLM-135M")` → paramétrer |
+| `tools/make_resume_subset.py:30` | `load_tokenizer("HuggingFaceTB/SmolLM-135M")` → paramétrer |
+| `tools/eval_bpc.py:235` | `smol_tok = load_tokenizer("HuggingFaceTB/SmolLM-135M")` → paramétrer |
+| `tools/convert_vocab.py` | si changement `kept_ids` → adapter |
+
+Fichiers déjà dynamiques (OK) : `main.py`, `distill.py`, `tools/eval_valbig.py`, `tools/run_resume.sh`, `tools/eval_downstream.sh`.
+
+### D5.d — Règles de décision parent (COMMITTÉES ci-dessous)
+
+**Critères de sélection** (tous obligatoires) :
+1. bench ≥ 700 tok/s (tiny, bs 8, 30 steps, MPS fp16)
+2. logits finis (pas de NaN/Inf sur 5 batches aléatoires)
+3. RAM max < 12 Go (marge système sur 16 Go)
+
+**Fallback** : si un critère échoue → SmolLM2-360M (même bench, même critères).
+
+### D5.e — Commandes exactes du futur run R3 (Qwen3-0.6B)
+
+```bash
+uv run python main.py train --data runs/abl_data/resume_5M.jsonl \
+  --parent Qwen/Qwen3-0.6B --out runs/R3-qwen3-0.6b/model.pt \
+  --config tiny --vocab-size 12000 --vocab-from runs/abl_data/resume_5M_manifest.json \
+  --seq-len 128 --save-batch 8 --batch-size 8 --accum 16 \
+  --epochs 15 --seed 0 --alpha 0.0 --lr 1e-3 --temperature 2.0 \
+  --val-ratio 0.05 --eval-every 50 --ckpt-every 500 \
+  --resume runs/R2-ce-lr3e4/model.pt --rewarmup-ratio 0.05 --lr-resume 1e-3
+```
+
+**Estimation temps** (basé sur R2 : 1305 s / 342 steps = 3,8 s/step → ~1300 s ≈ 22 min pour 342 steps). Plus lent que R2 (~1,4×) à cause du parent plus gros (653 ms vs 372 ms parent forward).
+
+### D5.f — Fallback SmolLM2-360M (si Qwen échoue)
+
+Même commande avec `--parent HuggingFaceTB/SmolLM2-360M` (si disponible sur HF), même bench, mêmes critères. À documenter si déclenché.
