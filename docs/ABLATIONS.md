@@ -196,6 +196,11 @@ Règles de décision (appliquées après P5, sans dérogation) :
 - Si ni R1 ni R2 ne battent tranche00 au-delà de leur MDE : STOP,
   la continuation sur Wikipédia seule n'apporte rien tel quel.
 
+Convention signes (F0c) : Δ(X−Y) = X−Y en BPC, négatif = X meilleur,
+δ = |Δ|. Exemple : gate R2→R2b val_big Δc = −0,0054 (R2b meilleur
+de 0,0054), OOD Δc = −0,0072. Tout tableau antérieur affichant +0,0054
+pour R2b−R2 est corrigé en −0,0054.
+
 ## Parent switch — D5 (préparation, non lancé)
 
 ### D5.a — ID repo Qwen3-0.6B-Base + hash

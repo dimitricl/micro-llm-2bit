@@ -1,0 +1,14 @@
+{
+ "parent": "Qwen/Qwen3-0.6B-Base",
+ "vocab_size": 12000,
+ "unk_new": 11999,
+ "eos_new": 0,
+ "unk_distinct": true,
+ "vocab_version": 2,
+ "n_texts": 905,
+ "train_ids": 4196918,
+ "train_covered": 4128371,
+ "train_coverage": 0.983667300623934,
+ "sha1_texts": "1945907e4f9a7cdf033d948b6dad1100596243a3",
+ "build_s": 9.8
+}
