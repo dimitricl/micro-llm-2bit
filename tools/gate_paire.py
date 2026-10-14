@@ -116,12 +116,13 @@ def check_repetition(metrics_path: str) -> dict:
     """
     m = json.load(open(metrics_path, encoding="utf-8"))
     mm = m["metrics"]
+    assert len(mm) >= 30, f"metrics {metrics_path} : {len(mm)} prompts (< 30)"
     reps = [v["sampling"]["taux_repetition_4g"] for v in mm.values()]
     bous = [v["sampling"]["plus_longue_boucle"] for v in mm.values()]
     rm = sum(reps) / len(reps)
     bm = sum(bous) / len(bous)
     motifs = []
-    if rm > S_REP_SEUIL:
+    if rm > S_REP_SEUIL + 1e-9:  # tolérance flottant (0.15 exact = PASS)
         motifs.append(f"repetition sampling {rm:.4f} > {S_REP_SEUIL}")
     return {"rep_moy": rm, "boucle_moy": bm, "boucle_max": max(bous),
             "n": len(mm), "fail": bool(motifs), "motif": "; ".join(motifs)}

@@ -411,6 +411,8 @@ class Engine:
         top_p: float = 0.9,
         rng: np.random.Generator | None = None,
         mask_id: int = -1,
+        repetition_penalty: float = 1.0,
+        no_repeat_ngram_size: int = 0,
     ) -> list[int]:
         """Génère une trace think ; le parsing se fait après décodage."""
         return self.generate(
@@ -421,6 +423,8 @@ class Engine:
             top_p=top_p,
             rng=rng,
             mask_id=mask_id,
+            repetition_penalty=repetition_penalty,
+            no_repeat_ngram_size=no_repeat_ngram_size,
         )
 
 

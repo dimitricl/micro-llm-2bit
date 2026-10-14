@@ -508,11 +508,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     pi.add_argument(
         "--repetition-penalty", type=float, default=1.0,
-        help="P3 : frequency penalty (1.0 = OFF, défaut).",
+        help="P3 : frequency penalty (1.0 = OFF, défaut ; <1 favorise la répétition).",
     )
     pi.add_argument(
         "--no-repeat-ngram", type=int, default=0,
-        help="P3 : interdit les n-grammes déjà vus (0 = OFF, défaut).",
+        help="P3 : interdit les n-grammes déjà vus (0 = OFF, 1 = no-op, défaut).",
     )
     pi.add_argument(
         "--think",

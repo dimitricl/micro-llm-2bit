@@ -133,3 +133,15 @@ def test_repetition_gate_borne(tmp_path):
     f = os.path.join(tmp_path, "lim.json")
     json.dump(_mk_metrics(0.09, 1), open(f, "w"))
     assert check_repetition(f)["fail"] is False
+
+
+def test_repetition_gate_frontiere(tmp_path):
+    """Frontière : == seuil PASS, juste au-dessus FAIL."""
+    import json
+    from tools.gate_paire import check_repetition, S_REP_SEUIL
+    f = os.path.join(tmp_path, "eq.json")
+    json.dump(_mk_metrics(S_REP_SEUIL, 1), open(f, "w"))
+    assert check_repetition(f)["fail"] is False
+    g = os.path.join(tmp_path, "over.json")
+    json.dump(_mk_metrics(S_REP_SEUIL + 0.0001, 1), open(g, "w"))
+    assert check_repetition(g)["fail"] is True
