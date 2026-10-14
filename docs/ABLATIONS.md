@@ -455,3 +455,14 @@ Fourche Qwen PARKÉE (R4 confondue, e6 poubelle).
 - Garde-fous actifs : staging F0b sur les 5 sites `torch.save`,
   règle stall S1, lock `logs/gpu.lock`, `ollama ps` vide, F0a silencieux
   attendu (même tokenizer).
+
+## E-PILOTE t01 — pre-flight (committé avant le run)
+- Val gelée : `runs/abl_data/val_E_frozen.jsonl` (500 docs, 5 149 388 chars,
+  seed 0, pool dedup t00), manifeste+hash `docs/results/val_E_frozen_manifest.json`.
+  Disjonction SHA1 vérifiée : t01-t09, val_big, OOD.
+- Arithmétique t01 (plan exact `logs/plan_t01.log`) : 10236 docs,
+  36355 micros, **SPE=2273**, E_CUMUL=3, total=6819, **restants=2571 steps**
+  (≈42,1M tokens, ~1,13 époque). ETA 16849 s ≈ **4,7 h** à 2500 tok/s.
+  Garde : total ≈ 6819 et « restants » ≈ 2571 dans le log, sinon kill < 50 steps.
+- Disque : 650 Gi libres (`df`, budget 3,6 Go).
+- F0a : silencieux attendu (tokenizer SmolLM des deux côtés).
