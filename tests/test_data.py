@@ -31,8 +31,11 @@ def test_vocab_reduit():
     # Mots fréquents présents.
     frequent_old = abs(hash("monde")) % 500
     assert frequent_old in vocab["kept_ids"]
-    # Encodage : inconnu -> unk, eos ajouté.
-    ids = D.encode_mapped(tok, vocab, "monde xyzzyplugh")
+    # Encodage : inconnu -> unk, eos ajouté. Mot OOV dérivé au runtime
+    # (pas de collision avec kept_ids, indépendant de PYTHONHASHSEED).
+    oov = next(f"zzq{i}" for i in range(100000)
+               if abs(hash(f"zzq{i}")) % 500 not in vocab["kept_ids"])
+    ids = D.encode_mapped(tok, vocab, f"monde {oov}")
     assert ids[-1] == vocab["eos_new"]
     assert vocab["unk_new"] in ids
 
@@ -134,6 +137,8 @@ def test_vocab_sans_unk_parent():
     assert vocab["vocab_version"] == 2
     assert -1 in vocab["kept_ids"]  # sentinelle unk dédiée
     assert vocab["eos_new"] == vocab["kept_ids"].index(1)
-    ids = D.encode_mapped(tok, vocab, "monde xyzzyplugh")
+    oov = next(f"zzq{i}" for i in range(100000)
+               if abs(hash(f"zzq{i}")) % 500 not in vocab["kept_ids"])
+    ids = D.encode_mapped(tok, vocab, f"monde {oov}")
     assert ids[-1] == vocab["eos_new"]
     assert vocab["unk_new"] in ids

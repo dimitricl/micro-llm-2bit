@@ -222,6 +222,14 @@ def cmd_train(a: argparse.Namespace) -> None:
     if getattr(a, "from_scratch", False) and getattr(a, "resume", ""):
         raise ValueError("--from-scratch interdit avec --resume "
                          "(bypass réservé aux runs frais).")
+    if getattr(a, "vocab_from", ""):
+        # F0a précoce : refuse le mismatch avant même load_tokenizer.
+        import json as _json
+        with open(a.vocab_from, encoding="utf-8") as f:
+            _vocab_early = _json.load(f)
+        D.check_parent_vocab_match(getattr(a, "parent", ""),
+                                   _vocab_early,
+                                   getattr(a, "from_scratch", False))
     tok = load_tokenizer(a.parent)
     pb, sb, vpb, vsb, vocab = prepare_corpus(
         tok, a, save_vocab_to=a.vocab_out or (a.out + ".vocab.json"))
@@ -577,6 +585,8 @@ def build_parser() -> argparse.ArgumentParser:
     pc.add_argument("--seed", type=int, default=0)
     pc.add_argument("--vocab-from", default="")
     pc.add_argument("--cache-k", type=int, default=32)
+    pc.add_argument("--from-scratch", action="store_true",
+                    help="Bypass explicite du garde-fou tokenizer-vs-vocab.")
 
     pb = sub.add_parser("bench", help="RAM réelle, tok/s, budget 100 Mo.")
     pb.add_argument("--model", required=True)

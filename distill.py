@@ -408,39 +408,70 @@ def stall_exceeded(last_log_time: float, now: float,
     return (now - last_log_time) > interval
 
 
-def save_atomic(obj, path: str, retries: int = 3) -> str:
+def save_atomic(obj, path: str, retries: int = 3,
+                stage_dir: str | None = None) -> str:
     """torch.save anti-troncature (F0b, 2e crash même classe que R3).
 
-    Écriture vers fichier temporaire sur disque interne (staging, hors
-    USB instable) + fsync + `os.replace` atomique vers la cible, retry
-    3× avec backoff sur EINTR. La cible n'est jamais tronquée : soit
-    l'ancienne version intacte (échec), soit la nouvelle complète.
+    Écriture vers fichier temporaire (staging, interne par défaut pour
+    éviter l'USB instable) + fsync + `os.replace` vers la cible, retry
+    3× avec backoff sur EINTR. Si le staging interne et la cible sont
+    sur des filesystems différents, `os.replace` lève EXDEV : on
+    restage alors dans le dossier cible (replace atomique garanti).
+    La cible n'est jamais tronquée : soit l'ancienne version intacte
+    (échec), soit la nouvelle complète. `stage_dir` = testabilité.
     """
     last_exc: OSError | None = None
-    for attempt in range(max(retries, 1)):
+    target_dir = os.path.dirname(os.path.abspath(path)) or "."
+    attempt = 0
+    staged_local = False
+    while attempt < max(retries, 1):
         try:
-            fd, tmp = tempfile.mkstemp(dir=tempfile.gettempdir(),
-                                       prefix=".ckpt_stage_")
+            if stage_dir is not None:
+                fd, tmp = tempfile.mkstemp(dir=stage_dir,
+                                           prefix=".ckpt_stage_")
+            elif staged_local:
+                fd, tmp = tempfile.mkstemp(dir=target_dir,
+                                           prefix=".ckpt_stage_")
+            else:
+                try:
+                    fd, tmp = tempfile.mkstemp(
+                        dir=tempfile.gettempdir(), prefix=".ckpt_stage_")
+                except OSError:
+                    fd, tmp = tempfile.mkstemp(dir=target_dir,
+                                               prefix=".ckpt_stage_")
+                    staged_local = True
         except OSError:
-            fd, tmp = tempfile.mkstemp(
-                dir=os.path.dirname(os.path.abspath(path)) or ".",
-                prefix=".ckpt_stage_")
+            fd, tmp = tempfile.mkstemp(dir=target_dir,
+                                       prefix=".ckpt_stage_")
+            staged_local = True
+        tmp_exists = True
         try:
             with os.fdopen(fd, "wb") as f:
                 torch.save(obj, f)
                 f.flush()
                 os.fsync(f.fileno())
-            os.replace(tmp, path)
+            try:
+                os.replace(tmp, path)
+            except OSError as e:
+                if e.errno == errno.EXDEV and not staged_local:
+                    # Cross-filesystem : restage local et rejoue.
+                    staged_local = True
+                    continue
+                raise
+            tmp_exists = False
             return path
         except OSError as e:
             last_exc = e
-            try:
-                os.remove(tmp)
-            except OSError:
-                pass
             if e.errno != errno.EINTR or attempt + 1 >= max(retries, 1):
                 raise
             time.sleep(0.5 * (attempt + 1))
+        finally:
+            if tmp_exists:
+                try:
+                    os.remove(tmp)
+                except OSError:
+                    pass
+        attempt += 1
     assert last_exc is not None
     raise last_exc
 
