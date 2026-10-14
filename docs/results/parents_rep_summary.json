@@ -1,0 +1,27 @@
+{
+ "smol135_greedy": {
+  "rep": 0.6287,
+  "rep_max": 1.0,
+  "boucle": 3.2,
+  "boucle_max": 56,
+  "dis": 10.8
+ },
+ "smol360_greedy": {
+  "rep": 0.3488,
+  "rep_max": 1.0,
+  "boucle": 1.4,
+  "boucle_max": 3,
+  "dis": 19.8
+ },
+ "smol135_sampling": {
+  "rep": 0.1074,
+  "rep_max": 0.5,
+  "boucle": 1.7
+ },
+ "smol360_sampling": {
+  "rep": 0.11,
+  "rep_max": 1.0,
+  "boucle": 1.4
+ },
+ "note": "greedy: seed fixe via eval_fixed.PROMPTS; sampling HF: temperature 0.7 top_k 40 top_p 0.9, NON seede (variance inter-runs). Sources: logs/parents_rep.log, logs/parents_samp.log"
+}

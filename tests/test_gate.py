@@ -98,3 +98,38 @@ def test_compare_loops_proportion():
             r = compare_loops(pr, pn)
             assert r["worse"] == k and r["n"] == 32
             assert r["fail"] == fail
+
+
+def _mk_metrics(rep, bou, n=32):
+    return {"version": 2,
+            "metrics": {f"p{i}": {"greedy": {"plus_longue_boucle": 1,
+                                             "taux_repetition_4g": 0.3,
+                                             "mots_distincts": 10},
+                                  "sampling": {"plus_longue_boucle": bou,
+                                               "taux_repetition_4g": rep,
+                                               "mots_distincts": 10}}
+                          for i in range(n)}}
+
+
+def test_repetition_gate_absolu(tmp_path):
+    """P3 : seuil absolu calibré — sain passe, dégénéré FAIL."""
+    import json
+    from tools.gate_paire import check_repetition, S_REP_SEUIL
+    sain = os.path.join(tmp_path, "sain.json")
+    deg = os.path.join(tmp_path, "deg.json")
+    json.dump(_mk_metrics(0.03, 1), open(sain, "w"))
+    json.dump(_mk_metrics(0.33, 28), open(deg, "w"))
+    r1 = check_repetition(sain)
+    assert r1["fail"] is False
+    r2 = check_repetition(deg)
+    assert r2["fail"] is True and "repetition" in r2["motif"]
+    assert S_REP_SEUIL == 0.15
+
+
+def test_repetition_gate_borne(tmp_path):
+    """Juste sous le seuil : PASS (pas de faux positif limite)."""
+    import json
+    from tools.gate_paire import check_repetition
+    f = os.path.join(tmp_path, "lim.json")
+    json.dump(_mk_metrics(0.09, 1), open(f, "w"))
+    assert check_repetition(f)["fail"] is False

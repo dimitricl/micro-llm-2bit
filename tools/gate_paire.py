@@ -97,6 +97,36 @@ def wilson_lower(k: int, n: int, z: float = 1.96) -> float:
             + z * z / (4 * n * n))) / den
 
 
+# P3 : seuil absolu anti-boucle sur SAMPLING (T=0.7, seed fixe).
+# Le greedy ne sépare pas (parents greedy 0.63/3.2 bouclent plus que nos
+# tinies) ; le sampling oui. Refs mesurées sampling/32 : tranche00 0.0441,
+# R2 0.0144, R2b 0.0098, R3 0.0472, parents HF 0.1074/0.1100 (sampling
+# non seedé côté HF, variance inter-runs).
+# (R4 dégénéré 0.3263 FAIL, e6 vide exclu).
+# Marge +35 % sur le max sain, 2× sous R4.
+S_REP_SEUIL = 0.15
+
+
+def check_repetition(metrics_path: str) -> dict:
+    """Gate répétition absolu (P3) : FAIL = tranche boucleuse, tout seul.
+
+    Teste le NOUVEAU modèle seul (pas de ref) sur SAMPLING :
+    repet4g moy > S_REP_SEUIL. Câblé dans verdict() quand new_loops
+    est fourni.
+    """
+    m = json.load(open(metrics_path, encoding="utf-8"))
+    mm = m["metrics"]
+    reps = [v["sampling"]["taux_repetition_4g"] for v in mm.values()]
+    bous = [v["sampling"]["plus_longue_boucle"] for v in mm.values()]
+    rm = sum(reps) / len(reps)
+    bm = sum(bous) / len(bous)
+    motifs = []
+    if rm > S_REP_SEUIL:
+        motifs.append(f"repetition sampling {rm:.4f} > {S_REP_SEUIL}")
+    return {"rep_moy": rm, "boucle_moy": bm, "boucle_max": max(bous),
+            "n": len(mm), "fail": bool(motifs), "motif": "; ".join(motifs)}
+
+
 def compare_loops(ref_path: str, new_path: str) -> dict:
     """Proportion de prompts où la boucle greedy empire + borne Wilson."""
     r = json.load(open(ref_path, encoding="utf-8"))
@@ -127,9 +157,12 @@ def verdict(ref_path: str, new_path: str, draws: int = DRAWS,
         loops = compare_loops(ref_loops, new_loops)
         if loops["fail"]:
             fails.append("loops")
+    rep = check_repetition(new_loops) if new_loops else None
+    if rep is not None and rep["fail"]:
+        fails.append("repetition")
     ok = not fails
     return ok, {"bpc": out, "eps": eps, "fails": fails,
-                "gate_faible": faible, "loops": loops,
+                "gate_faible": faible, "loops": loops, "repetition": rep,
                 "avertissements": avert[:5]}
 
 
@@ -159,6 +192,11 @@ def main() -> None:
         L = res["loops"]
         print(f"[loops] pire {L['worse']}/{L['n']} "
               f"(Wilson_lo={L['wilson_lo']:.3f})", flush=True)
+    if res.get("repetition") is not None:
+        R = res["repetition"]
+        print(f"[repetition] sampling moy={R['rep_moy']:.4f} "
+              f"(seuil {S_REP_SEUIL})"
+              + (f" FAIL {R['motif']}" if R["fail"] else ""), flush=True)
     print(("PASS" if ok else "FAIL")
           + ("" if ok else f" : {res['fails']}"), flush=True)
     sys.exit(0 if ok else 1)
