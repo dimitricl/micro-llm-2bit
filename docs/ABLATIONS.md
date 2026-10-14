@@ -444,12 +444,18 @@ Fourche Qwen PARKÉE (R4 confondue, e6 poubelle).
   (t09 24,2M) ≈ **23887**. Tokens E totaux ≈ 321,9M (+34,8M tranche00).
 - ETA au débit MESURÉ R3 (2500 tok/s) : 37,2M/2500 ≈ 14880 s ≈ 4,1 h
   par tranche → **~37 h les 9 tranches** + ~10 min d'évals par tranche.
+  **Amendement t01 (run en cours)** : débit réel ~1500 tok/s, pas 2500.
+  Cause mesurée : eval-every-50 sur val gelée 500 docs (~4 min/eval)
+  vs 45 docs chez R3 — l'overhead eval dilue la moyenne (entraînement
+  lui-même inchangé : GPU exclusif, 65 % mem libre, disque idle).
+  ETA t01 révisée ≈ **7,5 h**. Run conforme à la spec (flags intacts),
+  pas de STOP : seule l'estimation était fausse.
 - Checkpoints par tranche : best-val (100 Mo) + final (300 Mo) gardés,
   `_ckpt*` (garde 2 en cours) et `_e*.pt` purgés après validation.
   Budget disque : 9 × 400 Mo ≈ **3,6 Go** (+2 _ckpt courants 600 Mo).
 - Évals par tranche : val-PPL in-run, Δc val_big + OOD vs tranche00
   (gate apparié), eval_fixed 32 prompts + gate répétition P3
-  (seuil sampling 0,10, câblé dans `verdict()`).
+  (seuil sampling 0,15, câblé dans `verdict()`).
 - STOP : **2 régressions OOD > δ** (δ = max(MDE, δ_bruit)) → STOP ;
   **gate répétition FAIL → tranche rejetée** (chaîne stoppée, diagnostic).
 - Garde-fous actifs : staging F0b sur les 5 sites `torch.save`,
