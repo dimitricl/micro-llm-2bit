@@ -144,6 +144,8 @@ def cmd_infer(a: argparse.Namespace) -> None:
         mask_id=vocab["unk_new"]
         if (vocab.get("unk_distinct") and not a.allow_unk)
         else -1,
+        repetition_penalty=getattr(a, "repetition_penalty", 1.0),
+        no_repeat_ngram_size=getattr(a, "no_repeat_ngram", 0),
     )
     dt = time.time() - t0
     text = decode_ids(tok, vocab, out)
@@ -503,6 +505,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--allow-unk",
         action="store_true",
         help="Autorise la génération du token unk (masqué par défaut).",
+    )
+    pi.add_argument(
+        "--repetition-penalty", type=float, default=1.0,
+        help="P3 : frequency penalty (1.0 = OFF, défaut).",
+    )
+    pi.add_argument(
+        "--no-repeat-ngram", type=int, default=0,
+        help="P3 : interdit les n-grammes déjà vus (0 = OFF, défaut).",
     )
     pi.add_argument(
         "--think",

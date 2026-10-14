@@ -354,11 +354,15 @@ class Engine:
         stop: set[int] | None = None,
         rng: np.random.Generator | None = None,
         mask_id: int = -1,  # B2 : >=0 : token interdit à l'échantillonnage (unk)
+        repetition_penalty: float = 1.0,  # P3 : 1.0 = OFF
+        no_repeat_ngram_size: int = 0,  # P3 : 0 = OFF
     ) -> list[int]:
         """Préfill puis génération. temperature=0 -> glouton.
 
         S'arrête à capacité (préfill + max_new bornés par seq_max) : le
         KV cache est de taille fixe, sans fenêtre glissante.
+        P3 (défaut OFF) : frequency penalty sur les tokens vus (préfill
+        compté à 1) + interdiction des n-grammes déjà vus.
         """
         self.reset()
         S = self.meta["seq_max"]
@@ -368,11 +372,31 @@ class Engine:
         out = []
         rng = rng or np.random.default_rng(0)
         exclude = {mask_id} if mask_id is not None and mask_id >= 0 else None
+        n = no_repeat_ngram_size
+        seen_counts: dict[int, int] = {}
+        seen_ngrams: set[tuple[int, ...]] = set()
+        hist = list(ids[-S:])
+        if repetition_penalty != 1.0:
+            for t in hist:
+                seen_counts[t] = seen_counts.get(t, 0) + 1
+        if n >= 2:
+            for i in range(len(hist) - n + 1):
+                seen_ngrams.add(tuple(hist[i:i + n]))
         for _ in range(max_new):
             if self.pos >= S:
                 break
-            nxt = sample(logits, temperature, top_k, top_p, rng, exclude=exclude)
+            ban = (forbidden_by_ngram(hist, seen_ngrams, n)
+                   if n >= 2 else set())
+            exc = (exclude | ban) if exclude else (ban or None)
+            nxt = sample(logits, temperature, top_k, top_p, rng,
+                         exclude=exc, repetition_penalty=repetition_penalty,
+                         seen=seen_counts or None)
             out.append(nxt)
+            hist.append(nxt)
+            if repetition_penalty != 1.0:
+                seen_counts[nxt] = seen_counts.get(nxt, 0) + 1
+            if n >= 2 and len(hist) >= n:
+                seen_ngrams.add(tuple(hist[-n:]))
             if stop and nxt in stop:
                 break
             logits = self.step(nxt)
@@ -400,6 +424,19 @@ class Engine:
         )
 
 
+def forbidden_by_ngram(prefix_ids: list[int], seen: set[tuple[int, ...]],
+                       n: int) -> set[int]:
+    """Tokens qui compléteraient un n-gramme déjà vu (P3, défaut OFF).
+
+    `prefix_ids` = historique (préfill + généré), `seen` = n-grammes vus.
+    n < 2 : ensemble vide (pas d'interdiction).
+    """
+    if n < 2 or len(prefix_ids) < n - 1:
+        return set()
+    ctx = tuple(prefix_ids[-(n - 1):])
+    return {g[-1] for g in seen if len(g) == n and g[:-1] == ctx}
+
+
 def sample(
     logits: np.ndarray,
     temperature: float = 0.0,
@@ -407,9 +444,16 @@ def sample(
     top_p: float = 1.0,
     rng: np.random.Generator | None = None,
     exclude: set[int] | None = None,  # B2 : tokens interdits (ex. unk)
+    repetition_penalty: float = 1.0,  # P3 : frequency penalty, 1.0 = OFF
+    seen: dict[int, int] | None = None,  # P3 : token -> nb d'occurrences
 ) -> int:
     """Échantillonne un token : glouton si temperature<=0."""
     z = logits.astype(np.float64)
+    if repetition_penalty != 1.0 and seen:
+        z = z.copy()
+        for i, c in seen.items():
+            if 0 <= i < len(z) and c > 0:
+                z[i] -= (repetition_penalty - 1.0) * c
     if exclude:
         valid = [i for i in exclude if 0 <= i < len(z)]
         if valid:
