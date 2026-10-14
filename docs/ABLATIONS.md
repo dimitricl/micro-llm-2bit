@@ -271,3 +271,66 @@ uv run python main.py train --data runs/abl_data/resume_5M.jsonl \
 ### D5.f — Fallback SmolLM2-360M (si Qwen échoue)
 
 Même commande avec `--parent HuggingFaceTB/SmolLM2-360M` (si disponible sur HF), même bench, mêmes critères. À documenter si déclenché.
+
+## R3 — Amendement post-mortem (3 déviations S2a + arrêt KD-Qwen)
+
+### Déviation 1 : bs 4 vs bs 8 — pas d'OOM déterministe
+Le passage bs 8 → bs 4 suivait un OOM MPS (Insufficient Memory) observé
+sur le premier lancement R3, sous contention mémoire (modèle Ollama
+résident ~7 Go + run). Log d'origine écrasé par les relances (non sourcé).
+Re-test le 14/10 (`logs/probe_bs8.log`, flags K3, bs 8/accum 16, GPU
+exclusif) : 981 tok/s, step 4260, **aucun OOM**. Hypothèse « bs 8 OOM de
+façon déterministe » **infirmée** dans ces conditions. bs 4 reste le
+standard conservateur (R3 a tenu 3591 steps sans OOM) ; bs 8 non retesté
+à complétion. Statut : déviation documentée, sans preuve OOM reproductible.
+
+### Déviation 2 : --vocab-from tranche00 vs manifest 5M
+`runs/abl_data/resume_5M_manifest.json` ne contient QUE des stats
+(K, n_train, plan, sha1) : `vocab['kept_ids']` → `KeyError` (reproduit :
+`python -c "json.load(...)['kept_ids']"`). Le manifest n'a jamais été un
+vocab valide. `--vocab-from tranche00.pt.vocab.json` (SmolLM kept_ids)
+était le seul fichier valide — **mais invalide sémantiquement avec un
+parent Qwen** (voir cause racine ci-dessous). Le refus B2
+(`check_vocab_compatible`, `data.py:156`) ne claque que sur kept_ids
+différents entre deux vocabs ; ici le vocab est identique à lui-même,
+donc aucun refus : le trou est l'absence de contrôle
+tokenizer-vs-vocab (Qwen tok 151643 vs kept SmolLM).
+
+### Déviation 3 : schedule 7695 — arithmétique complète
+À bs 4 (save-batch 4, micro-batch 4) : 8197 micros/epoch
+(`logs/r3.log` : « 8197 batchs, 8197 micros/epoch, 513 steps/epoch
+x 15 epochs = 7695 steps »). 513 = ceil(8197/16).
+R2 (bs 8/accum 16) : 342 steps × 16 = 5472 micros, 5,6M tokens
+(342×16×8×128).
+R3 projeté : (3591 faits + 7695 reconstruits) = 11 286 steps × 16 × 4
+× 128 = **92,4M tokens ≈ 22 époques** vs R2 5,6M (**×16,5**).
+Comparaison D3 invalide : confond « KD » et « 16× plus de tokens ».
+De plus le resume remettait le compteur à 0 par-dessus 3591 steps
+(« nouveau run step 0 », `logs/r3_resume.log`). Sémantique B4 restaurée
+(`distill.py`, commit ci-dessous) : compteurs cumulatifs, epochs
+cumulatives.
+
+### Cause racine : mismatch tokenizer/vocab (yinvalide R3)
+R3 = tokenizer Qwen3 (`--parent`, 151643 tokens) + kept_ids SmolLM
+(`--vocab-from` tranche00). Mesure CPU (sans GPU) : **46,45 %** des ids
+Qwen du subset couverts par les kept SmolLM (211627/455571), **0 %
+d'alignement sémantique** (Qwen id i ≠ SmolLM token i) ; référence SmolLM :
+99,10 %. Conséquence : flux élève 54 % unk + tokens faux ; CE (30 %) +
+KL (70 % vers logits Qwen indexés SmolLM) sur du garbage → collapse sur
+id 0 (unk==eos ancien format) : e6 teacher-forced NLL **11,25**
+(PPL ~77k), argmax==0 à **97,9 %** (`runs/R3-qwen3-0.6b-base/model_e6.pt`).
+La val-PPL in-run 15,3 était mesurée dans l'espace d'indices Qwen
+(auto-cohérente, non comparable à R2 22,9 en espace SmolLM).
+Génération e6 : EOS immédiat (n_tokens=1, 32/32 prompts) —
+`eval/R3-e6/metrics.json`, hors comparaison D3.
+Corollaire B2 : `check_vocab_compatible` (`data.py:177`) **refuse**
+tout kept_ids différent au resume → resume tranche00 + vocab Qwen
+cohérent est impossible. La prémisse D3 (resume tranche00 + parent
+d'une autre famille de tokenizer) est inimplémentable : KD-Qwen exigerait
+vocab Qwen + départ from scratch (poids tranche00 = autre espace).
+**Aucun run K3 relancé** : 1h de GPU pour un résultat prouvé invalide.
+
+### Décision : STOP KD-Qwen sous prémisse D3
+Options laissées à la décision : (i) KD-Qwen from scratch + vocab Qwen
+(nouveau run ~1h, ne teste plus le resume) ; (ii) rester en CE (R1/R2) ;
+(iii) parent switch repoussé à E avec vocab frais. En attente de « go ».
