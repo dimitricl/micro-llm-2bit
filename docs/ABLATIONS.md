@@ -339,3 +339,32 @@ vocab Qwen + départ from scratch (poids tranche00 = autre espace).
 Options laissées à la décision : (i) KD-Qwen from scratch + vocab Qwen
 (nouveau run ~1h, ne teste plus le resume) ; (ii) rester en CE (R1/R2) ;
 (iii) parent switch repoussé à E avec vocab frais. En attente de « go ».
+
+## R4 — KD-Qwen from-scratch (option i, exécuté)
+
+Config miroir de R2 sauf : parent Qwen/Qwen3-0.6B-Base, vocab frais
+`runs/abl_data/vocab_qwen.json` (12000, parent Qwen, unk_distinct v2,
+couverture train 98,37 %, manifeste `docs/results/vocab_qwen_manifest.json`),
+from-scratch (PAS de resume, PAS de lr-resume), alpha 0.7, lr 3e-4,
+warmup 5 % from-scratch, bs 4/accum 16, epochs 1, seed 0, T 2.0.
+Subset 905 docs identique. Schedule loggé : 8197 micros/epoch,
+513 steps/epoch × 1 = **513 steps, 4,2M tokens** (`logs/R4.log`).
+Temps réel **3884 s** (~1h05, ~1080 tok/s). Checkpoint intègre
+(step=513, `runs/R4-qwen-kd/model.pt` + bestval ; intermédiaires purgés).
+
+Confounders restants vs R2 : parent (Qwen vs SmolLM), vocab (Qwen 12k vs
+SmolLM 12k), init (scratch vs resume tranche00), micro-batch (4 vs 8),
+objectif (KD 0.7 vs CE). D'où la condition d'attribution ci-dessous.
+
+Résultats (sources `docs/results/valbig_R4*.json`, `ood_R4*.json`) :
+- val-PPL in-run finale **201,0** (best, monotone 1538→201).
+- val_big vs R2 (réf c=1,6495) : R4 c=2,3341 →
+  **Δc = +0,6847 [+0,6745, +0,6959], MDE 0,0107, FAIL**.
+- OOD vs R2 (réf c=2,3641) : R4 c=2,9365 →
+  **Δc = +0,5724 [+0,5674, +0,5769], MDE 0,0048, FAIL**.
+- eval_fixed greedy (`eval/R4/metrics.md`) : repet4g **0,4168**,
+  boucle moy **50,5** (max 60), distincts 2,2 — dégénéré (répétitions).
+
+Décision D3 appliquée : OOD(R4−R2) = +0,5724 ≮ −δ_bruit (−0,0072) →
+**KD NON retenue. CE (V6/R2) tranchée, pas de run contrôle**
+(conformément à la règle : contrôle requis seulement si R4 gagne).
