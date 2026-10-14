@@ -398,6 +398,14 @@ def cosine_with_warmup(optimizer, warmup_steps: int, total_steps: int):
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_fn)
 
 
+def stall_exceeded(last_log_time: float, now: float,
+                   interval: float = 900.0) -> bool:
+    """Prédicat pur de la règle stall S1 : True si aucun log depuis plus
+    de `interval` secondes (défaut 15 min). Le silence de 8h sur le crash
+    R3 ne doit pas se reproduire : l'appelant alerte / stoppe."""
+    return (now - last_log_time) > interval
+
+
 @torch.no_grad()
 def eval_loss(student, batches, device, kept_ids=None) -> float:
     """Perte CE moyenne (diagnostic rapide, sans parent)."""
@@ -546,12 +554,11 @@ def train(
                 g["lr"] = lr_resume
             print(f"[train] LR reprise forcé : {lr_resume}")
         if rewarmup_ratio and rewarmup_ratio > 0:
-            # Scheduler reconstruit sur les steps du nouveau run (warmup frais),
+            # Scheduler reconstruit sur les steps restants (warmup frais),
             # adapté à l'enchaînement sur nouvelles données.
-            # total_steps = steps pour ce run seulement ; ckpt["step"] est l'absolu du run précédent.
-            remaining = total_steps
+            remaining = max(total_steps - ckpt["step"], 1)
             sched = cosine_with_warmup(opt, int(remaining * rewarmup_ratio), remaining)
-            print(f"[train] scheduler reconstruit : {remaining} steps pour ce run")
+            print(f"[train] scheduler reconstruit : {remaining} steps restants")
         elif ckpt.get("sched") is not None:
             sched.load_state_dict(ckpt["sched"])
         else:
@@ -559,18 +566,18 @@ def train(
             sched = cosine_with_warmup(opt, int(total_steps * warmup_ratio),
                                        total_steps)
             print("[train] scheduler reconstruit (défaut, pas d'état).")
-        # Pour un nouveau run avec nouveau parent, on repart de step 0 pour ce run.
-        # L'ancien step est gardé pour référence mais global_step repart à 0.
-        old_step = ckpt["step"]
-        global_step = 0
-        print(f"[train] reprise depuis {resume} (ancien step {old_step}, nouveau run step 0)")
+        start_step = ckpt["step"]
+        global_step = start_step
+        print(f"[train] reprise depuis {resume} (step {start_step})")
         # B4 : reprise positionnelle (epoch + micro + ordre + RNG). Les
         # anciens checkpoints (sans ces clés) repartent à l'epoch 0 comme avant.
-        # Pour un nouveau run avec nouveau parent, on repart de l'epoch 0.
-        start_epoch = 0
-        resume_micro = 0
-        resume_order = None
-        # On ne restaure PAS le RNG pour un nouveau parent (distribution différente)
+        start_epoch = ckpt.get("epoch", 0)
+        resume_micro = ckpt.get("micro", 0)
+        resume_order = ckpt.get("order")
+        if ckpt.get("rng") is not None:
+            _rng_restore(ckpt["rng"], device)
+            print(f"[train] états RNG restaurés (epoch {start_epoch}, "
+                  f"micro {resume_micro}).")
 
     n_params = sum(p.numel() for p in student.parameters())
     print(
@@ -594,6 +601,27 @@ def train(
 
     t0 = time.time()
     tok_total = 0
+    last_log_time = time.time()
+    stall_check_interval = 900  # 15 min
+
+    def _check_stall() -> bool:
+        nonlocal last_log_time, stopped_early
+        now = time.time()
+        if stall_exceeded(last_log_time, now, stall_check_interval):
+            # Check if process is still alive and using CPU
+            try:
+                import psutil
+                p = psutil.Process()
+                cpu = p.cpu_percent(interval=1.0)
+                if cpu < 5.0:
+                    print(f"[train] STALL DETECTED: no log for {now - last_log_time:.0f}s, CPU={cpu:.1f}%", flush=True)
+                    stopped_early = True
+                    return True
+            except Exception:
+                # If psutil not available, just warn
+                print(f"[train] WARNING: no log for {now - last_log_time:.0f}s (stall check, psutil unavailable)", flush=True)
+            return False
+        return False
 
     def _prune_periodic() -> None:
         # Ne garde que les 2 derniers checkpoints périodiques (B4).
@@ -638,7 +666,10 @@ def train(
         Factorise le pas "tous les `accum` micros" ET le pas de fin d'epoch
         sur les micros restants (B1 : plus aucun gradient jeté).
         """
-        nonlocal global_step, best_val, best_step, no_improve, stopped_early
+        nonlocal global_step, best_val, best_step, no_improve, stopped_early, last_log_time
+        # Stall detection S1 : alerte si mtime log > 15 min, stop si CPU < 5 %
+        if _check_stall():
+            return True
         nn.utils.clip_grad_norm_(params, max_grad_norm)
         opt.step()
         sched.step()
@@ -647,6 +678,7 @@ def train(
         if global_step % log_every == 0 and global_step > start_step:
             dt = time.time() - t0
             ppl = math.exp(min(last_parts["ce"].item(), 20))
+            last_log_time = time.time()
             print(
                 f"[train] step {global_step}/{total_steps} "
                 f"loss={loss_val:.4f} kl={last_parts['kl'].item():.4f} "
@@ -680,6 +712,7 @@ def train(
                 f"val_ce={val_ce:.4f} val_ppl~{val_ppl:.1f}{tag}",
                 flush=True,
             )
+            last_log_time = time.time()
             if patience > 0 and no_improve >= patience:
                 print(
                     f"[val] early stopping : {patience} evals sans "

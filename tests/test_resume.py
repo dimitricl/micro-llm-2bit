@@ -141,3 +141,11 @@ def test_ordre_deterministe_par_seed(tmp_path, capsys):
                     epochs=1, seed=6, ckpt_every=0, capsys=capsys)
     assert l1 == l2  # bit-identique : même seed, mêmes ops
     assert l1 != l3  # un seed différent mélange différemment
+
+
+def test_stall_exceeded_predicat():
+    """Règle stall S1 : alerte si mtime log > 15 min (prédicat pur)."""
+    from distill import stall_exceeded
+    assert stall_exceeded(0.0, 901.0, 900.0) is True
+    assert stall_exceeded(0.0, 899.0, 900.0) is False
+    assert stall_exceeded(100.0, 100.0, 900.0) is False
