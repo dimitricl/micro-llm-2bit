@@ -178,6 +178,9 @@ def prepare_corpus(tok, a: argparse.Namespace, save_vocab_to: str = ""):
             vocab = json.load(f)
         print(f"[corpus] vocab réutilisé : {a.vocab_from} "
               f"({len(vocab['kept_ids'])} tokens)")
+        # F0a (trou B2, cas R3) : refuse tokenizer parent ≠ source du vocab.
+        D.check_parent_vocab_match(getattr(a, "parent", ""),
+                                   vocab, getattr(a, "from_scratch", False))
     else:
         vocab = D.build_reduced_vocab(tok, texts, a.vocab_size)
     if save_vocab_to:
@@ -216,6 +219,9 @@ def prepare_corpus(tok, a: argparse.Namespace, save_vocab_to: str = ""):
 
 
 def cmd_train(a: argparse.Namespace) -> None:
+    if getattr(a, "from_scratch", False) and getattr(a, "resume", ""):
+        raise ValueError("--from-scratch interdit avec --resume "
+                         "(bypass réservé aux runs frais).")
     tok = load_tokenizer(a.parent)
     pb, sb, vpb, vsb, vocab = prepare_corpus(
         tok, a, save_vocab_to=a.vocab_out or (a.out + ".vocab.json"))
@@ -547,6 +553,10 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--rewarmup-ratio", type=float, default=0.0,
                     help="Reconstruit le scheduler sur les steps restants à la "
                     "reprise (0 = garde celui du checkpoint).")
+    pt.add_argument("--from-scratch", action="store_true",
+                    help="Bypass explicite du garde-fou tokenizer-vs-vocab "
+                    "(F0a) : run frais sans resume, vocab assumé. Refusé "
+                    "avec --resume.")
 
     pe = sub.add_parser("export", help="Quantifie et packe en .bin.")
     pe.add_argument("--ckpt", required=True)

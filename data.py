@@ -183,6 +183,32 @@ def check_vocab_compatible(vocab: dict, ckpt_vocab: dict) -> None:
         )
 
 
+def check_parent_vocab_match(parent_name: str, vocab: dict,
+                             from_scratch: bool = False) -> None:
+    """Refuse parent-tokenizer ≠ tokenizer-source-du-vocab (trou B2, cas R3).
+
+    R3 a entraîné avec tokenizer Qwen (151k) mappé via kept_ids SmolLM :
+    46 % de couverture d'ids, 0 % d'alignement sémantique → collapse sur
+    id 0. Ce garde-fou aurait empêché R3 : `--parent Qwen/...` +
+    `--vocab-from tranche00...` (parent SmolLM) = ValueError en < 10 s CPU,
+    avant tout téléchargement/chargement du parent.
+    Bypass documenté : `--from-scratch` (run frais, vocab assumé).
+    Vocab sans champ "parent" (ancien format) : invérifiable, on laisse
+    passer (compatibilité).
+    """
+    src = (vocab or {}).get("parent")
+    if not src:
+        return
+    if src != parent_name and not from_scratch:
+        raise ValueError(
+            "Mismatch tokenizer parent vs vocab "
+            f"(parent={parent_name!r}, vocab construit depuis {src!r}). "
+            "Les kept_ids ne correspondent à rien dans ce tokenizer "
+            "(cf. R3 : collapse sur id 0). Reconstruisez le vocab avec ce "
+            "tokenizer, ou passez --from-scratch en connaissance de cause."
+        )
+
+
 def encode_mapped(tokenizer, vocab: dict, text: str, add_eos: bool = True) -> list[int]:
     """Encode puis rabat sur le vocab réduit (hors-vocab -> unk)."""
     unk = vocab["unk_new"]
