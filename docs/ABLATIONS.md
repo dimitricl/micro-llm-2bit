@@ -368,3 +368,38 @@ Résultats (sources `docs/results/valbig_R4*.json`, `ood_R4*.json`) :
 Décision D3 appliquée : OOD(R4−R2) = +0,5724 ≮ −δ_bruit (−0,0072) →
 **KD NON retenue. CE (V6/R2) tranchée, pas de run contrôle**
 (conformément à la règle : contrôle requis seulement si R4 gagne).
+
+## R3-ORIGINAL — KD SmolLM-135M resume tranche00 (test D3 jamais lancé, exécuté)
+
+Commande = R2 exacte, seules différences : --parent SmolLM-135M,
+--alpha 0.7, --seed 0, --out runs/R3-smol135-kd/ (outil
+`tools/run_r3_original.sh`). Même tokenizer des deux côtés, garde-fou
+F0a silencieux vérifié. Schedule B4 : « 342 steps restants », total
+4590, reprise step 4248 (`logs/R3.log`). Temps réel **2269 s** (~38 min,
+~2500 tok/s) vs ETA ~40 min. Checkpoint intègre (step=4590).
+Veilleur log-only : GO (val 29,4 → 28,0, jamais > 2× initiale).
+
+Résultats (sources `docs/results/valbig_R3*.json`, `ood_R3*.json`) :
+- val-PPL in-run finale **28,0** (best ; R2 : 22,9).
+- val_big vs R2 (réf c=1,6495) : R3 c=1,7290 →
+  **Δc = +0,0795 [+0,0747, +0,0844], MDE 0,0049**
+  (perte +4,8 % ≤ 50 % ✓).
+- OOD vs R2 (réf c=2,3641) : R3 c=2,2846 →
+  **Δc = −0,0795 [−0,0827, −0,0757], MDE 0,0035**
+  (< −δ_bruit −0,0072 ✓, ~10× le seuil).
+- eval_fixed greedy (`eval/R3/metrics.md`) : repet4g **0,3255**,
+  boucle moy **2,1** (max 26, un prompt outlier), distincts 6,7 —
+  vs R2 0,3078/1,3/3/15,2 : légèrement plus boucleur, même ordre.
+
+Décision D3 (règles hash 13aa7f1) : OOD(R3−R2) < −δ ✓ ET perte val_big
+≤ 50 % ✓ → **KD VALIDÉE (espace SmolLM)**. La KD paie +4,8 % in-domain
+pour −0,08 BPC OOD : effet régularisant du teacher, invisible aux
+ablations V (from-scratch) et inversé chez R4-Qwen (confondue init).
+
+Amendement : la conclusion « CE tranchée » du livrable R4 est **retirée**.
+Elle reposait sur R4-Qwen (from-scratch, confondue init + parent) :
+le vrai test KD-vs-CE à budget et espace constants (R3 vs R2) donne
+l'inverse sur OOD. Chapitre KD ROUVERT, pas clos.
+
+Suite : paire from-scratch (CE-vocab-Qwen vs KD-Qwen, même init, même
+budget) pour tester « meilleur parent » avant E — spec à part, pas ce run.
