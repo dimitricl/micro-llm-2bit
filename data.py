@@ -107,9 +107,9 @@ def build_reduced_vocab(tokenizer, texts: list[str], vocab_size: int = 8000) -> 
         tid = getattr(tokenizer, attr, None)
         if tid is not None:
             specials.add(int(tid))
-    unk_id = tokenizer.unk_token_id
-    if unk_id is None:
-        raise ValueError("Le tokenizer parent n'a pas de token unk.")
+    # Note : pas besoin de unk_token_id ici. La sentinelle -1 (§4)
+    # couvre les hors-vocab même pour un tokenizer byte-level sans unk
+    # (ex. Qwen).
     # 2) Fréquences sur le corpus.
     counter: collections.Counter[int] = collections.Counter()
     for t in texts:

@@ -116,3 +116,24 @@ def test_prepare_corpus_refuse_mismatch_parent(tmp_path):
     a.from_scratch = True
     pb, sb, vpb, vsb, vocab = prepare_corpus(FakeTok(), a)
     assert len(pb) == len(sb) > 0
+
+
+class QwenLikeTok(StubTok):
+    """Tokenizer byte-level type Qwen : pas de token unk."""
+    unk_token_id = None
+    name_or_path = "qwen-like"
+
+
+def test_vocab_sans_unk_parent():
+    """F1 : tokenizer sans unk (Qwen) -> vocab v2 valide quand même."""
+    tok = QwenLikeTok()
+    texts = ["bonjour le monde", "le monde est vaste", "bonjour vaste monde"]
+    vocab = D.build_reduced_vocab(tok, texts, vocab_size=32)
+    assert vocab["vocab_size"] == 32
+    assert vocab["unk_distinct"] is True
+    assert vocab["vocab_version"] == 2
+    assert -1 in vocab["kept_ids"]  # sentinelle unk dédiée
+    assert vocab["eos_new"] == vocab["kept_ids"].index(1)
+    ids = D.encode_mapped(tok, vocab, "monde xyzzyplugh")
+    assert ids[-1] == vocab["eos_new"]
+    assert vocab["unk_new"] in ids
