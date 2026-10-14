@@ -13,10 +13,12 @@
 
 from __future__ import annotations
 
+import errno
 import math
 import glob
 import os
 import random
+import tempfile
 import time
 
 import numpy as np
@@ -406,6 +408,43 @@ def stall_exceeded(last_log_time: float, now: float,
     return (now - last_log_time) > interval
 
 
+def save_atomic(obj, path: str, retries: int = 3) -> str:
+    """torch.save anti-troncature (F0b, 2e crash même classe que R3).
+
+    Écriture vers fichier temporaire sur disque interne (staging, hors
+    USB instable) + fsync + `os.replace` atomique vers la cible, retry
+    3× avec backoff sur EINTR. La cible n'est jamais tronquée : soit
+    l'ancienne version intacte (échec), soit la nouvelle complète.
+    """
+    last_exc: OSError | None = None
+    for attempt in range(max(retries, 1)):
+        try:
+            fd, tmp = tempfile.mkstemp(dir=tempfile.gettempdir(),
+                                       prefix=".ckpt_stage_")
+        except OSError:
+            fd, tmp = tempfile.mkstemp(
+                dir=os.path.dirname(os.path.abspath(path)) or ".",
+                prefix=".ckpt_stage_")
+        try:
+            with os.fdopen(fd, "wb") as f:
+                torch.save(obj, f)
+                f.flush()
+                os.fsync(f.fileno())
+            os.replace(tmp, path)
+            return path
+        except OSError as e:
+            last_exc = e
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+            if e.errno != errno.EINTR or attempt + 1 >= max(retries, 1):
+                raise
+            time.sleep(0.5 * (attempt + 1))
+    assert last_exc is not None
+    raise last_exc
+
+
 @torch.no_grad()
 def eval_loss(student, batches, device, kept_ids=None) -> float:
     """Perte CE moyenne (diagnostic rapide, sans parent)."""
@@ -636,7 +675,7 @@ def train(
     def _save_periodic(epoch: int, micro: int, order: list) -> str:
         base = out[:-3] if out.endswith(".pt") else out
         path = f"{base}_ckpt{global_step:07d}.pt"
-        torch.save(
+        save_atomic(
             {
                 "model": student.state_dict(),
                 "proj": proj.state_dict() if proj is not None else None,
@@ -693,7 +732,7 @@ def train(
             tag = ""
             if val_ce < best_val:
                 best_val, best_step, no_improve = val_ce, global_step, 0
-                torch.save(
+                save_atomic(
                     {
                         "model": student.state_dict(),
                         "cfg": student.cfg,
@@ -784,7 +823,7 @@ def train(
                     # propre avec checkpoint de sauvegarde, pas de backward.
                     bad_path = (out.replace(".pt", "_nonfinite.pt")
                                 if out.endswith(".pt") else out + "_nonfinite.pt")
-                    torch.save(
+                    save_atomic(
                         {
                             "model": student.state_dict(),
                             "cfg": student.cfg,
@@ -820,7 +859,7 @@ def train(
         # B4 : position exacte. Epoch complète -> reprise à epoch+1 ; arrêt
         # précoce mid-epoch -> reprise au même (epoch, micro, ordre).
         epoch_done = (skip0 + micro) >= plan["micros"]
-        torch.save(
+        save_atomic(
             {
                 "model": student.state_dict(),
                 "proj": proj.state_dict() if proj is not None else None,
@@ -861,7 +900,7 @@ def train(
                 "surapprentissage probable."
             )
     final = out if out.endswith(".pt") else out + ".pt"
-    torch.save(
+    save_atomic(
         {
             "model": student.state_dict(),
             "proj": proj.state_dict() if proj is not None else None,
