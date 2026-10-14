@@ -142,3 +142,58 @@ def test_vocab_sans_unk_parent():
     ids = D.encode_mapped(tok, vocab, f"monde {oov}")
     assert ids[-1] == vocab["eos_new"]
     assert vocab["unk_new"] in ids
+
+
+def _mk_args(**kw):
+    import argparse
+    base = dict(data="", val_ratio=0.0, seed=0, vocab_from="",
+                vocab_size=64, save_batch=2, seq_len=8, parent="stub",
+                from_scratch=False, val_data="")
+    base.update(kw)
+    return argparse.Namespace(**base)
+
+
+def test_val_data_fichier_gelé(tmp_path):
+    """Val gelée : --val-data fixe la val, train = fichier entier, disjoints."""
+    import json
+    from main import prepare_corpus
+    tr = tmp_path / "train.jsonl"
+    va = tmp_path / "val.jsonl"
+    tr.write_text('{"text": "' + "pomme " * 40 + '"}\n'
+                  '{"text": "' + "poire " * 40 + '"}\n')
+    va.write_text('{"text": "' + "kiwi " * 40 + '"}\n')
+
+    class FakeTok:
+        eos_token_id = 1
+        unk_token_id = 0
+
+        def encode(self, t, add_special_tokens=False):
+            return list(range(64))
+
+    a = _mk_args(data=str(tr), val_data=str(va))
+    pb, sb, vpb, vsb, vocab = prepare_corpus(FakeTok(), a)
+    assert len(vpb) == len(vsb) > 0  # val non vide depuis le fichier
+    assert len(pb) == len(sb) > 0  # train = fichier entier (pas de split)
+
+
+def test_val_data_chevauchement_refusé(tmp_path):
+    """Val qui recoupe le train = fuite : refus explicite."""
+    import json
+    import pytest
+    from main import prepare_corpus
+
+    class FakeTok:
+        eos_token_id = 1
+        unk_token_id = 0
+
+        def encode(self, t, add_special_tokens=False):
+            return list(range(64))
+
+    same = '{"text": "' + "pomme " * 40 + '"}\n'
+    tr = tmp_path / "train.jsonl"
+    va = tmp_path / "val.jsonl"
+    tr.write_text(same + '{"text": "' + "poire " * 40 + '"}\n')
+    va.write_text(same)
+    a = _mk_args(data=str(tr), val_data=str(va))
+    with pytest.raises(ValueError, match="FUITE|fuite|chevauche"):
+        prepare_corpus(FakeTok(), a)

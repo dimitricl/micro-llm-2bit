@@ -183,6 +183,12 @@ def check_vocab_compatible(vocab: dict, ckpt_vocab: dict) -> None:
         )
 
 
+def doc_hash(t: str) -> str:
+    """SHA1 du texte normalisé (comparaison inter-fichiers, anti-fuite)."""
+    import hashlib
+    return hashlib.sha1(re.sub(r"\s+", " ", t).strip().lower().encode()).hexdigest()
+
+
 def check_parent_vocab_match(parent_name: str, vocab: dict,
                              from_scratch: bool = False) -> None:
     """Refuse parent-tokenizer ≠ tokenizer-source-du-vocab (trou B2, cas R3).

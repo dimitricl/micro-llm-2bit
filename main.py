@@ -172,7 +172,19 @@ def prepare_corpus(tok, a: argparse.Namespace, save_vocab_to: str = ""):
     print(f"[corpus] {len(texts)} documents, {sum(len(t) for t in texts)} caractères")
     val_ratio = getattr(a, "val_ratio", 0.0) or 0.0
     val_texts: list[str] = []
-    if val_ratio > 0 and len(texts) > 1:
+    if getattr(a, "val_data", ""):
+        # E-PREP : val GELÉE (un seul fichier fixe pour les 9 tranches,
+        # jamais re-tirée — sinon val-PPL inter-tranches incomparables).
+        # Le train garde le fichier entier (pas de split).
+        val_texts = D.load_texts(a.val_data)
+        print(f"[corpus] val gelée : {len(val_texts)} docs depuis {a.val_data}")
+        train_hashes = {D.doc_hash(t) for t in texts}
+        leaked = [t for t in val_texts if D.doc_hash(t) in train_hashes]
+        if leaked:
+            raise ValueError(
+                f"[corpus] FUITE : {len(leaked)} docs de --val-data "
+                f"recoupent le train (ex. {leaked[0][:60]!r}).")
+    elif val_ratio > 0 and len(texts) > 1:
         texts, val_texts = D.train_val_split(texts, val_ratio, getattr(a, "seed", 0))
         print(f"[corpus] split : {len(texts)} docs train, {len(val_texts)} docs val")
     if getattr(a, "vocab_from", ""):
@@ -559,6 +571,10 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--seed", type=int, default=0)
     pt.add_argument("--val-ratio", type=float, default=0.0,
                     help="Part des docs en validation (0 = désactivé).")
+    pt.add_argument("--val-data", default="",
+                    help="Fichier val GELÉ (E : un seul pour les 9 tranches, "
+                    "jamais re-tiré ; le train garde son fichier entier ; "
+                    "chevauchement = erreur).")
     pt.add_argument("--eval-every", type=int, default=0,
                     help="Évalue la val tous les N steps (0 = désactivé).")
     pt.add_argument("--patience", type=int, default=0,
