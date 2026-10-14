@@ -1,0 +1,78 @@
+{
+ "n_avant": 99965,
+ "chars_avant": 1012192668,
+ "doublons_exacts": 0,
+ "near_dup_085": 3,
+ "n_apres": 99962,
+ "chars_apres": 1012188052,
+ "langues": {
+  "fr": 99924,
+  "en": 41,
+  "unk": 0
+ },
+ "pattern_n": 5329,
+ "tranches": [
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_00.jsonl",
+   "n_docs": 10134,
+   "chars": 104918140,
+   "tokens": 37191199
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_01.jsonl",
+   "n_docs": 10236,
+   "chars": 104860561,
+   "tokens": 37227255
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_02.jsonl",
+   "n_docs": 10240,
+   "chars": 104865455,
+   "tokens": 37153750
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_03.jsonl",
+   "n_docs": 10344,
+   "chars": 104876207,
+   "tokens": 37256684
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_04.jsonl",
+   "n_docs": 10450,
+   "chars": 104918222,
+   "tokens": 37200553
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_05.jsonl",
+   "n_docs": 10074,
+   "chars": 104875979,
+   "tokens": 37190205
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_06.jsonl",
+   "n_docs": 10151,
+   "chars": 104866684,
+   "tokens": 37173228
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_07.jsonl",
+   "n_docs": 10304,
+   "chars": 104873517,
+   "tokens": 37301505
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_08.jsonl",
+   "n_docs": 10422,
+   "chars": 104896908,
+   "tokens": 37255192
+  },
+  {
+   "file": "/Volumes/Lexar/clean-corpus/dedup/tranche_09.jsonl",
+   "n_docs": 7607,
+   "chars": 68236379,
+   "tokens": 24219014
+  }
+ ],
+ "methode": "sha1(normalise) + MinHash(125,shingle5)+LSH(25x5)+Jaccard>=0.85",
+ "duree_s": 2109.2
+}
