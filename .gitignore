@@ -28,6 +28,10 @@ runs/*/*
 
 # Logs et rapports locaux
 *.log
+logs/*.pid
+logs/*.lock
+logs/*.done
+logs/*.exit
 RAPPORT_*.txt
 
 # Secrets (par sécurité, même si aucun n'existe)
