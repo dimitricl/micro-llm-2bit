@@ -403,3 +403,55 @@ l'inverse sur OOD. Chapitre KD ROUVERT, pas clos.
 
 Suite : paire from-scratch (CE-vocab-Qwen vs KD-Qwen, même init, même
 budget) pour tester « meilleur parent » avant E — spec à part, pas ce run.
+
+## E — Spec du run principal (contrat du go, E gelé)
+
+### P1 — Parent : SmolLM-135M par défaut, sans test 360M
+Le test subset KD-360M (~1h GPU) est un run long : interdit par
+l'en-tête E-PREP (« AUCUN RUN LONG »). **Renoncement explicite** au
+test, donc **parent E = SmolLM-135M, sans discussion**.
+Contexte chiffré existant (`tools/bench_train.md`) : 135M 2577 tok/s
+bs16, 360M 1748 tok/s ; KD-135M validée D3 (R3 : Δc OOD −0,0795).
+Fourche Qwen PARKÉE (R4 confondue, e6 poubelle).
+
+### P2 — Données (mesures `docs/results/dedup_report.json`, audit
+`docs/results/dedup_audit.json`, tranches `/Volumes/Lexar/clean-corpus/dedup/`)
+- Corpus slices 00-09 : **99965 docs, 1012,2 M chars** avant.
+- Doublons exacts (sha1 normalisé) : **0**. Near-dup MinHash
+  (125 sigs shingle-5, LSH 25×5, Jaccard vérifié ≥ 0,85) : **3 docs**.
+  Après : **99962 docs, 1012,2 M chars** (corpus déjà propre).
+- Langues (stopwords) : **fr 99924 / en 41 / unk 0**. Pattern
+  (fiches/listes/quiz) : **5329 docs (5,3 %)**. Audit stratifié 200 docs
+  committé (`docs/results/dedup_audit.json`).
+- 10 tranches ~105 Mo : t00-t08 ≈ **37,2M tokens** chacune, t09 24,2M
+  (total 359,2M). Manifests avec tokens (tokenizer SmolLM) dans le rapport.
+- **E utilise les tranches dédupliquées 01-09** (la 00 ≈ slice_00 déjà
+  consommée par tranche00 est sautée : pas de réentraînement).
+- Vocab : **RESTE 12000 espace SmolLM**. L'idée « 16k » est **enterrée** :
+  E reprend `tranche00.pt` dont l'embedding est 12000 lignes indexées
+  SmolLM ; changer de taille/kept_ids casserait le mapping poids↔tokens
+  (B2 `check_vocab_compatible` refuserait, `data.py:177`). Pas de 16k.
+
+### P4 — Recette E
+- Objectif KD alpha 0.7 (R3), parent SmolLM-135M, lr 3e-4, warmup 5 %,
+  rewarmup 5 % par tranche, seed 0, T 2.0, seq 128, val 5 %, eval/50.
+- Micro-batch : **bs 8 / accum 16** (R3 : 2500 tok/s mesurés, zéro OOM
+  en GPU exclusif). bs 4 seulement avec preuve OOM-négative committée
+  (à ce jour : aucune — probe bs 8 passe).
+- Schedule B4 cumulative depuis step 4248 (tranche00) :
+  total_N = 4248 + Σ steps/tranche. À 16384 tok/step (8×16×128),
+  tranche ~37,2M tok ≈ 2270 steps → total_9 ≈ 4248 + 8×2270 + 1479
+  (t09 24,2M) ≈ **23887**. Tokens E totaux ≈ 321,9M (+34,8M tranche00).
+- ETA au débit MESURÉ R3 (2500 tok/s) : 37,2M/2500 ≈ 14880 s ≈ 4,1 h
+  par tranche → **~37 h les 9 tranches** + ~10 min d'évals par tranche.
+- Checkpoints par tranche : best-val (100 Mo) + final (300 Mo) gardés,
+  `_ckpt*` (garde 2 en cours) et `_e*.pt` purgés après validation.
+  Budget disque : 9 × 400 Mo ≈ **3,6 Go** (+2 _ckpt courants 600 Mo).
+- Évals par tranche : val-PPL in-run, Δc val_big + OOD vs tranche00
+  (gate apparié), eval_fixed 32 prompts + gate répétition P3
+  (seuil sampling 0,10, câblé dans `verdict()`).
+- STOP : **2 régressions OOD > δ** (δ = max(MDE, δ_bruit)) → STOP ;
+  **gate répétition FAIL → tranche rejetée** (chaîne stoppée, diagnostic).
+- Garde-fous actifs : staging F0b sur les 5 sites `torch.save`,
+  règle stall S1, lock `logs/gpu.lock`, `ollama ps` vide, F0a silencieux
+  attendu (même tokenizer).
