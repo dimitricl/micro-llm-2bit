@@ -472,3 +472,19 @@ Fourche Qwen PARKÉE (R4 confondue, e6 poubelle).
   Garde : total ≈ 6819 et « restants » ≈ 2571 dans le log, sinon kill < 50 steps.
 - Disque : 650 Gi libres (`df`, budget 3,6 Go).
 - F0a : silencieux attendu (tokenizer SmolLM des deux côtés).
+
+## E-PILOTE t01 — run + décision (t02-t09 NON autorisés)
+- Run : schedule 2273×3=6819, restants 2571, F0a silencieux, 1 kill
+  précoce (bug `python3` système → epochs=1, garde STOP < 50 steps OK),
+  fix + relance. Durée **25220 s (~7,0h)**, tok/s réel ~1670 (< 2000 :
+  eval-overhead val gelée 500 docs, investigué, amendement ETA committé).
+  Zéro incident (pas de NaN, pas d'EINTR — staging F0b OK), veilleur GO.
+- Val gelée : 29,2 → **25,8** (best=final, monotone). Refs : tranche00 29,7,
+  R2 22,9 (autre val : sens et ordre de grandeur OK).
+- Gate vs tranche00 (`docs/results/valbig_Et01*.json`, `ood_Et01*.json`) :
+  val_big **Δc −0,0711** [−0,0746,−0,0678] ; OOD **Δc −0,0557**
+  [−0,0568,−0,0544] ; loops 6/32 pires (Wilson 0,089) ;
+  répétition sampling 0,0216 < 0,15 → **PASS global** (exit 0).
+  Compteur STOP OOD : **0 strike** (amélioration, pas régression).
+- eval_fixed t01 : greedy 0,2824/1,4 — sampling 0,0216/1,5
+  (vs R2 0,3078/1,3 — R3 0,3255/2,1) : le moins boucleur mesuré.
