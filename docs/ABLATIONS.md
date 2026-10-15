@@ -488,3 +488,40 @@ Fourche Qwen PARKÉE (R4 confondue, e6 poubelle).
   Compteur STOP OOD : **0 strike** (amélioration, pas régression).
 - eval_fixed t01 : greedy 0,2824/1,4 — sampling 0,0216/1,5
   (vs R2 0,3078/1,3 — R3 0,3255/2,1) : le moins boucleur mesuré.
+
+## E-SUITE t02-t09 — amendements Q0 (committés avant t02)
+
+### Q0a — eval-every 100 (val gelée intouchée)
+Courbe t01 monotone 29,2→25,8, best=final (`logs/Et01.log`, 51 evals).
+Coût mesuré d'une eval gelée : **239 s** (`logs/measure_eval.log`,
+1761 batchs, E-t01 sur MPS). 51 evals ≈ 12 200 s ≈ **3,4 h de t01
+sur 7 h = la moitié du run en eval**.
+eval-every 100 → ~26 evals/tranche : économie ≈ 25×270 s ≈ **6750 s
+≈ 1,9 h/tranche ≈ 15 h sur t02-t09**. La courbe garde 26 points
+(surveillance intacte) ; divergence précoce aussi visible via loss
+train (toutes les 20 steps) + veilleur. La val gelée elle-même est
+inchangée (comparabilité préservée).
+
+### Q0b — resume depuis final (continuité B4)
+t01 : best=final (6800, monotone) — les deux coïncident ici, mais la
+règle générale retient **final (model.pt)** : seul lui porte l'état
+complet (opt/sched/epoch/micro/order/RNG) pour continuité B4 exacte ;
+bestval = poids seuls (nouvel optimiseur). bestval gardé comme fallback
+documenté si tail suspecte (val remonte ≥2 evals consécutives en fin
+de tranche — trancherait alors contre final, avec justification).
+Continuité scheduler t02 : prev step 6819 (final t01) ; SPE t02 ≈ 2268
+(manifest dedup t02, 37,15M tok). ceil() donnerait 5 epochs (2 époques
+de données neuves — surestimation dès que PREV n'est pas multiple de
+SPE) : l'outil utilise round() avec garde (restants ≥ SPE/2) →
+E_CUMUL = 4, restants ≈ 2253 steps (~0,99 époque, parité t01).
+(L'outil calcule l'exact au lancement depuis le plan réel ; garde
+schedule-guard identique.)
+
+### Q0c — plancher perf : 1300 tok/s reportés post-warmup
+t01 : min 1429 post step 4350 (n=123 lignes, `logs/Et01.log`),
+moyenne ~1550-1680. Train-pur estimé ~2500 (cohérent R3 ; l'écart aux
+reportés = overhead eval, pas contention). Règle : moyenne reportée
+< 1300 soutenue (hors 100 premiers steps) → **pas de tranche suivante
+avant cause trouvée** (STOP t-suivante, run en cours non tué). Avec
+eval-every 100 la moyenne remontera vers ~2000 ; le plancher 1300 reste
+un garde contention/disque valide.
