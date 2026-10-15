@@ -1,0 +1,453 @@
+{
+ "version": 2,
+ "metrics": {
+  "Le Japon est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.4615,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 8,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 28,
+    "n_tokens": 60
+   }
+  },
+  "Le Br\u00e9sil est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.1667,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 8,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0179,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 20,
+    "n_tokens": 60
+   }
+  },
+  "L'\u00c9gypte est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.2222,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 7,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 26,
+    "n_tokens": 60
+   }
+  },
+  "Le Canada est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.2326,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 18,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 28,
+    "n_tokens": 60
+   }
+  },
+  "L'Italie est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.5,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 15,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 26,
+    "n_tokens": 60
+   }
+  },
+  "Paris est la capitale": {
+   "greedy": {
+    "taux_repetition_4g": 0.6538,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 12,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 3,
+    "mots_distincts": 11,
+    "n_tokens": 27
+   }
+  },
+  "La photosynth\u00e8se est": {
+   "greedy": {
+    "taux_repetition_4g": 0.6,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 5,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0962,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 18,
+    "n_tokens": 60
+   }
+  },
+  "L'Empire romain": {
+   "greedy": {
+    "taux_repetition_4g": 1.0,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 6,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 25,
+    "n_tokens": 60
+   }
+  },
+  "Le cerveau humain": {
+   "greedy": {
+    "taux_repetition_4g": 0.3235,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 14,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.1176,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 20,
+    "n_tokens": 60
+   }
+  },
+  "La R\u00e9volution fran\u00e7aise": {
+   "greedy": {
+    "taux_repetition_4g": 1.0,
+    "plus_longue_boucle": 3,
+    "mots_distincts": 7,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0769,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 17,
+    "n_tokens": 60
+   }
+  },
+  "Il fait beau aujourd'hui": {
+   "greedy": {
+    "taux_repetition_4g": 0.1765,
+    "plus_longue_boucle": 3,
+    "mots_distincts": 15,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 23,
+    "n_tokens": 60
+   }
+  },
+  "Je vais au march\u00e9": {
+   "greedy": {
+    "taux_repetition_4g": 0.5,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 7,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0556,
+    "plus_longue_boucle": 4,
+    "mots_distincts": 17,
+    "n_tokens": 60
+   }
+  },
+  "Le chat dort sur": {
+   "greedy": {
+    "taux_repetition_4g": 1.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 3,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 11,
+    "n_tokens": 29
+   }
+  },
+  "Demain nous irons": {
+   "greedy": {
+    "taux_repetition_4g": 0.4,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 4,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 3,
+    "mots_distincts": 22,
+    "n_tokens": 60
+   }
+  },
+  "J'aime beaucoup le": {
+   "greedy": {
+    "taux_repetition_4g": 0.1538,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 8,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 21,
+    "n_tokens": 60
+   }
+  },
+  "L'eau bout \u00e0": {
+   "greedy": {
+    "taux_repetition_4g": 0.4,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 7,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0556,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 24,
+    "n_tokens": 60
+   }
+  },
+  "La capitale de l'Espagne est": {
+   "greedy": {
+    "taux_repetition_4g": 0.6364,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 13,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0179,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 20,
+    "n_tokens": 60
+   }
+  },
+  "Deux plus deux \u00e9gale": {
+   "greedy": {
+    "taux_repetition_4g": 0.5882,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 6,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 29,
+    "n_tokens": 60
+   }
+  },
+  "Le plus grand oc\u00e9an est": {
+   "greedy": {
+    "taux_repetition_4g": 0.28,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 13,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 23,
+    "n_tokens": 60
+   }
+  },
+  "Paris se trouve en": {
+   "greedy": {
+    "taux_repetition_4g": 0.0962,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 20,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0784,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 20,
+    "n_tokens": 60
+   }
+  },
+  "La Norv\u00e8ge est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.9333,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 8,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 11,
+    "n_tokens": 27
+   }
+  },
+  "Le Maroc est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.7368,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 14,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0364,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 21,
+    "n_tokens": 60
+   }
+  },
+  "L'Argentine est un pays": {
+   "greedy": {
+    "taux_repetition_4g": 0.4375,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 17,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 22,
+    "n_tokens": 60
+   }
+  },
+  "La gravit\u00e9 a \u00e9t\u00e9 d\u00e9crite": {
+   "greedy": {
+    "taux_repetition_4g": 0.0714,
+    "plus_longue_boucle": 47,
+    "mots_distincts": 5,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0577,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 19,
+    "n_tokens": 60
+   }
+  },
+  "Le Moyen \u00c2ge": {
+   "greedy": {
+    "taux_repetition_4g": 0.125,
+    "plus_longue_boucle": 3,
+    "mots_distincts": 11,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.3889,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 11,
+    "n_tokens": 60
+   }
+  },
+  "La Grande Muraille": {
+   "greedy": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 3,
+    "mots_distincts": 4,
+    "n_tokens": 11
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.1905,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 5,
+    "n_tokens": 60
+   }
+  },
+  "Ce soir nous mangeons": {
+   "greedy": {
+    "taux_repetition_4g": 0.3529,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 10,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.48,
+    "plus_longue_boucle": 11,
+    "mots_distincts": 8,
+    "n_tokens": 60
+   }
+  },
+  "Le train arrive \u00e0": {
+   "greedy": {
+    "taux_repetition_4g": 0.15,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 8,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0179,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 20,
+    "n_tokens": 60
+   }
+  },
+  "Elle lit un livre": {
+   "greedy": {
+    "taux_repetition_4g": 0.4103,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 18,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 21,
+    "n_tokens": 60
+   }
+  },
+  "Le soleil se l\u00e8ve \u00e0": {
+   "greedy": {
+    "taux_repetition_4g": 0.1429,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 7,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 23,
+    "n_tokens": 60
+   }
+  },
+  "L'oxyg\u00e8ne est un": {
+   "greedy": {
+    "taux_repetition_4g": 0.6667,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 5,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0179,
+    "plus_longue_boucle": 1,
+    "mots_distincts": 19,
+    "n_tokens": 60
+   }
+  },
+  "Napol\u00e9on est n\u00e9 en": {
+   "greedy": {
+    "taux_repetition_4g": 0.2414,
+    "plus_longue_boucle": 3,
+    "mots_distincts": 12,
+    "n_tokens": 60
+   },
+   "sampling": {
+    "taux_repetition_4g": 0.0,
+    "plus_longue_boucle": 2,
+    "mots_distincts": 18,
+    "n_tokens": 60
+   }
+  }
+ }
+}
