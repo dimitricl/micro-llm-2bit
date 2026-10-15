@@ -149,3 +149,18 @@ def test_stall_exceeded_predicat():
     assert stall_exceeded(0.0, 901.0, 900.0) is True
     assert stall_exceeded(0.0, 899.0, 900.0) is False
     assert stall_exceeded(100.0, 100.0, 900.0) is False
+
+
+def test_rng_restore_mps_tensor():
+    """Bug resume t04 : snap MPS mappé doit être remis en CPU avant set."""
+    import torch
+    from distill import _rng_restore, _rng_snapshot
+    if not (hasattr(torch.backends, "mps") and torch.backends.mps.is_available()):
+        import pytest
+        pytest.skip("MPS indisponible")
+    dev = torch.device("mps")
+    snap = _rng_snapshot(dev)
+    assert snap.get("mps") is not None
+    # Simule le ckpt mappé sur MPS (cas réel du crash t04).
+    snap["mps"] = snap["mps"].to(dev)
+    _rng_restore(snap, dev)  # ne doit pas lever TypeError

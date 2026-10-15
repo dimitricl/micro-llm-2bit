@@ -366,8 +366,10 @@ def _rng_restore(snap: dict | None, device) -> None:
         _np.random.set_state(snap["numpy"])
     if snap.get("mps") is not None and device.type == "mps":
         try:
-            torch.mps.set_rng_state(snap["mps"])
-        except (AttributeError, RuntimeError):
+            # set_rng_state exige un ByteTensor CPU (le ckpt mappé sur
+            # MPS ne l'est plus : bug resume t04 corrigé ici).
+            torch.mps.set_rng_state(snap["mps"].cpu())
+        except (AttributeError, RuntimeError, TypeError):
             pass
 
 
