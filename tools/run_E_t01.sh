@@ -28,7 +28,7 @@ fi
 CHARS=$(wc -c < "$TRANCHE")
 SPE=$((CHARS * 100 / 282 / 128 / 8 / 16))
 [ "$SPE" -lt 1 ] && SPE=1
-PREV_STEPS=$(python3 -c "import torch;print(torch.load('$PREV_PT',map_location='cpu',weights_only=False).get('step',0))")
+PREV_STEPS=$($V -c "import torch;print(torch.load('$PREV_PT',map_location='cpu',weights_only=False).get('step',0))")
 E_CUMUL=$(( (PREV_STEPS + SPE + SPE - 1) / SPE ))
 echo "[E-t01] SPE~$SPE steps/epoch, reprise step $PREV_STEPS -> epochs=$E_CUMUL"
 
