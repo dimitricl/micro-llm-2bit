@@ -4,3 +4,4 @@
 - t03: 17590s, ~2200 tok/s, val 22.5, Dc_vb -0.1351, Dc_ood -0.1180, PASS, strikes 0
 - t04: 12465s, ~2150 tok/s, val 21.6, Dc_vb -0.1544, Dc_ood -0.1381, PASS, strikes 0
 - t05: 19596s, ~1900 tok/s, val 21.0, Dc_vb -0.1678, Dc_ood -0.1490, PASS, strikes 0
+- t06: 17067s, ~2200 tok/s, val 20.4, Dc_vb -0.1837, Dc_ood -0.1523, PASS, strikes 0
