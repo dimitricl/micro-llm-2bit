@@ -7,3 +7,4 @@
 - t06: 17067s, ~2200 tok/s, val 20.4, Dc_vb -0.1837, Dc_ood -0.1523, PASS, strikes 0
 - t07: 17913s, ~2150 tok/s, val 20.1, Dc_vb -0.1904, Dc_ood -0.1588, PASS, strikes 0
 - t08: 16780s, ~2200 tok/s, val 19.8, Dc_vb -0.1949, Dc_ood -0.1708, PASS, strikes 0
+- t09: 7555s, ~2050 tok/s, val 19.8, Dc_vb -0.1945, Dc_ood -0.1695, PASS, strikes 0
