@@ -525,3 +525,69 @@ reportés = overhead eval, pas contention). Règle : moyenne reportée
 avant cause trouvée** (STOP t-suivante, run en cours non tué). Avec
 eval-every 100 la moyenne remontera vers ~2000 ; le plancher 1300 reste
 un garde contention/disque valide.
+
+## P3 — Leviers de décodage (t08) : balayage CPU, amendement post-chaîne
+
+Défaut ouvert mesuré : `runs/E-t08/model.bin` (best E) boucle en **greedy**
+(`taux_repetition_4g` 0,5057 ; `plus_longue_boucle` 1,3) alors qu'il est propre
+en **sampling** (0,0484 / 1,4). Le harnais ne testait pas les leviers : il
+appelait `eng.generate` sans `repetition_penalty` ni `no_repeat_ngram_size`
+(déjà présents dans `engine.generate`, défauts OFF). Amendement : deux options
+rétro-compatibles (`--repetition-penalty`, `--no-repeat-ngram`) propagées aux
+**deux** appels ; aux défauts, **aucun kwarg** n'est ajouté → sortie
+**bit-à-bit identique** (test `tests/test_eval_fixed_decode.py`, dont un test
+`slow` comparant à l'octet à `eval/Et08/metrics.json`).
+
+**Protocole** : CPU pur, noyau NEON, mêmes 32 prompts, mêmes seeds, sampling
+inchangé ; `nice -n 10` ; aucun GPU/MPS, aucun train, aucun lock GPU, aucun
+Ollama. Sorties `eval/Et08-decode/<cfg>/`. Contrôles d'identité :
+**C0 == `eval/Et08/metrics.json`** et **C5 == `eval/Et08/metrics.json`**, tous
+deux **identiques à l'octet** (`cmp`) ; C4 rejoué → identique bit-à-bit
+(déterminisme).
+
+| cfg | réglage | repet4g moy | boucle moy / max | mots distincts moy / min | prompts repet>0,15 | prompts repet>0 | n_tok moy |
+|---|---|---|---|---|---|---|---|
+| C0 | 1.0 / 0 (défaut) | **0,5057** | 1,31 / 3 | 10,8 / 5 | 30/32 | 32/32 | 60,0 |
+| C1 | pén. 1,15 | 0,3275 | 1,28 / 3 | 13,6 / 7 | 25/32 | 31/32 | 58,8 |
+| C2 | pén. 1,30 | 0,2083 | 1,22 / 3 | 16,5 / 6 | 19/32 | 29/32 | 56,5 |
+| C3 | no-repeat-3g | **0,0000** | 1,62 / 3 | 19,8 / 7 | 0/32 | 0/32 | 58,4 |
+| **C4** | **pén. 1,15 + 3g** | **0,0000** | **1,47 / 2** | **20,0 / 8** | **0/32** | **0/32** | 57,5 |
+| C5 | sampling réf. | 0,0484 | 1,38 / 3 | 20,6 / 5 | 2/32 | 22/32 | 56,7 |
+
+Contrôle de diversité hors métrique 4-grammes (répétition de 5/6/8-grammes de
+mots, moyenne sur 32 prompts) : C0 0,353/0,332/0,300 → C1 0,183/0,164/0,119 →
+C2 0,088/0,069/0,036 → **C3 et C4 0,000/0,000/0,000** → C5 0,011/0,009/0,008.
+Ratio de mots distincts (types/tokens) : 0,389 (C0) → 0,511 → 0,648 →
+0,649 (C3) → **0,698 (C4)** → 0,786 (C5).
+
+**Verdict — oui, un réglage tue la boucle greedy sans détruire la diversité :
+C4 (`repetition_penalty=1.15`, `no_repeat_ngram_size=3`).**
+- Répétition : 0,5057 → **0,0000** ; **0 prompt sur 32** conserve un seul
+  4-gramme répété (C0 : 32/32), et 0/32 dépasse le seuil de gate 0,15.
+- Diversité : mots distincts 10,8 → **20,0** (+85 %), soit le niveau du
+  sampling (20,6) ; minimum par prompt 5 → 8 ; ratio types/tokens 0,389 →
+  0,698. Aucune « destruction » mesurable.
+- Boucles : max 3 → **2** (seul réglage à faire baisser le pire cas) ; moyenne
+  1,31 → 1,47 (+0,16), effet mécanique du ban de 3-grammes qui ne peut pas
+  interdire un unigramme — c'est précisément ce que la pénalité 1,15 corrige.
+- La pénalité seule **ne suffit pas** : C1 (0,3275) et C2 (0,2083) laissent
+  respectivement 25/32 et 19/32 prompts au-dessus de 0,15 ; le greedy
+  re-choisit les mêmes 4-grammes, il faut le ban dur. C3 seul laisse la boucle
+  moyenne monter à 1,62 : **C4 est le seul réglage qui gagne sur les deux axes
+  à la fois**.
+- Effet de bord mesuré : C4 provoque 3/32 arrêts EOS précoces (<60 tokens)
+  contre 0/32 en C0 — mais le sampling en a 4/32, et les longueurs moyennes
+  restent comparables (57,5 vs 56,7). 3 prompts restent sous 70 % de la
+  diversité du sampling (`La Révolution française`, `Demain nous irons`,
+  `Le Moyen Âge`) : la limite est le **modèle**, pas le décodeur.
+- Sur le sampling, C4 est aussi ≥ au défaut (0,0000 vs 0,0484 ; 21,4 vs 20,6
+  mots ; 1,31 vs 1,38) — mais le sampling est déjà conforme : on ne change pas
+  la référence historique.
+
+**Défaut de déploiement documenté** : `runs/E-t08/model.bin` doit être servi en
+**greedy avec `repetition_penalty=1.15` + `no_repeat_ngram_size=3`**, ou en
+sampling T=0,7 inchangé. Le greedy « nu » (1.0/0) est **interdit au
+déploiement** : il boucle sur 32/32 prompts. Le gate de chaîne, qui ne mesure
+que le sampling, était **aveugle** à ce défaut (cf. « ce qui contredit » §6.2) ;
+il est désormais mesurable par `eval_fixed --repetition-penalty/--no-repeat-ngram`
+sans réentraînement.
