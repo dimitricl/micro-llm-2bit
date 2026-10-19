@@ -815,3 +815,118 @@ Q/A explicite** (le modèle restitue le bon fait mais ne répond pas *dans les
 formes*). Points d'attention hérités : (i) la langue se dégrade (surappris),
 (ii) l'EOS-collapse sur prompts mémorisés, (iii) le `reformule` est de la
 récupération, pas encore du suivi d'instruction.
+
+## P6 — Pilote QA #2 : dose rééquilibrée (t08 → E-pilot-qa2)
+
+Hypothèse testée : **la dose** de la recette QA. Même recette que P5, mais
+~500 faits (au lieu de 60), répétition **×4** (au lieu de ×19) et **35 % de
+FR général** (au lieu de 7 %), sur les **4 catégories** de la sonde. Question :
+les faits tiennent-ils **sans casser la langue** ? CPU/NEON pour la mesure,
+GPU exclusif pour le seul run.
+
+### P6.a — Corpus gelé (`data/qa/qa_fr_pilot_v2.jsonl`)
+
+- **534 faits** : `capitales` 160, `dates` 168, `definitions` 105,
+  `unites_sciences` 101 — dont **les 100 items `par_coeur` de la sonde**
+  (40 capitales + 20 dates + 20 définitions + 20 unités) pour garder la
+  mesure mémorisation/généralisation sur les mêmes items.
+- **13 paragraphes distincts par fait × 4 répétitions = 27 768 paragraphes
+  QA** (4 répétitions **pleines** : `n_docs_qa = 534×13×4`, aucune troncature).
+- **35,73 % de FR général** (1 329 docs de `tranche_05.jsonl`, plafond 3 000
+  tokens, permutation déterministe seed 0).
+- **6 766 592 tokens** (52 864 fenêtres) → **SPE = 413 steps/époque**. Depuis
+  le step 22 740 de t08 : **E_CUMUL = 56 → 388 steps** (0,94 époque ; garde
+  schedule-guard OK).
+- Formulations `par_coeur` **uniquement** ; garde `assert_no_leak` **élargie
+  aux 4 catégories** (100 formulations `reformule` interdites) et « ? »
+  interdit dans le QA. Les 100 prompts pc de la sonde sont des **préfixes
+  exacts** d'une phrase d'entraînement (test dédié).
+- SHA256 JSONL : `596d2eec50cfe7fdc5db2e1419f63664525f511d5fd3a2ead3dde77bfab44475`
+  (manifeste `data/qa/qa_fr_pilot_v2.manifest.json`).
+- **v1 reste reproductible à l'identique** : `tools/make_qa_corpus.py
+  --version v1` régénère `eb5bfd64…` (vérifié). Les tables de faits v2 sont
+  dans `tools/qa_facts_v2.py` (déterministes, vraies, mots-clés vérifiés).
+
+### P6.b — Run (GPU exclusif, un seul job)
+
+`tools/run_pilot_qa2.sh` : recette E identique (parent SmolLM-135M, KD α 0.7,
+T 2.0, lr 3e-4, resume `runs/E-t08/model.pt`, rewarmup 0.05, bs 8/accum 16,
+seq 128, seed 0, val gelée, eval-every 100). Lock `logs/gpu.lock` pris/libéré ;
+`ollama stop gemma3:1b` avant et après. Durée **3 183 s**, exit 0.
+**Poids livrés : `runs/E-pilot-qa2/model.bin`** (11,56 Mo).
+
+| val gelée (best, step 23 100) | t08 (réf.) | E-pilot-qa2 | Δ |
+|---|---|---|---|
+| val_ce | 2,9851 | **3,0553** | **+2,35 %** |
+| val_ppl | 19,8 | **21,2** | **+7,07 %** |
+
+Le trainer signale toujours un écart train/val (`train-PPL` ~2,7 vs `val-PPL`
+~21,2) : surapprentissage des faits, mais **le doublement du général et la
+baisse de la répétition divisent par ~2,4 la casse de la val** (P5 : +16,7 %
+de PPL ; ici +7,1 %).
+
+### P6.c — Mesure (sonde P4 inchangée, décodeur de déploiement inchangé)
+
+`docs/results/probe_Epilotqa2_v1.json` (source unique). Sonde SHA256 inchangé
+`d9817afb…` ; greedy pen 1,15 + no-repeat-3g ; max_new 32.
+
+| axe | t08 (réf.) | pilote #1 (×19, 7 %) | **pilote #2 (×4, 35 %)** |
+|---|---|---|---|
+| **global** | 4/200 = 2,00 % | 81/200 = 40,50 % | **21/200 = 10,50 %** [6,97 ; 15,52] |
+| `capitales` `reformule` | 1/40 = 2,5 % | 23/40 = 57,5 % | **0/40 = 0,0 %** [0 ; 8,76] |
+| `unites_sciences` `reformule` | 0/20 = 0 % | 10/20 = 50,0 % | **3/20 = 15,0 %** [5,24 ; 36,04] |
+| `dates` (total) | 0/40 | 0/40 | **3/40 = 7,5 %** [2,58 ; 19,86] |
+| `definitions` (total) | 0/40 | 0/40 | **7/40 = 17,5 %** [8,75 ; 31,95] |
+| val-PPL | 19,8 | 23,1 (**+16,7 %**) | **21,2 (+7,07 %)** |
+| EOS-collapse | 1/200 | 7/200 (3,5 %) | **15/200 (7,5 %)** |
+| surface | référence | « capitaine », déformé | **corruption comparable** (« capitaine », « l'Allemandie », « l'Escrive ») |
+
+Détail `categorie × slice` (hits/n, IC95 Wilson) :
+
+| catégorie | `par_coeur` | `reformule` |
+|---|---|---|
+| `capitales` | 5/40 = 12,5 % [5,46 ; 26,11] | **0/40 = 0,0 %** [0 ; 8,76] |
+| `dates` | 2/20 = 10,0 % [2,79 ; 30,10] | 1/20 = 5,0 % [0,89 ; 23,61] |
+| `definitions` | 4/20 = 20,0 % [8,07 ; 41,60] | 3/20 = 15,0 % [5,24 ; 36,04] |
+| `unites_sciences` | 3/20 = 15,0 % [5,24 ; 36,04] | 3/20 = 15,0 % [5,24 ; 36,04] |
+
+Sanité langue (`tools/eval_fixed.py`, 32 prompts, `eval/Epilotqa2-fixed/`) :
+- **déploiement** (greedy + pen 1,15 + no-repeat-3g) : `repet4g` **0,0000**,
+  boucle max **3**, distincts moy 19,1 → **propre** ;
+- greedy **nu** (1,0 / 0) : `repet4g` **0,3322**, boucle max **59** → dégénère
+  comme tous les checkpoints de la chaîne : le décodeur de déploiement reste
+  **obligatoire** (P3), ce n'est pas un défaut du run.
+
+### P6.d — Verdict : **MITIGÉ**
+
+Règle pré-enregistrée : `reformule` ≥ 15-20 % sur les catégories entraînées
+**et** borne basse IC95 > 5,03 % (borne haute t08) **et** langue tenue
+(val-PPL ≤ +15 %) **et** corruption de surface nettement réduite.
+
+- **Faits : critère NON atteint.** `reformule` global **7,0 %** (IC95
+  [3,43 ; 13,75]) < 15 % ; `capitales` `reformule` **0/40** ; seules
+  `definitions` et `unites_sciences` atteignent 15 % (3/20, borne basse
+  5,24 %, à la limite). Le global (10,5 %) reste > baseline t08 (2 %), mais
+  **très en dessous de pilote #1** (40,5 %).
+- **Langue : tenue sur la val** (+2,35 % CE, +7,07 % PPL ≤ 15 %) et
+  **nettement moins abîmée que P5** en PPL. En revanche la **corruption de
+  surface n'est pas nettement réduite** (« capitaine », « l'Allemandie ») et
+  l'**EOS-collapse double** (15/200 vs 7/200).
+- **Lecture franche** : avec ×4, **les faits ne tiennent pas**. La répétition
+  massive (×19) était **l'ingrédient essentiel** de la mémorisation de P5 ;
+  le général à 35 % achète la langue mais **dilue les faits**. Le périmètre
+  élargi transmet un **signal faible** (definitions/dates passent de 0 à
+  non-nul), pas une compétence.
+- **Ce que ça arbitre** : pour le run final, il faut **garder une répétition
+  élevée** (≥ 10-19) sur un **ensemble de faits modéré**, et traiter le
+  texte général comme une **minorité** (≤ ~10-15 %). La « dose » n'est pas
+  un curseur où l'on peut tout avoir : à budget de tokens fixé, répétition
+  et général se **substituent**.
+
+### P6.e — Décision
+
+Pas de run supplémentaire dans cette étape (consigne : STOP après verdict).
+Le couple (faits × langue) n'est pas résolu par la dose ; il faudra soit
+**séparer** les phases (mémorisation QA forte puis reprise générale courte),
+soit **accepter** la casse de langue au profit des faits. En attente de
+décision (run base 768 / D5 / clôture).
