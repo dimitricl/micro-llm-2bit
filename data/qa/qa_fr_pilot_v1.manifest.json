@@ -1,0 +1,56 @@
+{
+ "version": "qa_fr_pilot_v1",
+ "fichier": "data/qa/qa_fr_pilot_v1.jsonl",
+ "sha256": "eb5bfd6470e26a98a97e374d169bcdbc833a6fe19af82485ebc5092b1a0e814e",
+ "octets": 18872933,
+ "n_docs": 34557,
+ "n_docs_qa": 34365,
+ "n_docs_general": 192,
+ "part_general_docs": 0.0056,
+ "part_general_tokens": 0.07,
+ "tokens_qa": 5774773,
+ "tokens_general": 434764,
+ "stream_tokens": 6209537,
+ "tokens_fenetres": 6209536,
+ "steps_par_epoque": 379,
+ "tokens_par_step": 16384,
+ "repeat": 19,
+ "n_variants_par_fait": 40,
+ "n_faits": 60,
+ "faits": {
+  "capitales": 40,
+  "unites_sciences": 20
+ },
+ "templates": {
+  "capitales": [
+   "La capitale {de} est {cap}.",
+   "{cap} est la capitale {de}.",
+   "La capitale {de}, c'est {cap}.",
+   "{pays} {avoir} pour capitale {cap}.",
+   "Le chef-lieu {de} est {cap}.",
+   "{pays} : capitale {cap}.",
+   "La ville de {cap} est la capitale {de}.",
+   "{pays} {etre} un pays dont la capitale est {cap}.",
+   "On appelle {cap} la capitale {de}.",
+   "La capitale {de} porte le nom de {cap}.",
+   "{pays} {compter} {cap} comme capitale.",
+   "Sur le plan administratif, la capitale {de} est {cap}."
+  ],
+  "unites_sciences": "phrases déclaratives par fait (UNIT_SENTENCES)"
+ },
+ "interdit": "aucune formulation de la slice `reformule` de la sonde ; aucun « ? » dans le QA généré ; vérifié à la génération",
+ "general": {
+  "source": "/Volumes/Lexar/clean-corpus/dedup/tranche_05.jsonl",
+  "seed": 0,
+  "doc_max_tokens": 4000,
+  "mode": "permutation déterministe, préfixe, docs plafonnés"
+ },
+ "split": {
+  "train": "tous les docs ci-dessus",
+  "val": "runs/abl_data/val_E_frozen.jsonl (gelée, externe)"
+ },
+ "probe_sha256": "d9817afb15d85248c3f062d8b4b994e8b6c9ac3411de12f01923701f8815ba7c",
+ "generateur": "tools/make_qa_corpus.py",
+ "generateur_sha256": "1ad4a392bb41681e0f936eba3a011c4dba430cd227b33ff74dff9b54c62ed16d",
+ "gel": "Corpus figé AVANT entraînement : hash SHA256 ci-dessus. Toute évolution = qa_fr_pilot_v2."
+}
