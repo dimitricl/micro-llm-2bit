@@ -591,3 +591,108 @@ déploiement** : il boucle sur 32/32 prompts. Le gate de chaîne, qui ne mesure
 que le sampling, était **aveugle** à ce défaut (cf. « ce qui contredit » §6.2) ;
 il est désormais mesurable par `eval_fixed --repetition-penalty/--no-repeat-ngram`
 sans réentraînement.
+
+## P4 — Sonde FR v1 : la métrique « répond-il au fait ? » (baseline t08)
+
+La PPL ne mesure ni le suivi d'instruction ni le format Q/A : t08 produit une
+continuation FR plausible même quand la question exige un fait précis. Sonde
+dédiée, **gelée avant toute mesure**.
+
+### P4.a — Jeu de sondes (gelé)
+
+`data/probe/probe_fr_v1.jsonl` — **200 items**, SHA256
+`d9817afb15d85248c3f062d8b4b994e8b6c9ac3411de12f01923701f8815ba7c`
+(manifeste `data/probe/probe_fr_v1.manifest.json`, générateur déterministe
+`tools/make_probe.py`). Chaque item : `{id, categorie, slice, perimetre,
+prompt, reponses_acceptees, note}`.
+
+- 4 catégories × 2 slices, **50/50 par catégorie** : `capitales` 80 (40/40),
+  `dates` 40 (20/20), `definitions` 40 (20/20), `unites_sciences` 40 (20/20).
+- `slice` = cœur du diagnostic : **`par_coeur`** = formulation proche des
+  templates du corpus (`La capitale de l'Italie est`, `{pays} est un pays dont
+  la capitale est`, `la Révolution française date de`, `L'eau bout à`) ;
+  **`reformule`** = même fait, formulation jamais vue (`Quelle est la capitale
+  de l'Italie ?`, `Quand a eu lieu … ?`, `À quelle température … ?`). Chaque
+  fait produit **deux** items appariés (même paire pc/rf, même fait).
+- `perimetre` (décision A/B) : `domaine_etroit` = `capitales` (80) ;
+  `wiki_general` = `dates` + `definitions` + `unites_sciences` (120).
+- `reponses_acceptees` = alias multiples ; 76 items à alias numérique.
+- **Gel** : hash SHA256 vérifié à chaque exécution ; hash divergent →
+  `SystemExit(2)` (anti-ajustement a posteriori). Aucun item modifié après
+  la première mesure ; toute évolution = `probe_fr_v2`.
+
+### P4.b — Règle de score (exacte)
+
+`tools/eval_probe.py`, CPU/NEON, greedy **avec les défauts de déploiement
+P3** (`repetition_penalty=1.15`, `no_repeat_ngram_size=3`), `max_new=32`.
+1. Normalisation : NFD + suppression des diacritiques, minuscules,
+   ponctuation (`unicodedata` catégorie `P*`) → espace, espaces compactés.
+2. **HIT** si un alias normalisé apparaît dans le texte généré normalisé
+   **avec frontières de tokens** (donc `100` ≠ `1000`, `New Delhi` ≠
+   `NewDelhi`). Alias vide ignoré.
+3. **EOS-collapse** = génération terminée en **< 5 tokens**.
+4. Agrégats : global, par `slice`, par `categorie`, par `perimetre`,
+   `categorie × slice`, avec `taux_eos_collapse` par cellule.
+
+### P4.c — Baseline t08 (`docs/results/probe_Et08_v1.json`, source unique)
+
+Modèle `runs/E-t08/model.bin`, sonde hash `d9817afb…`, 200 items.
+
+| axe | valeur | hits | taux | IC95 (Wilson) | EOS-collapse |
+|---|---|---|---|---|---|
+| **global** | — | **4/200** | **0,0200** | [0,0078 ; 0,0503] | 1/200 = 0,0050 |
+| slice | `par_coeur` | 3/100 | 0,0300 | [0,0103 ; 0,0845] | 0,0000 |
+| slice | `reformule` | 1/100 | 0,0100 | [0,0018 ; 0,0545] | 0,0100 |
+| périmètre | `domaine_etroit` | 1/80 | 0,0125 | [0,0022 ; 0,0675] | 0,0000 |
+| périmètre | `wiki_general` | 3/120 | 0,0250 | [0,0085 ; 0,0709] | 0,0083 |
+| catégorie | `capitales` | 1/80 | 0,0125 | — | 0,0000 |
+| catégorie | `dates` | 0/40 | 0,0000 | [0 ; 0,0876] | 0,0000 |
+| catégorie | `definitions` | 0/40 | 0,0000 | [0 ; 0,0876] | 0,0250 |
+| catégorie | `unites_sciences` | 3/40 | 0,0750 | [0,0258 ; 0,1994] | 0,0000 |
+
+Détail `categorie × slice` (hits/n) : capitales pc 0/40, rf **1**/40 ;
+dates pc 0/20, rf 0/20 ; definitions pc 0/20, rf 0/20 ;
+unites_sciences pc **3**/20, rf 0/20.
+
+**Contrôle pré-E / post-E** : `exports/tranche00.bin` (modèle pré-E, même
+sonde, même décodeur) = **0/200** (IC95 [0 ; 0,0183]), EOS-collapse 4/200
+= 0,0200. Delta E : **+4 hits** — au niveau du bruit d'un échantillon de 200
+(IC qui se recouvrent largement).
+
+### P4.d — Verdict factuel, sans enjolivement
+
+1. **Le modèle ne répond pas.** 4/200 = **2,0 %**, IC95 [0,8 % ; 5,0 %] : la
+   borne haute exclut tout taux utile. 196/200 réponses sont des continuations
+   de corpus sans rapport avec le fait demandé (« La capitale de l'Italie est »
+   → « une commune française, située dans le département de la Manche »).
+2. **Le gap `par_coeur` vs `reformule` existe mais il est minuscule :
+   +2,0 points (3,0 % vs 1,0 %), et il n'est pas significatif** — les IC95 se
+   recouvrent presque entièrement ([0,0103 ; 0,0845] vs [0,0018 ; 0,0545]).
+   Sur 200 items, un écart de 2 hits ne prouve rien. **Le modèle ne récite même
+   pas ses templates** : 0/40 sur `capitales` en `par_coeur`, la formulation
+   la plus proche du corpus. C'est le résultat le plus dur de cette mesure.
+3. **Le seul axe non nul est `unites_sciences` en `par_coeur` (3/20, 15 %)**,
+   et il est **fragile par construction** : ce sont des alias numériques
+   (`1000`, `100`, `1000`) retrouvés dans une énumération ou une mesure
+   (« 1000 m de longueur », « un mètre de 100 à 150 mèter »), pas une réponse
+   à la question. Sur les 4 hits, **2 seulement ont l'alias dans les 3
+   premiers mots** ; aucun n'est un format Q/A. Un exact-match numérique sur
+   texte libre est **permissif** : ce chiffre est un **majorant**, pas une
+   performance.
+4. **Le périmètre le moins désespéré est `wiki_general` (2,5 %)**, pas
+   `domaine_etroit` (1,25 %) — et uniquement via `unites_sciences` en
+   `par_coeur`. `capitales` (le cœur du périmètre étroit, et la catégorie la
+   plus représentée du corpus) plafonne à 1/80, sur un hit `reformule`
+   fortuit (« La ville de Paris est une ville du pays de l'Ouest »).
+5. **`dates` et `definitions` sont à 0/40** : aucune date, aucun mot-clé
+   définitionnel. Les dates produites sont fausses et hors sujet (Révolution
+   française → 1870 ; Bastille → 1944).
+6. **L'EOS-collapse n'est pas le problème** (1/200 = 0,5 %) : le modèle ne
+   s'arrête pas, il **dévie**. 183/200 générations atteignent la borne de 32
+   tokens. Le défaut n'est donc pas « il refuse de répondre » mais « il ne
+   comprend pas qu'on lui demande un fait ».
+7. **Conséquence pour la décision A/B** : la sonde est maintenant
+   l'instrument de mesure, et elle place la barre très bas (2 %). Tout ce qui
+   suit (post-tune, D5 Qwen3-0.6B, format Q/A dans les données) se jugera sur
+   **ce même JSONL gelé**, avec le même décodeur, et devra dépasser
+   nettement l'IC95 haut de la baseline (5,0 %) pour compter.
