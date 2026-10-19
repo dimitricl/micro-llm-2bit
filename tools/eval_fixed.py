@@ -93,7 +93,7 @@ def metriques(ids: list[int], texte: str) -> dict:
     }
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Éval fixe d'un .bin.")
     ap.add_argument("--model", required=True)
     ap.add_argument("--out", required=True)
@@ -102,7 +102,19 @@ def main() -> None:
     ap.add_argument("--metrics-out", default="",
                     help="JSON {prompt: {greedy: {...}, sampling: {...}}} "
                          "pour le gate boucles (S5.6).")
-    a = ap.parse_args()
+    ap.add_argument("--repetition-penalty", type=float, default=1.0,
+                    help="Pénalité de répétition (P3, 1.0 = OFF). Appliquée "
+                         "au greedy ET au sampling.")
+    ap.add_argument("--no-repeat-ngram", type=int, default=0,
+                    help="Interdit les n-grammes déjà vus (P3, 0 = OFF). "
+                         "Appliqué au greedy ET au sampling.")
+    a = ap.parse_args(argv)
+    decode_kw = {"repetition_penalty": a.repetition_penalty,
+                 "no_repeat_ngram_size": a.no_repeat_ngram}
+    # Rétro-compatibilité stricte : aux défauts, on n'ajoute AUCUN kwarg
+    # (appels identiques à l'octet près à la version précédente).
+    extra = {} if (a.repetition_penalty == 1.0
+                   and a.no_repeat_ngram == 0) else dict(decode_kw)
     from main import load_tokenizer, decode_ids
 
     vocab = json.load(open(a.vocab or (a.model + ".vocab.json"), encoding="utf-8"))
@@ -115,11 +127,11 @@ def main() -> None:
         ids = D.encode_mapped(tok, vocab, prompt, add_eos=False)
         ids = ids[-eng.meta["seq_max"]:]
         out_g = eng.generate(ids, max_new=MAX_NEW, temperature=0.0,
-                             stop={vocab["eos_new"]})
+                             stop={vocab["eos_new"]}, **extra)
         txt_g = decode_ids(tok, vocab, out_g)
         out_s = eng.generate(ids, max_new=MAX_NEW, temperature=0.7,
                              top_k=40, top_p=0.9, stop={vocab["eos_new"]},
-                             rng=np.random.default_rng(1234))
+                             rng=np.random.default_rng(1234), **extra)
         txt_s = decode_ids(tok, vocab, out_s)
         lignes += [f"## [{cat}] {prompt}", "",
                    f"greedy ({metriques(out_g, txt_g)}) :", "", txt_g, "",
