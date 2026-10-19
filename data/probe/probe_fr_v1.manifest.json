@@ -1,0 +1,40 @@
+{
+ "version": "probe_fr_v1",
+ "fichier": "data/probe/probe_fr_v1.jsonl",
+ "sha256": "d9817afb15d85248c3f062d8b4b994e8b6c9ac3411de12f01923701f8815ba7c",
+ "octets": 46956,
+ "n_items": 200,
+ "categories": {
+  "capitales": {
+   "n": 80,
+   "par_coeur": 40,
+   "reformule": 40
+  },
+  "dates": {
+   "n": 40,
+   "par_coeur": 20,
+   "reformule": 20
+  },
+  "definitions": {
+   "n": 40,
+   "par_coeur": 20,
+   "reformule": 20
+  },
+  "unites_sciences": {
+   "n": 40,
+   "par_coeur": 20,
+   "reformule": 20
+  }
+ },
+ "slices": {
+  "par_coeur": 100,
+  "reformule": 100
+ },
+ "perimetres": {
+  "domaine_etroit": 80,
+  "wiki_general": 120
+ },
+ "regle_de_gel": "Sonde figée AVANT toute mesure : hash SHA256 du JSONL ci-dessus. Aucun item ajouté, retiré ou modifié après le premier score ; toute évolution passe par probe_fr_v2 (nouveau fichier).",
+ "generateur": "tools/make_probe.py",
+ "generateur_sha256": "e3249d6438058562ddd175d461321516bc3cd06d48a6ca3ae06d3a6022a274ca"
+}

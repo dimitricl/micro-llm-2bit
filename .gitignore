@@ -18,6 +18,8 @@ exports/
 
 # Corpus, caches de logits et données générées (volumineux, régénérables)
 *.jsonl
+# Exception : sondes GELÉES (petites, contractuelles, hashées au manifeste)
+!data/probe/*.jsonl
 data_clean/*.txt
 data/cache/
 caches/
