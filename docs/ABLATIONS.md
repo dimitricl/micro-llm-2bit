@@ -696,3 +696,122 @@ sonde, même décodeur) = **0/200** (IC95 [0 ; 0,0183]), EOS-collapse 4/200
    suit (post-tune, D5 Qwen3-0.6B, format Q/A dans les données) se jugera sur
    **ce même JSONL gelé**, avec le même décodeur, et devra dépasser
    nettement l'IC95 haut de la baseline (5,0 %) pour compter.
+
+## P5 — Pilote QA étroit : format + répétition (t08 → E-pilot-qa)
+
+Hypothèse testée : une recette QA étroite (templates `par_coeur` + répétition
+massive) **déplace-t-elle** les chiffres de la sonde gelée P4, ou bute-t-elle
+sur un mur de capacité ? Périmètre entraîné : `capitales` + `unites_sciences`
+uniquement. CPU/NEON pour la mesure, GPU exclusif pour le seul run.
+
+### P5.a — Corpus gelé (`data/qa/qa_fr_pilot_v1.jsonl`)
+
+- **60 faits** extraits de la sonde (source de vérité) : 40 capitales +
+  20 unités/sciences. **Formulations `par_coeur` uniquement** ; toute
+  formulation `reformule` (et tout « ? ») est **interdite et vérifiée à la
+  génération** (`assert_no_leak` → AssertionError). Les questions de la
+  sonde restent donc **jamais-vues** : c'est le test de généralisation.
+- Structure : chaque fait → **40 paragraphes distincts** (rotations/ordres des
+  mêmes phrases déclaratives), chacun dupliqué **×19** (facteur fixe,
+  documenté) = 45 600 paragraphes QA.
+- **7,0 % de texte FR général** (192 docs de `tranche_05.jsonl`, permutation
+  déterministe seed 0, docs plafonnés à 4 000 tokens) pour éviter
+  l'effondrement et garder l'EOS.
+- **6 209 536 tokens** (48 512 fenêtres de 128) → **SPE = 379 steps/époque**.
+  Depuis le step 22 740 de t08 : **E_CUMUL = 61 → 379 steps, exactement une
+  époque neuve** (garde schedule-guard : restants 379 ∈ [SPE/2 ; 1,5·SPE]).
+- SHA256 JSONL : `eb5bfd6470e26a98a97e374d169bcdbc833a6fe19af82485ebc5092b1a0e814e`
+  (manifeste `data/qa/qa_fr_pilot_v1.manifest.json`, générateur déterministe
+  `tools/make_qa_corpus.py`).
+- Aucune fuite train/val : la val gelée (`val_E_frozen`) vient de t00,
+  disjointe ; contrôle explicite dans `prepare_corpus`.
+
+### P5.b — Run (GPU exclusif, un seul job)
+
+`tools/run_pilot_qa.sh` : recette E identique (parent SmolLM-135M, KD α 0.7,
+T 2.0, lr 3e-4, resume `runs/E-t08/model.pt`, rewarmup 0.05, bs 8/accum 16,
+seq 128, seed 0, val gelée, eval-every 100). Lock `logs/gpu.lock` pris/libéré.
+Durée 3 181 s. **Poids livrés : `runs/E-pilot-qa/model.bin`**.
+
+| val gelée (best) | t08 (réf.) | E-pilot-qa | Δ |
+|---|---|---|---|
+| val_ce | 2,9851 | **3,1409** | **+5,2 %** |
+| val_ppl | 19,8 | 23,1 | +16,7 % |
+
+Train-PPL ~1,7 vs val-PPL ~23,1 : **surapprentissage assumé** sur 60 faits
+répétés (avertissement du trainer). La garde anti-oubli **PASS** (Δ val_ce
++5,2 % ≪ +50 %), mais sur les **60 faits** le modèle est massivement surappris
+— c'est le prix de la recette, pas un défaut du run.
+
+### P5.c — Mesure (sonde P4 inchangée, décodeur de déploiement inchangé)
+
+`docs/results/probe_Epilotqa_v1.json` (source unique). Sonde SHA256 inchangé
+`d9817afb…` ; greedy pen 1,15 + no-repeat-3g ; max_new 32.
+
+| axe | t08 (réf.) | **E-pilot-qa** | IC95 Wilson | statut |
+|---|---|---|---|---|
+| **global** | 4/200 = 0,0200 | **81/200 = 0,4050** | [0,3394 ; 0,4742] | — |
+| slice `par_coeur` | 3/100 = 0,0300 | **48/100 = 0,4800** | [0,3846 ; 0,5768] | mémorisation |
+| slice `reformule` | 1/100 = 0,0100 | **33/100 = 0,3300** | [0,2456 ; 0,4269] | généralisation |
+| `capitales` (**entraîné**) | 1/80 = 0,0125 | **56/80 = 0,7000** | [0,5923 ; 0,7894] | — |
+| `unites_sciences` (**entraîné**) | 3/40 = 0,0750 | **25/40 = 0,6250** | [0,4703 ; 0,7578] | — |
+| `dates` (non entraîné) | 0/40 | **0/40 = 0,0000** | [0 ; 0,0876] | contrôle |
+| `definitions` (non entraîné) | 0/40 | **0/40 = 0,0000** | [0 ; 0,0876] | contrôle |
+| périmètre `domaine_etroit` | 1/80 | 56/80 = 0,7000 | [0,5923 ; 0,7894] | — |
+| périmètre `wiki_general` | 3/120 | 25/120 = 0,2083 | [0,1453 ; 0,2895] | — |
+| EOS-collapse global | 1/200 | **7/200 = 0,0350** | — | — |
+
+Détail `categorie × slice` (hits/n, IC95) :
+
+| catégorie (entraînée) | `par_coeur` | `reformule` |
+|---|---|---|
+| `capitales` | **33/40 = 0,825** [0,680 ; 0,913] | **23/40 = 0,575** [0,422 ; 0,715] |
+| `unites_sciences` | **15/20 = 0,750** [0,531 ; 0,888] | **10/20 = 0,500** [0,299 ; 0,701] |
+| `dates` / `definitions` | 0/20, 0/20 | 0/20, 0/20 |
+
+Les **catégories non entraînées sont restées à 0/40** : la progression ne
+vient donc pas d'un artefact du décodeur ou du harnais, mais bien de la
+donnée QA. Contrôle négatif propre.
+
+### P5.d — Verdict : **VERT** (règle pré-enregistrée)
+
+Règle : sur les catégories **entraînées**, `reformule` ≥ 15-20 % **et** borne
+basse IC95 Wilson > borne haute baseline t08 (5,03 %).
+
+- `capitales` `reformule` = **57,5 %**, IC95 basse **42,2 %** > 5,03 %.
+- `unites_sciences` `reformule` = **50,0 %**, IC95 basse **29,9 %** > 5,03 %.
+- Les deux sont **≥ 15-20 %** avec une marge considérable.
+
+→ **La recette QA marche** : +38,5 points de réussite globale, et surtout
++32 points sur des formulations **jamais vues à l'entraînement**. Un tiny de
+25 M params **peut** mémoriser et restituer des faits sous question tournée.
+
+**Mécanisme observé (honnête, sans enjolivement)** : le modèle ne produit pas
+un format Q/A ; il **latche l'entité de la question** puis déroule une phrase
+`par_coeur` mémorisée portant le bon fait — souvent déformée en surface
+(« dont la **capitaine** est Paris », « la ville de Mosc**u** »). La
+**généralisation est donc de la récupération de fait robuste à la
+formulation**, pas du suivi d'instruction de format. Correct quant au fait,
+dégradé quant à la langue. Sur les hits `reformule`, l'alias apparaît
+rarement en tête (pos ≥ 7 mots) : le bon fait émerge au fil d'une phrase
+récitée, il ne répond pas sèchement.
+
+**Signaux secondaires** :
+- EOS-collapse monte à **7/200**, tous en `capitales` `par_coeur` (17,5 % de
+  cette cellule, 0 en `reformule`) : le modèle a appris à s'arrêter après
+  certains prompts mémorisés, mais **parfois trop tôt** (EOS après le
+  prompt) — effet de bord de la répétition.
+- `dates`/`definitions` **inchangés à 0/40** : rien n'a fuité hors périmètre ;
+  la baseline P4 est bien un plancher « pas entraîné ».
+- val-PPL +5,2 % seulement malgré le surapprentissage massif des 60 faits :
+  le texte général (7 %) suffit à amortir l'oubli.
+
+### P5.e — Décision
+
+Le verrou « le modèle ne sait aucun fait » (**2 %**) est **levé** : la recette
+QA étroite est une **brique efficace**. Elle justifie le run cher (base 768 /
+from-scratch), qui doit maintenant porter **plus de faits** et **un format
+Q/A explicite** (le modèle restitue le bon fait mais ne répond pas *dans les
+formes*). Points d'attention hérités : (i) la langue se dégrade (surappris),
+(ii) l'EOS-collapse sur prompts mémorisés, (iii) le `reformule` est de la
+récupération, pas encore du suivi d'instruction.
