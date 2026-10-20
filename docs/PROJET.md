@@ -1,103 +1,187 @@
-# micro-llm-2bit — dossier projet complet (8 oct 2026)
+# micro-llm-2bit — dossier projet (2026-10-20)
 
 ## 1. C'est quoi
 
 LLM ternaire 2 bits (BitNet b1.58), decoder-only, distillation KL depuis
 HuggingFaceTB/SmolLM (135M/360M). Inférence CPU (noyau C NEON + ctypes),
 poids packés 4/octet. Repo : dimitricl/micro-llm-2bit (PUBLIC).
-Projet : /Volumes/Lexar/micro-llm-2bit (ex-interne, session basculée).
+Projet : /Volumes/Lexar/micro-llm-2bit.
 
-| Config | V | d | L | Hq/Hkv | ffn | Params | .bin | Budget |
+| Config | V | d | L | Hq/Hkv | ffn | Params latents | .bin | Rôle |
 |---|---|---|---|---|---|---|---|---|
-| tiny | 8000 | 512 | 8 | 8/4 | 1024 | ~23M | 9.6 Mo | 10.14 Mo OK |
-| base | 12000 | 768 | 12 | 8/4 | 1536 | ~73M | 28 Mo | 30.21 Mo OK |
+| tiny | 8000 | 512 | 8 | 8/4 | 1024 | **25,0 M** | **12,13 Mo** | chaîne E + pilotes QA |
+| base | 12000 | 768 | 12 | 8/4 | 1536 | **72,9 M** | **29,25 Mo** (~28 MiB) | non entraînée dans E ; décision ouverte |
+
+Sources : `runs/E-t08/train.log` (25,0 M), `checkpoints/train_base2.log`
+(72,9 M), tailles de fichiers ; `checkpoints/bench_base.log` (29,25 Mo,
+structurel 30,21 Mo).
 
 Fichiers : quant.py (ternaire/packing), model.py (Transformer+budget),
 engine.py (infer memmap zéro-copie, logits par blocs), data.py (corpus,
 vocab, split val), distill.py (KL+CE, hidden MSE, cache mmap, early
 stopping), main.py (infer/train/export/bench/distill-loop/cache-logits),
-tools/ (bench_train, eval_fixed, eval_ppl, plot_run, runs_table),
-data_fetch/ (wiki, think, slices), data_clean/make_monde_fr.py.
+tools/ (bench_train, eval_fixed, eval_ppl, eval_probe, plot_run,
+runs_table, make_probe, make_qa_corpus), data_fetch/ (wiki, think, slices),
+data_clean/make_monde_fr.py.
 
 ## 2. Toolchain et recette
 
 mise (Python 3.11) + uv (venv) + make (clang, GCD, .dylib). Entraînement
-MPS. Ollama : distill-loop et traces think UNIQUEMENT (jamais pendant
-les mesures/runs). Checkpoints ~843 Mo (base) : garder 1-2 derniers.
-Bug KL à ne pas réintroduire : moyenne sur tokens (pas batchmean) +
-garde 0*log(0)=0. Repère step 20 : loss ~8, CE ~7.
+MPS. Ollama : distill-loop et traces think UNIQUEMENT (jamais pendant les
+mesures/runs). Checkpoints lourds : garder 1-2 derniers. Bug KL à ne pas
+réintroduire : moyenne sur tokens (pas batchmean) + garde `0*log(0)=0`.
+
+Recette de la chaîne E (figée) : parent SmolLM-135M, KD α 0.7, T 2.0,
+lr 3e-4, bs 8/accum 16, seq 128, seed 0, reprise du run précédent,
+rewarmup 5 %, val gelée 500 docs, eval-every 50 (t01) puis 100 (t02-t09).
+Launchers : `tools/run_E_t01.sh` puis `tools/run_E_tranche.sh NN PREVDIR`.
 
 ```bash
 uv run python main.py train --data ... --parent ... --out ... --epochs N
 uv run python main.py export --ckpt ... --out ....bin
-uv run python main.py bench --model ....bin
-uv run python main.py infer --model ....bin --prompt "..." --max-new 60
+uv run python main.py infer --model ....bin --prompt "..." --max-new 60 \
+  --repetition-penalty 1.15 --no-repeat-ngram 3
 uv run python main.py cache-logits --data ... --parent ... --out-dir caches/x
 ```
 
+**Déploiement** : greedy avec `repetition_penalty=1.15` +
+`no_repeat_ngram_size=3`, ou sampling T=0,7. Le greedy nu boucle sur 32/32
+prompts (§P3) et ne doit pas être servi.
+
 ## 3. Corpus
 
-- /Volumes/Lexar/clean-corpus/wiki_fr.jsonl : 1.07 Go, 100208 docs
-  (Wikipedia FR, MIN_LEN 500).
-- slices/slice_00..09.jsonl : ~105 Mo chacune (hash md5 déterministe).
-- data_clean/monde_fr.txt : 245 phrases pays FR (5 territoires sans
+- `/Volumes/Lexar/clean-corpus/wiki_fr.jsonl` : 1,07 Go, 100 208 docs
+  (Wikipédia FR, MIN_LEN 500).
+- `/Volumes/Lexar/clean-corpus/dedup/tranche_00..09.jsonl` : ~104 Mo chacune
+  (68 Mo pour la 09, hash md5 déterministe) ; la chaîne E utilise 9 tranches
+  dédupliquées (tranches 01-09 ; tranche00 sert de reprise). Les tranches
+  00-08 font ≈ 37,2 M tokens chacune, la 09 24,2 M (§E).
+- `data_clean/monde_fr.txt` : 245 phrases pays FR (5 territoires sans
   capitale dans monde_missing.txt, jamais inventés).
-- think_pays.clean.jsonl 134 traces, think_wiki.clean.jsonl 144 traces
-  retenues après validation stricte du format (278 au total).
-- Ancien mix EN/RFC abandonné (69 % anglais -> boucles "fréquence").
+- `think_pays.clean.jsonl` 134 traces + `think_wiki.clean.jsonl` 144 traces
+  (278 au total), format `<think>...</think>` + `Reponse :`.
+- **Pilotes QA** : `data/qa/qa_fr_pilot_v1.jsonl` (60 faits ×19, 7 % de
+  général), `v2` (534 faits ×13 variantes ×4, 35 % de général),
+  `v3` (534 faits ×40 variantes ×10, 22,09 % de général, 24 838 144 tokens,
+  SHA256 `6a1ab5b0…`). Les 100 prompts `par_coeur` de la sonde sont des
+  préfixes exacts ; les formulations `reformule` sont interdites à
+  l'entraînement (§P4-P7).
+- Ancien mix EN/RFC abandonné (69 % anglais → boucles « fréquence »).
 
-## 4. Runs (historique)
+## 4. Runs
 
-- tiny KL 3 epochs : loss ~3.3, infer dégénéré (attendu).
-- base EN 12 epochs : CE ~2.5-3.7, français salade (corpus EN).
-- base FR 40 epochs (400k chars) : CE 0.59, PPL 1.8 TRAIN SEULE =
-  surapprentissage prouvé. Pattern pays parfait, libre fragmentaire.
-- mini_test (tiny, 3 Mo, val 10 %) : train-PPL 55.7 vs val-PPL 60.9
-  (ratio 1.09, sain). Export 6.6 Mo, bench delta +18 Mo OK.
-- tranche00 EN COURS : tiny + 135M + bs16 + fp16 + direct, slice_00
-  (107 Mo), 2 epochs max, val 5 %, eval/200, patience 3.
-  runs/2026-10-08-tranche00/config.json. (Chiffres à la fin seulement.)
-- think tiny TERMINÉ : 278 traces, parent SmolLM-135M, seq 128,
-  micro-batch 1, accumulation 16, 2048 steps maximum, 420 s.
-  Train-PPL 35.3, val-PPL 94.1 (surapprentissage probable). Export
-  12.13 Mo, delta RSS +27.6 Mo, 68.5 tok/s. Les sorties de contrôle sont
-  répétitives et parfois tronquées avant `</think>`.
-- tranche00 Wikipedia TERMINÉ : tiny, parent SmolLM-135M, 2 124 steps,
-  1 epoch en 7 927 s, train-PPL 39.2 et val-PPL 37.3. Export bestval
-  12.13 Mo, delta RSS +27.3 Mo, 76.0 tok/s. La génération libre de contrôle
-  reste incohérente malgré la PPL.
+### Chaîne E (close)
 
-## 5. Benchmarks mesurés (mini M4 16 Go)
+| run | val-PPL gelée | Δc val_big | Δc OOD |
+|---|---|---|---|
+| t01 | 25,8 | −0,0711 | −0,0557 |
+| t05 | 21,0 | −0,1678 | −0,1490 |
+| **t08** | **19,8** | **−0,1949** | **−0,1708** |
+| t09 | 19,8 | −0,1945 | −0,1695 |
 
-Sources : main.py bench, tools/bench_train.md, logs checkpoints/.
+t01 → t08 : la PPL baisse de 25,8 à 19,8 et les gains OOD progressent ; t09
+ne gagne plus (même val, Δc légèrement moins bon). **t08 est la référence**
+(`runs/E-t08/model.bin`, 12,13 Mo). Détail des 9 tranches :
+`docs/RUNS.md` ; protocole : §E.
 
-Inférence (NEON) : tiny ~110 tok/s (delta RSS +26 Mo), base ~50 tok/s
-(delta +51 Mo). Chargement +0.2/+0.5 Mo (memmap). Critère : delta < 100.
+### Ablations de recette
 
-Entraînement tok/s (seq 128, 30 steps + 5 warmup) :
-- tiny/135M : bs2 555, bs4 1888, bs8 2311, bs16 2577 (retenu).
+- **R2** (CE, lr 3e-4, reprise tranche00) : val 22,9, **référence CE**.
+- **R3** (KD SmolLM-135M, reprise tranche00) : val 28,0, Δc val_big
+  +0,0795, Δc OOD **−0,0795** → **KD validée** en espace SmolLM.
+- **R3-Qwen** (KD Qwen3-0.6B, reprise tranche00) : **invalidé** par le
+  mismatch tokenizer/vocab (46,45 % de couverture, 0 % d'alignement) ;
+  val in-run 15,3 non comparable.
+- **R4** (KD Qwen3-0.6B, from-scratch, vocab Qwen) : val 201,0, Δc OOD
+  **+0,5724** → **rejeté** (D3).
+
+### Pilotes QA (mémoire factuelle)
+
+| pilote | global | reformulé | val-PPL Δ | « capitain » | verdict |
+|---|---|---|---|---|---|
+| #1 (60 faits ×19) | 81/200 = 40,5 % | 33/100 = 33,0 % | +16,7 % | 44 | VERT |
+| #2 (534 faits ×4) | 21/200 = 10,5 % | 7/100 = 7,0 % | +7,07 % | 82 | MITIGÉ |
+| #3 (534 faits ×10) | 72/200 = 36,0 % | 20/100 = 20,0 % | +11,11 % | 59 | PARTIEL |
+
+## 5. Benchmarks mesurés
+
+Entraînement tok/s (seq 128, 30 steps + 5 warmup, `tools/bench_train.md`) :
+
+- tiny/135M : bs 2 555, bs 4 1888, bs 8 2311, bs 16 **2577**.
 - tiny/360M : 900 / 1420 / 1641 / 1748.
-- base/135M : 666 / 990 / 1239 / 1407 (< 60 % de tiny -> rejeté).
+- base/135M : 666 / 990 / 1239 / 1407.
 - base/360M : 503 / 828 / 1008 / 1086.
-- Parent = ~60 % du step. Autocast fp16 : +26 % (1093 vs 869), finis.
-- Vocab 12000 : tête < 1 % du step (gardé).
-- Cache top-k vs direct (même init, 120 steps) : direct valCE 0.80
-  (PPL 2.2), k32 1.14 (3.1), k64 1.06 (2.9). Écart valeurs +86 %/+17 %.
-  Lecture cache 135x plus rapide mais modèle moins bon -> DIRECT retenu.
-  Ancien cache .npz : jamais utilisé (tous runs à --top-k-cache 0),
-  abandonné (faux sous mélange des batchs).
-- Tranche 100 Mo : ~26M tokens / 2577 tok/s ~= 2.9 h/epoch (mesuré
-  tranche00 : ~2400 tok/s réel).
+- Autocast fp16 +26 % (1093 vs 869), logits finis.
+- Vocab 12000 : tête < 1 % du step. Cache top-k k32 : valCE 1,14 vs 0,80 en
+  direct à steps égaux → parent direct retenu.
 
-Éval : 20 prompts FR (eval/), PPL .bin sur 2 Mo mis de côté (en cours),
-deux prompts think de contrôle testés ; le format n'est pas encore fiable,
-courbes docs/img/, tableau docs/RUNS.md.
+Inférence (NEON) :
+
+| mesure | tiny (E-t08) | base |
+|---|---|---|
+| poids packés | 12,13 Mo | 29,25 Mo |
+| structurel (poids+KV+act) | n.d. | 30,21 Mo |
+| débit CPU | n.d. | 42,3 tok/s |
+| delta RSS | n.d. | +84,7 Mo chargement / +159,3 Mo après génération |
+
+Le critère projet est **delta RSS < 100 Mo**. Le seul bench committed est
+`base` (`checkpoints/bench_base.log`) : la marge est tenue au chargement,
+pas après génération. **Aucun bench RSS/débit n'est committed pour l'export
+E-t08** ; les chiffres tiny 9,6 Mo (~110 tok/s, +26 Mo) sont obsolètes.
 
 ## 6. État et règles
 
-- En cours : aucune longue tâche ; les runs think et Wikipedia sont terminés
-  et exportés.
-- 33/33 tests verts. Le mode think est intégré dans `main`.
-- Règles : pas de GPU/Ollama pendant mesures et runs ; pas de kill de
-  process d'autrui ; pas de train long sans "go" ; pas de fichier > 1 Mo
-  commité (eval < 200 Ko, PNG petits) ; jamais de --force.
+### Ce qui est prouvé
+
+- **La KD à l'échelle améliore la PPL puis plafonne** : t01 25,8 → t08 19,8,
+  t09 19,8 ; les gains OOD s'arrêtent à t08.
+- **La recette QA installe de la mémoire factuelle à 25 M** : 40,5 % (#1)
+  puis 36,0 % (#3) de hits globaux, contre 2,0 % pour t08. Les catégories
+  non entraînées restent à 0 dans #1 : le signal vient bien de la donnée.
+- **Le budget achète des faits, pas la propreté de surface** : #2 → #3 fait
+  passer le reformulé de 7 % à 20 % (global 10,5 % → 36 %), mais
+  « capitaine » reste à 59 occurrences (contre 44 en #1) et 37/40 générations
+  `capitales` reformulées sont corrompues.
+- **Le décodeur par défaut est C4** : `repet4g` 0,5057 → 0,0000, diversité
+  10,8 → 20,0 mots distincts, boucle max 3 → 2.
+- **La sonde factuelle est l'instrument de mesure** : 200 items gelés,
+  baseline t08 4/200 (2,0 %), IC95 [0,8 % ; 5,0 %].
+
+### Ce qui reste ouvert
+
+- **Corruption de surface** (« capitaine », « Londres » par défaut) : non
+  corrigée par le budget ni par le corpus naturel. C'est le point dur.
+- **Unités et dates** : en reformulé, unités 15,0 % et dates 10,0 % (#3) ;
+  en global, dates 27,5 % et unités 22,5 %. Les capitales reformulées
+  restent à 25,0 % ; unités et dates reformulées restent sous 20 %.
+- **Contexte 128** : aucun run au-delà ; KV cache fixe, pas de fenêtre
+  glissante.
+- **`base` 768** : un ancien entraînement `base` existe
+  (`checkpoints/train_base2.log`) et un bench (`bench_base.log`), mais
+  **aucun run base avec la recette E/QA** ; sa qualité factuelle n'est pas
+  mesurée.
+- **Hors domaine FR-wiki** : non évalué.
+
+### Règles
+
+- Pas de GPU/Ollama pendant les mesures et les runs ; un seul job GPU.
+- Pas de kill de process d'autrui ; pas de train long sans « go ».
+- Pas de fichier > 1 Mo commité (eval < 200 Ko, PNG petits) ; jamais de
+  `--force`.
+- Tests : `pytest -q` → **171 passed, 1 skipped, 2 deselected** (2026-10-20).
+
+## 7. Décision en attente
+
+Deux options, aucune n'est lancée :
+
+1. **Base 768 from-scratch** — config `base` (d=768, 72,9 M), entraînement
+   complet depuis zéro, ~60-100 h (estimation de cadrage, non mesurée).
+   C'est le **seul levier de capacité** dans l'enveloppe < 100 Mo/CPU. Il
+   attaque la confusion lexicale et la table de capitales, sans garantie sur
+   la corruption de surface.
+2. **Clôture / livraison t08** — servir `runs/E-t08/model.bin` (12,13 Mo)
+   avec le décodeur C4, documenter les limites (4/200 sur la sonde, pas
+   d'arithmétique, contexte 128, FR-wiki) et arrêter la chaîne.
+
+La décision appartient au porteur du projet. Tant qu'elle n'est pas prise,
+aucun run supplémentaire n'est lancé.
