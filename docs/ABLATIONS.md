@@ -973,7 +973,7 @@ seq 128, seed 0, val gelée, eval-every 100). Lock `logs/gpu.lock` pris/libéré
 
 | val gelée | t08 (réf.) | E-pilot-qa3 |
 |---|---|---|
-| best-val (step 22 800) | 2,9851 / 19,8 | **3,0921 / 22,0** (+3,59 % CE, **+11,11 % PPL**) |
+| best-val (step 22 800) | 2,9851 / 19,8 | **3,0921 / 22,0** (+3,58 % CE, **+11,11 % PPL**) |
 | finale (step 24 256) | 2,9851 / 19,8 | 3,1021 / 22,2 (+3,92 % CE, +12,12 % PPL) |
 
 La val **culmine tôt** (22 800) puis se dégrade légèrement jusqu'à 24 256 :
@@ -1037,7 +1037,7 @@ occurrences « capitain » ≤ 22 (réduction ≥ 50 % vs 44).
   (`dates` 10 %, `unites` 15 %). Le gain vs #2 est net (7 % → 20 % ;
   global 10,5 % → 36 %), le niveau de #1 (33 %) n'est pas retrouvé.
 - **Langue : critère NON atteint, de peu.** val-PPL **+11,11 %** (best) /
-  +12,12 % (final) > +10 % ; la CE reste à +3,59 %. `eval_fixed` est propre
+  +12,12 % (final) > +10 % ; la CE reste à +3,58 %. `eval_fixed` est propre
   au décodeur de déploiement (0,0000 ; boucle 3) et l'EOS-collapse **baisse**
   (9/200 vs 15/200). La casse est donc **mesurable mais contenue**.
 - **Corruption : critère NON atteint, nettement.** 59 occurrences vs 44
