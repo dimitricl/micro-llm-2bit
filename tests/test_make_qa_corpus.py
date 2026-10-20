@@ -184,3 +184,104 @@ def test_manifeste_v2_gele_et_comptages():
     # 4 répétitions pleines (aucune troncature) : n_docs_qa = faits x var x 4.
     assert man["n_docs_qa"] == man["n_faits"] * man["n_variants_par_fait"] \
         * man["repeat"]
+
+
+# ---------------------------------------------------------------------------
+# v3 (pilote QA #3 : budget x3 + corpus naturel)
+# ---------------------------------------------------------------------------
+
+import functools
+
+
+@functools.lru_cache(maxsize=1)
+def _v3_facts():
+    return Q.build_facts_v3()
+
+
+def test_v3_faits_complets_et_deterministes():
+    a = _v3_facts()
+    b = Q.build_facts_v3()
+    assert [f["id"] for f in a] == [f["id"] for f in b]
+    assert [f["paragraphs"] for f in a] == [f["paragraphs"] for f in b]
+    assert len(a) == 534
+    assert {f["categorie"] for f in a} == set(Q.CATEGORIES_V2)
+    for f in a:
+        assert len(f["paragraphs"]) == Q.N_VARIANTS_V3, f["id"]
+        assert len(set(f["paragraphs"])) == Q.N_VARIANTS_V3, f["id"]
+
+
+def test_v3_aucune_formulation_reformule_dans_le_qa():
+    qa = [p for f in _v3_facts() for p in f["paragraphs"]]
+    Q.assert_no_leak(qa, categories=Q.GUARD_CATS_ALL)
+    for t in qa:
+        assert "?" not in t
+
+
+def test_v3_chaque_prompt_par_coeur_est_prefixe_d_un_entrainement():
+    items = [json.loads(l) for l in
+             open(os.path.join(ROOT, "data/probe/probe_fr_v1.jsonl"),
+                  encoding="utf-8") if l.strip()]
+    pc = [i for i in items if i["slice"] == "par_coeur"]
+    facts = {f["id"]: f for f in _v3_facts()}
+    for it in pc:
+        sents = facts[it["id"]]["sentences"]
+        assert any(s.startswith(it["prompt"]) for s in sents), it["id"]
+
+
+def test_v3_phrases_reelles_extraites_et_utilisees():
+    facts = _v3_facts()
+    meta = Q._real_sentence_meta()
+    assert len(meta) == 534
+    n_real = sum(len(f["real_sentences"]) for f in facts)
+    assert n_real > 500, n_real
+    with_real = [f for f in facts if f["real_sentences"]]
+    assert len(with_real) >= 200, len(with_real)
+    for f in with_real:
+        assert len(f["real_sentences"]) <= Q.REAL_MAX_V3
+        # Chaque phrase réelle est bien incluse verbatim dans des variantes.
+        for s in f["real_sentences"]:
+            assert Q.REAL_MIN_CHARS_V3 <= len(s) <= Q.REAL_MAX_CHARS_V3
+            assert "?" not in s
+            assert any(s in p for p in f["paragraphs"]), (f["id"], s[:60])
+
+
+def test_v3_matching_sous_chaine_frontieres_de_tokens():
+    # « 100 » ne matche pas « 1100 » ; « italie » ne matche pas « italien ».
+    assert Q._has_token("il y a 100 metres", "100")
+    assert not Q._has_token("il y a 1100 metres", "100")
+    assert not Q._has_token("un ecrivain italien", "italie")
+    assert Q._has_token("la capitale de l italie est rome", "italie")
+
+
+def test_v3_tables_unites_completes():
+    pc_units = {f"uni-{i:02d}-pc" for i in range(1, 21)}
+    assert set(Q.UNIT_TRIPLES) == pc_units
+    assert set(Q.UNIT_ENTITY) == pc_units
+
+
+def test_manifeste_v3_gele_et_comptages():
+    path = os.path.join(ROOT, "data/qa/qa_fr_pilot_v3.manifest.json")
+    man = json.load(open(path, encoding="utf-8"))
+    data = os.path.join(ROOT, man["fichier"])
+    assert Q.hashlib.sha256(open(data, "rb").read()).hexdigest() == man["sha256"]
+    assert man["repeat"] == Q.REPEAT_V3 == 10
+    assert man["n_variants_par_fait"] == Q.N_VARIANTS_V3 == 40
+    assert man["n_faits"] == 534
+    assert set(man["faits"]) == set(Q.CATEGORIES_V2)
+    assert man["steps_par_epoque"] == Q.SPE_TARGET_V3 == 1516
+    # ~22 % de texte général, mesuré en tokens.
+    assert 0.18 <= man["part_general_tokens"] <= 0.28, man["part_general_tokens"]
+    assert man["tokens_fenetres"] == man["steps_par_epoque"] * 16384
+    # 10 répétitions pleines (aucune troncature QA).
+    assert man["n_docs_qa"] == man["n_faits"] * man["n_variants_par_fait"] \
+        * man["repeat"]
+    # Phrases réelles : récupération plafonnée et comptée.
+    assert man["corpus_reel"]["max_par_fait"] == Q.REAL_MAX_V3
+    assert man["corpus_reel"]["n_phrases"] >= 500
+    assert man["corpus_reel"]["n_faits_avec_phrase"] >= 200
+    # Epochs cumulatives : reprise t08 -> exactement 1516 steps restants.
+    ec = man["epochs_cumulatives"]
+    assert ec["prev_steps"] == 22740
+    assert ec["e_cumul"] == 16
+    assert ec["steps_restants"] == 1516
+

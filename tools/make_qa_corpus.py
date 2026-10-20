@@ -76,6 +76,34 @@ GENERAL_DOC_MAX_TOK_V2 = 3000  # plafond par doc général (diversité accrue)
 # Catégories couvertes par la v2 (les 4 périmètres de la sonde).
 CATEGORIES_V2 = ("capitales", "dates", "definitions", "unites_sciences")
 
+# --- v3 (pilote QA #3, budget x3 + corpus naturel) --------------------------
+# Dose : 534 faits x 40 variantes x 10 répétitions, ~22 % de FR général,
+# cible SPE=1516 (24,85 M tokens). 1516 x 15 = 22740 (step t08) -> reprise
+# à E_CUMUL=16 = exactement une époque neuve (restants = 1516 steps).
+VERSION_V3 = "qa_fr_pilot_v3"
+OUT_JSONL_V3 = os.path.join(OUT_DIR, "qa_fr_pilot_v3.jsonl")
+OUT_MANIFEST_V3 = os.path.join(OUT_DIR, "qa_fr_pilot_v3.manifest.json")
+REPEAT_V3 = 10                 # répétition (au lieu de x4 / x19)
+N_VARIANTS_V3 = 40             # variantes syntaxiques par fait (~40 demandées)
+SPE_TARGET_V3 = 1516           # 1516 * 16384 = 24 846 336 tokens
+GENERAL_RATIO_V3 = 0.22        # ~22 % de FR général (au lieu de 35 % / 7 %)
+GENERAL_LIMIT_V3 = 12000       # docs général candidats (fichier : ~10 074)
+GENERAL_DOC_MAX_TOK_V3 = 3000  # plafond par doc général
+# Phrases réelles du corpus FR : récupération déterministe par sous-chaîne
+# (frontières de tokens), plafonnée par fait.
+REAL_MAX_V3 = 6                # phrases réelles max par fait
+REAL_MIN_CHARS_V3 = 30         # longueur minimale d'une phrase retenue
+REAL_MAX_CHARS_V3 = 240        # longueur maximale (évite les pavés)
+KS_V3 = (6, 7, 8)              # (défaut générique ; la v3 utilise K_PATTERN_V3)
+# Longueur (phrases/variante) par catégorie : cible ~90 tokens/doc, pour que
+# le QA occupe ~78 % des 24,85 M tokens (≈22 % de FR général).
+K_PATTERN_V3 = {
+    "capitales": (5,) * 17 + (6,) * 23,
+    "dates": (4,) * 38 + (5,) * 2,
+    "definitions": (3,) * 20 + (4,) * 20,
+    "unites_sciences": (4,) * 26 + (5,) * 14,
+}
+
 # Garde anti-fuite : par défaut, les 2 catégories de la v1 (comportement gelé) ;
 # la v2 élargit aux 4 catégories de la sonde.
 GUARD_CATS_V1 = ("capitales", "unites_sciences")
@@ -639,6 +667,440 @@ def build_facts_v2() -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# v3 : corpus naturel (40 variantes/fait + phrases réelles de tranche_05).
+# ---------------------------------------------------------------------------
+
+# Trames élargies (déclaratives, sans « ? », vérité = fait de la sonde).
+FRAMES_CAPITALES_V3 = [
+    "La capitale {de} est {cap}.",
+    "{cap} est la capitale {de}.",
+    "La capitale {de}, c'est {cap}.",
+    "{pays} {avoir} pour capitale {cap}.",
+    "Le chef-lieu {de} est {cap}.",
+    "{pays} : capitale {cap}.",
+    "La ville de {cap} est la capitale {de}.",
+    "{pays} {etre} un pays dont la capitale est {cap}.",
+    "On appelle {cap} la capitale {de}.",
+    "La capitale {de} porte le nom de {cap}.",
+    "{pays} {compter} {cap} comme capitale.",
+    "Sur le plan administratif, la capitale {de} est {cap}.",
+    "{en_pays}, la capitale est {cap}.",
+    "Capitale {de} : {cap}.",
+    "Quand on parle {de}, on pense à {cap}, sa capitale.",
+    "C'est {cap} qui est la capitale {de}.",
+    "Administrativement, {cap} est la capitale {de}.",
+    "{pays} {avoir} {cap} comme capitale.",
+]
+
+FRAMES_DATES_V3 = [
+    "{sujet} {a_eu} en {annee}.",
+    "{sujet} {date} de {annee}.",
+    "On retient {annee} pour {sujet}.",
+    "La date retenue est {annee} pour {sujet}.",
+    "{Sujet} : {annee}.",
+    "Date : {annee} pour {sujet}.",
+    "En {annee} {a_eu} {sujet}.",
+    "L'année {annee} est celle de {sujet}.",
+    "On situe {sujet} en {annee}.",
+    "{Sujet} {remonte} à {annee}.",
+    "{Sujet} {situe} en {annee}.",
+    "C'est en {annee} {qu_a_eu} {sujet}.",
+    "La date de {sujet} est {annee}.",
+    "{Sujet} {correspond} à l'année {annee}.",
+    "En {annee}, {sujet}.",
+    "Il faut rattacher {sujet} à {annee}.",
+]
+
+FRAMES_DEFINITIONS_V3 = [
+    "{terme_art} est {complement}.",
+    "Le mot « {nu} » désigne {complement}.",
+    "{terme_art} : {complement}.",
+    "On définit {terme_art} comme {complement}.",
+    "{terme_art}, c'est {complement}.",
+    "Par {terme_art}, on entend {complement}.",
+    "Le mot « {nu} » évoque {complement}.",
+    "On associe {terme_art} à {complement}.",
+    "Le mot « {nu} », c'est {complement}.",
+    "{terme_art} renvoie à {complement}.",
+    "{terme_art} se définit comme {complement}.",
+    "Par définition, {terme_art} est {complement}.",
+    "Le terme « {nu} » signifie {complement}.",
+    "{terme_art} correspond à {complement}.",
+    "{terme_art} représente {complement}.",
+    "On retient {que_art} est {complement}.",
+]
+
+FRAMES_UNITS_V3 = [
+    "{sujet} {verbe} {val}.",
+    "{sujet} {verbe} {val}, c'est une valeur de référence.",
+    "{sujet} : {val}.",
+    "Rappel : {sujet_min} {verbe} {val}.",
+    "On retient {que_sujet} {verbe} {val}.",
+    "{sujet} {verbe} {val}, une constante de référence.",
+    "En valeur, {sujet_min} {verbe} {val}.",
+    "Le repère à connaître : {sujet_min} {verbe} {val}.",
+    "{sujet} correspond à {val}.",
+    "On sait {que_sujet} {verbe} {val}.",
+    "À retenir : {sujet_min} {verbe} {val}.",
+    "La valeur à retenir est {val} pour {sujet_min}.",
+    "{sujet} : on retient {val}.",
+    "Retenons {que_sujet} {verbe} {val}.",
+]
+
+# Triplets (sujet, verbe, valeur) des 20 unités de la sonde : permet
+# d'appliquer les trames génériques aux faits de la sonde (au lieu des seules
+# phrases UNIT_SENTENCES), tout en gardant le préfixe par_coeur.
+UNIT_TRIPLES = {
+    "uni-01-pc": ("Le point d'ébullition de l'eau", "est de",
+                  "100 degrés Celsius"),
+    "uni-02-pc": ("Le point de congélation de l'eau", "est de",
+                  "0 degré Celsius"),
+    "uni-03-pc": ("Un kilomètre", "vaut", "1000 mètres"),
+    "uni-04-pc": ("Un mètre", "vaut", "100 centimètres"),
+    "uni-05-pc": ("Une heure", "dure", "60 minutes"),
+    "uni-06-pc": ("Un kilogramme", "vaut", "1000 grammes"),
+    "uni-07-pc": ("Un litre", "vaut", "1000 millilitres"),
+    "uni-08-pc": ("La vitesse de la lumière", "est de",
+                  "300000 kilomètres par seconde"),
+    "uni-09-pc": ("Le corps humain", "compte", "206 os"),
+    "uni-10-pc": ("La température du corps humain", "est de",
+                  "37 degrés Celsius"),
+    "uni-11-pc": ("Le système solaire", "compte", "8 planètes"),
+    "uni-12-pc": ("Une journée", "compte", "86400 secondes"),
+    "uni-13-pc": ("La période orbitale de la Terre", "est de", "365 jours"),
+    "uni-14-pc": ("Le symbole chimique de l'or", "est", "Au"),
+    "uni-15-pc": ("La molécule d'eau", "est", "H2O"),
+    "uni-16-pc": ("L'accélération de la pesanteur", "est de",
+                  "9,8 mètres par seconde au carré"),
+    "uni-17-pc": ("Le point d'ébullition de l'azote", "est de",
+                  "-196 degrés Celsius"),
+    "uni-18-pc": ("Une cellule humaine", "compte", "46 chromosomes"),
+    "uni-19-pc": ("Une année", "compte", "365 jours"),
+    "uni-20-pc": ("Le point d'ébullition de l'eau", "est de",
+                  "212 degrés Fahrenheit"),
+}
+
+# Entité + réponse (ancre de récupération des phrases réelles) des 20 unités.
+UNIT_ENTITY = {
+    "uni-01-pc": ("eau", "100"), "uni-02-pc": ("eau", "0"),
+    "uni-03-pc": ("kilomètre", "1000"), "uni-04-pc": ("mètre", "100"),
+    "uni-05-pc": ("heure", "60"), "uni-06-pc": ("kilogramme", "1000"),
+    "uni-07-pc": ("litre", "1000"), "uni-08-pc": ("lumière", "300000"),
+    "uni-09-pc": ("corps humain", "206"), "uni-10-pc": ("corps humain", "37"),
+    "uni-11-pc": ("système solaire", "8"), "uni-12-pc": ("journée", "86400"),
+    "uni-13-pc": ("Terre", "365"), "uni-14-pc": ("or", "Au"),
+    "uni-15-pc": ("eau", "H2O"), "uni-16-pc": ("pesanteur", "9,8"),
+    "uni-17-pc": ("azote", "196"), "uni-18-pc": ("cellule humaine", "46"),
+    "uni-19-pc": ("année", "365"), "uni-20-pc": ("eau", "212"),
+}
+
+
+def _en_from_article(pays: str) -> str:
+    """« La France » -> « en France » ; « Le Portugal » -> « au Portugal »."""
+    if pays.startswith("La "):
+        return "en " + pays[3:]
+    if pays.startswith("L'"):
+        return "en " + pays[2:]
+    if pays.startswith("Le "):
+        return "au " + pays[3:]
+    if pays.startswith("Les "):
+        return "aux " + pays[4:]
+    return "en " + pays
+
+
+def _pays_nu(pays: str) -> str:
+    """« L'Afghanistan » -> « Afghanistan » (nom sans article)."""
+    for pre in ("La ", "Le ", "Les ", "L'"):
+        if pays.startswith(pre):
+            return pays[len(pre):]
+    return pays
+
+
+_VOYELLES = "aeiouyàâäéèêëîïôöûüù"
+
+
+def _elide_que(s: str) -> str:
+    """« que la ... » / « qu'une ... » (élision devant voyelle)."""
+    return ("qu'" if s[:1].lower() in _VOYELLES else "que ") + s
+
+
+def _sentences_capitales_v3(fact: dict) -> list[str]:
+    out = []
+    for fr in FRAMES_CAPITALES_V3:
+        out.append(fr.format(
+            de=fact["de"], cap=fact["cap"], pays=fact["pays"],
+            en_pays=_en_from_article(fact["pays"]),
+            avoir="ont" if fact["pluriel"] else "a",
+            etre="est",
+            compter="comptent" if fact["pluriel"] else "compte",
+        ))
+    return out
+
+
+def _sentences_dates_v3(sujet: str, annee: str) -> list[str]:
+    pl = sujet.lower().startswith(("les ", "des "))
+    v = {
+        "a_eu": "ont eu lieu" if pl else "a eu lieu",
+        "date": "datent" if pl else "date",
+        "qu_a_eu": "qu'ont eu lieu" if pl else "qu'a eu lieu",
+        "remonte": "remontent" if pl else "remonte",
+        "situe": "se situent" if pl else "se situe",
+        "correspond": "correspondent" if pl else "correspond",
+    }
+    return [fr.format(sujet=sujet, Sujet=_cap1(sujet), annee=annee, **v)
+            for fr in FRAMES_DATES_V3]
+
+
+def _sentences_definitions_v3(terme_art: str, nu: str,
+                              complement: str) -> list[str]:
+    return [fr.format(terme_art=terme_art, Terme_art=_cap1(terme_art), nu=nu,
+                      complement=complement, que_art=_elide_que(terme_art))
+            for fr in FRAMES_DEFINITIONS_V3]
+
+
+def _sentences_units_v3(sujet: str, verbe: str, a: str, unite: str) -> list[str]:
+    val = (a + " " + unite).strip() if unite else a
+    return [fr.format(sujet=sujet, sujet_min=_lower1(sujet), verbe=verbe,
+                      val=val, que_sujet=_elide_que(_lower1(sujet)))
+            for fr in FRAMES_UNITS_V3]
+
+
+# ---------------------------------------------------------------------------
+# Phrases réelles de tranche_05 (déterministe, plafonnée par fait).
+# ---------------------------------------------------------------------------
+
+def _has_token(hay_norm: str, needle_norm: str) -> bool:
+    """Sous-chaîne avec frontières de tokens (`100` ne matche pas `1100`)."""
+    if not needle_norm:
+        return False
+    return (" " + needle_norm + " ") in (" " + hay_norm + " ")
+
+
+def _real_sentence_meta() -> list[dict]:
+    """Métadonnées (id, catégorie, ancre, réponse) des 534 faits de la v3."""
+    import tools.qa_facts_v2 as F2
+
+    pc = _probe_pc_items()
+    meta: list[dict] = []
+
+    caps, unis = load_probe_facts()
+    for f in caps:
+        meta.append({"id": f["id"], "categorie": "capitales",
+                     "anchor": f["cap"], "other": _pays_nu(f["pays"])})
+    for i, (pays, cap) in enumerate(F2.CAPITALES_EXTRA, start=1):
+        meta.append({"id": f"cap-x{i:03d}", "categorie": "capitales",
+                     "anchor": cap, "other": _pays_nu(pays)})
+
+    for it in pc:
+        if it["categorie"] != "dates":
+            continue
+        meta.append({"id": it["id"], "categorie": "dates",
+                     "anchor": _date_sujet(it["prompt"]),
+                     "other": it["reponses_acceptees"][0]})
+    for i, (sujet, annee) in enumerate(F2.DATES_EXTRA, start=1):
+        meta.append({"id": f"dat-x{i:03d}", "categorie": "dates",
+                     "anchor": sujet, "other": annee})
+
+    for it in pc:
+        if it["categorie"] != "definitions":
+            continue
+        _art, nu, kws, _comp = F2.DEFINITIONS_PROBE[it["id"]]
+        meta.append({"id": it["id"], "categorie": "definitions",
+                     "anchor": nu, "other": kws[0]})
+    for i, (_art, nu, kws, _comp) in enumerate(F2.DEFINITIONS_EXTRA, start=1):
+        meta.append({"id": f"def-x{i:03d}", "categorie": "definitions",
+                     "anchor": nu, "other": kws[0]})
+
+    for f in unis:
+        ent, rep = UNIT_ENTITY[f["id"]]
+        meta.append({"id": f["id"], "categorie": "unites_sciences",
+                     "anchor": ent, "other": rep})
+    for i, (sujet, _verbe, _a, _unite, kws) in enumerate(F2.UNITS_EXTRA, start=1):
+        meta.append({"id": f"uni-x{i:03d}", "categorie": "unites_sciences",
+                     "anchor": sujet, "other": kws[0]})
+    return meta
+
+
+_REAL_CACHE: dict = {}
+
+
+def retrieve_real_sentences(meta: list[dict], corpus: str = GENERAL,
+                            max_per: int = REAL_MAX_V3,
+                            smin: int = REAL_MIN_CHARS_V3,
+                            smax: int = REAL_MAX_CHARS_V3) -> dict[str, list[str]]:
+    """Phrases réelles contenant l'entité ET la réponse, plafonnées par fait.
+
+    Parcours séquentiel de `corpus` (ordre du fichier) -> déterministe.
+    Les phrases sont normalisées pour le test, mais renvoyées telles quelles
+    (morphologie naturelle préservée). Aucune phrase interrogative.
+    """
+    key = (corpus, max_per, smin, smax,
+           tuple((m["id"], m["categorie"], m["anchor"], m["other"])
+                 for m in meta))
+    if key in _REAL_CACHE:
+        return _REAL_CACHE[key]
+
+    index: dict[str, list[tuple]] = {}
+    for m in meta:
+        anchor_n = _norm(m["anchor"])
+        words = [w for w in re.findall(r"[a-z0-9]+", anchor_n)
+                 if len(w) >= 3]
+        k = max(words, key=len) if words else anchor_n
+        index.setdefault(k, []).append(
+            (m["id"], m["categorie"], anchor_n, _norm(m["other"])))
+    keyset = set(index)
+
+    found: dict[str, list[str]] = {m["id"]: [] for m in meta}
+    n_meta = len(meta)
+    full = 0
+    with open(corpus, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            txt = json.loads(line).get("text", "")
+            tokens = set(re.findall(r"[a-z0-9]+", _norm(txt)))
+            cands = keyset & tokens
+            if not cands:
+                continue
+            for match in re.finditer(r"[^.!?\n]+[.!?]?", txt):
+                s = " ".join(match.group(0).split())
+                if not (smin <= len(s) <= smax) or "?" in s:
+                    continue
+                ls = _norm(s)
+                for k in sorted(cands):
+                    for fid, cat, a, b in index[k]:
+                        if len(found[fid]) >= max_per:
+                            continue
+                        if not _has_token(ls, a) or not _has_token(ls, b):
+                            continue
+                        # Capitales : exiger le mot « capitale » (pertinence).
+                        if cat == "capitales" and "capitale" not in ls:
+                            continue
+                        if s not in found[fid]:
+                            found[fid].append(s)
+                            if len(found[fid]) == max_per:
+                                full += 1
+            if full == n_meta:
+                break
+    _REAL_CACHE[key] = found
+    return found
+
+
+def _paragraphs_v3(sentences: list[str], n_variants: int = N_VARIANTS_V3,
+                   ks: tuple | None = None) -> list[str]:
+    """n_variants paragraphes déterministes (rotations, longueurs variées).
+
+    `ks[i]` = nombre de phrases du paragraphe i ; les ordres varient par
+    rotation et par pas (1, 2, 3, 5, 7, 11) pour éviter les doublons.
+    """
+    n = len(sentences)
+    if ks is None:
+        ks = (5,) * 16 + (6,) * 24
+    if len(ks) < n_variants:
+        ks = tuple(ks[i % len(ks)] for i in range(n_variants))
+    seen, out = set(), []
+    for i in range(n_variants):
+        k = min(ks[i], n)
+        found = False
+        for stride in (1, 2, 3, 5, 7, 11, 13, 17):
+            for delta in range(n):
+                off = (i * 7 + delta) % n
+                text = " ".join(sentences[(off + j * stride) % n]
+                                for j in range(k))
+                if text not in seen:
+                    seen.add(text)
+                    out.append(text)
+                    found = True
+                    break
+            if found:
+                break
+        if not found:  # pragma: no cover - garde-fou
+            raise AssertionError(f"variante impossible ({i}, n={n})")
+    assert len(out) == n_variants, (len(out), n)
+    return out
+
+
+def build_facts_v3() -> list[dict]:
+    """534 faits -> 40 variantes (trames élargies + phrases réelles)."""
+    import tools.qa_facts_v2 as F2
+
+    meta = _real_sentence_meta()
+    assert len(meta) == 534, len(meta)
+    real = retrieve_real_sentences(meta)
+    facts: list[dict] = []
+    seen_pays: set[str] = set()
+
+    def attach(fact: dict, sents: list[str]) -> None:
+        rs = real.get(fact["id"], [])
+        for s in rs:
+            assert "?" not in s, s[:80]
+        sents = list(sents) + list(rs)
+        assert len(sents) >= 14, (fact["id"], len(sents))
+        fact["sentences"] = sents
+        fact["real_sentences"] = rs
+        fact["paragraphs"] = _paragraphs_v3(
+            sents, ks=K_PATTERN_V3[fact["categorie"]])
+        facts.append(fact)
+
+    caps, unis = load_probe_facts()
+    for f in caps:
+        seen_pays.add(f["pays"])
+        attach({"id": f["id"], "categorie": "capitales", "de": f["de"],
+                "pays": f["pays"], "cap": f["cap"], "pluriel": f["pluriel"]},
+               _sentences_capitales_v3(f))
+    for i, (pays, cap) in enumerate(F2.CAPITALES_EXTRA, start=1):
+        if pays in seen_pays:
+            continue
+        seen_pays.add(pays)
+        f = {"id": f"cap-x{i:03d}", "de": de_from_article(pays), "pays": pays,
+             "cap": cap, "pluriel": pays.startswith("Les")}
+        attach({"id": f["id"], "categorie": "capitales", "de": f["de"],
+                "pays": pays, "cap": cap, "pluriel": f["pluriel"]},
+               _sentences_capitales_v3(f))
+
+    for it in _probe_pc_items():
+        if it["categorie"] != "dates":
+            continue
+        sujet = _date_sujet(it["prompt"])
+        sents = _sentences_dates_v3(sujet, it["reponses_acceptees"][0])
+        assert any(s.startswith(it["prompt"]) for s in sents), it["id"]
+        attach({"id": it["id"], "categorie": "dates"},
+               sents)
+    for i, (sujet, annee) in enumerate(F2.DATES_EXTRA, start=1):
+        attach({"id": f"dat-x{i:03d}", "categorie": "dates"},
+               _sentences_dates_v3(sujet, annee))
+
+    for it in _probe_pc_items():
+        if it["categorie"] != "definitions":
+            continue
+        terme_art, nu, _kw, complement = F2.DEFINITIONS_PROBE[it["id"]]
+        sents = _sentences_definitions_v3(terme_art, nu, complement)
+        assert any(s.startswith(it["prompt"]) for s in sents), it["id"]
+        attach({"id": it["id"], "categorie": "definitions"}, sents)
+    for i, (terme_art, nu, _kw, complement) in enumerate(
+            F2.DEFINITIONS_EXTRA, start=1):
+        attach({"id": f"def-x{i:03d}", "categorie": "definitions"},
+               _sentences_definitions_v3(terme_art, nu, complement))
+
+    for f in unis:
+        items = list(UNIT_SENTENCES[f["id"]])
+        sujet, verbe, val = UNIT_TRIPLES[f["id"]]
+        items += _sentences_units_v3(sujet, verbe, val, "")
+        assert any(s.startswith(f["prompt"]) for s in items), f["id"]
+        attach({"id": f["id"], "categorie": "unites_sciences"}, items)
+    for i, (sujet, verbe, a, unite, _kw) in enumerate(F2.UNITS_EXTRA, start=1):
+        attach({"id": f"uni-x{i:03d}", "categorie": "unites_sciences"},
+               _sentences_units_v3(sujet, verbe, a, unite))
+
+    for f in facts:
+        assert len(f["paragraphs"]) == N_VARIANTS_V3, f["id"]
+        assert len(set(f["paragraphs"])) == N_VARIANTS_V3, f["id"]
+    assert len(facts) == 534, len(facts)
+    return facts
+
+
+# ---------------------------------------------------------------------------
 # Garde-fous : aucune formulation `reformule` ne doit fuiter.
 # ---------------------------------------------------------------------------
 
@@ -794,9 +1256,72 @@ def build_docs(repeat: int = REPEAT, target_steps: int = SPE_TARGET,
             "qa_tokens": qa_stream, "general_tokens": general_stream}
 
 
+def build_docs_v3(facts: list[dict], repeat: int = REPEAT_V3,
+                  target_steps: int = SPE_TARGET_V3,
+                  general_ratio: float = GENERAL_RATIO_V3,
+                  general_limit: int = GENERAL_LIMIT_V3,
+                  general_doc_max_tok: int = GENERAL_DOC_MAX_TOK_V3) -> dict:
+    """Assemble v3 : TOUTES les répétitions QA (aucune troncature) + général.
+
+    Contrairement aux v1/v2, le QA est conservé intégralement (534 faits x 40
+    variantes x 10 répétitions) : on vérifie qu'il tient sous `1 - ratio`,
+    puis le FR général remplit EXACTEMENT la cible (dernier doc tronqué).
+    """
+    from main import load_tokenizer
+
+    tok = load_tokenizer(PARENT)
+    qa: list[str] = []
+    for _r in range(repeat):
+        for f in facts:
+            qa.extend(f["paragraphs"])
+    assert_no_leak(qa, categories=GUARD_CATS_ALL)
+
+    cache: dict[str, int] = {}
+
+    def n_tok(t: str) -> int:
+        if t not in cache:
+            cache[t] = len(tok.encode(t, add_special_tokens=False)) + 1
+        return cache[t]
+
+    target = target_steps * 16384 + 1
+    qa_target = int(target * (1 - general_ratio))
+    qa_stream = sum(n_tok(t) for t in qa)
+    assert qa_stream <= qa_target, (qa_stream, qa_target)
+
+    docs = list(qa)
+    stream = qa_stream
+    general = load_general_docs(general_limit)
+    assert_no_leak(general, allow_questions=True, categories=GUARD_CATS_ALL)
+    n_general = 0
+    gi = 0
+    while stream < target:
+        room = target - stream
+        if room <= 1:
+            break
+        g = general[gi % len(general)]
+        gi += 1
+        ids = tok.encode(g, add_special_tokens=False)[:general_doc_max_tok]
+        if len(ids) + 1 > room:
+            ids = ids[: room - 1]
+        if not ids:
+            break
+        docs.append(tok.decode(ids))
+        stream += len(ids) + 1
+        n_general += 1
+    assert stream == target, (stream, target)
+    windows = (stream - 1) // 128
+    assert windows == target_steps * 128, (windows, target_steps * 128)
+    return {"docs": docs, "n_qa": len(qa), "n_general": n_general,
+            "stream": stream, "windows": windows, "tokens": windows * 128,
+            "qa_tokens": qa_stream, "general_tokens": stream - qa_stream,
+            "n_real": sum(len(f["real_sentences"]) for f in facts),
+            "n_facts_real": sum(1 for f in facts if f["real_sentences"])}
+
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description="Corpus QA gelé du pilote.")
-    ap.add_argument("--version", default="v1", choices=["v1", "v2"])
+    ap.add_argument("--version", default="v1", choices=["v1", "v2", "v3"])
     ap.add_argument("--repeat", type=int, default=None)
     ap.add_argument("--target-steps", type=int, default=None)
     ap.add_argument("--general-ratio", type=float, default=None)
@@ -823,7 +1348,7 @@ def main(argv: list[str] | None = None) -> None:
         out_manifest = a.out_manifest or OUT_MANIFEST
         version, gel = VERSION, ("Corpus figé AVANT entraînement : hash SHA256 "
                                  "ci-dessus. Toute évolution = qa_fr_pilot_v2.")
-    else:
+    elif a.version == "v2":
         repeat = a.repeat if a.repeat is not None else REPEAT_V2
         target_steps = (a.target_steps if a.target_steps is not None
                         else SPE_TARGET_V2)
@@ -846,11 +1371,43 @@ def main(argv: list[str] | None = None) -> None:
         version, gel = VERSION_V2, ("Corpus figé AVANT entraînement : hash "
                                     "SHA256 ci-dessus. Toute évolution = "
                                     "qa_fr_pilot_v3.")
-
-    res = build_docs(repeat=repeat, target_steps=target_steps,
-                     general_ratio=general_ratio, facts=facts,
-                     guard_categories=guard_cats, general_limit=general_limit,
-                     general_doc_max_tok=doc_max)
+    else:
+        repeat = a.repeat if a.repeat is not None else REPEAT_V3
+        target_steps = (a.target_steps if a.target_steps is not None
+                        else SPE_TARGET_V3)
+        general_ratio = (a.general_ratio if a.general_ratio is not None
+                         else GENERAL_RATIO_V3)
+        facts = build_facts_v3()
+        n_variants = N_VARIANTS_V3
+        cats = CATEGORIES_V2
+        templates = {
+            "capitales": FRAMES_CAPITALES_V3,
+            "dates": FRAMES_DATES_V3,
+            "definitions": FRAMES_DEFINITIONS_V3,
+            "unites_sciences": (list(FRAMES_UNITS_V3)
+                                + ["UNIT_SENTENCES (20 unités de la sonde)"]),
+            "phrases_reelles": ("tranche_05 : phrases contenant l'entité et la "
+                                "réponse (sous-chaîne, frontières de tokens), "
+                                f"max {REAL_MAX_V3}/fait"),
+        }
+        general_limit, doc_max = GENERAL_LIMIT_V3, GENERAL_DOC_MAX_TOK_V3
+        guard_cats = GUARD_CATS_ALL
+        out_jsonl = a.out_jsonl or OUT_JSONL_V3
+        out_manifest = a.out_manifest or OUT_MANIFEST_V3
+        version, gel = VERSION_V3, ("Corpus figé AVANT entraînement : hash "
+                                    "SHA256 ci-dessus. Toute évolution = "
+                                    "qa_fr_pilot_v4.")
+    if a.version == "v3":
+        res = build_docs_v3(facts, repeat=repeat, target_steps=target_steps,
+                            general_ratio=general_ratio,
+                            general_limit=general_limit,
+                            general_doc_max_tok=doc_max)
+    else:
+        res = build_docs(repeat=repeat, target_steps=target_steps,
+                         general_ratio=general_ratio, facts=facts,
+                         guard_categories=guard_cats,
+                         general_limit=general_limit,
+                         general_doc_max_tok=doc_max)
     docs = res["docs"]
     n_qa, n_general = res["n_qa"], res["n_general"]
     stream, wins, tokens = res["stream"], res["windows"], res["tokens"]
@@ -899,6 +1456,24 @@ def main(argv: list[str] | None = None) -> None:
             open(os.path.abspath(__file__), "rb").read()).hexdigest(),
         "gel": gel,
     }
+    if a.version == "v3":
+        manifest["corpus_reel"] = {
+            "source": GENERAL,
+            "mode": ("phrases contenant l'entité ET la réponse ; sous-chaîne "
+                     "avec frontières de tokens ; ordre du fichier"),
+            "max_par_fait": REAL_MAX_V3,
+            "longueur_min": REAL_MIN_CHARS_V3,
+            "longueur_max": REAL_MAX_CHARS_V3,
+            "n_phrases": res["n_real"],
+            "n_faits_avec_phrase": res["n_facts_real"],
+            "filtre_capitales": "mot « capitale » exigé",
+        }
+        manifest["epochs_cumulatives"] = {
+            "prev_steps": 22740,
+            "spe": spe,
+            "e_cumul": 22740 // spe + 1,
+            "steps_restants": (22740 // spe + 1) * spe - 22740,
+        }
     with open(out_manifest, "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=1)
         f.write("\n")
