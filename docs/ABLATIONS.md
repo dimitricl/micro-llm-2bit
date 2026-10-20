@@ -930,3 +930,137 @@ Le couple (faits × langue) n'est pas résolu par la dose ; il faudra soit
 **séparer** les phases (mémorisation QA forte puis reprise générale courte),
 soit **accepter** la casse de langue au profit des faits. En attente de
 décision (run base 768 / D5 / clôture).
+
+## P7 — Pilote QA #3 : budget ×3, répétition ×10, corpus naturel (t08 → E-pilot-qa3)
+
+Hypothèse testée : le **budget** (~3× P6, 24,8 M tokens) avec **répétition
+×10** et un **corpus plus naturel** (phrases réelles de `tranche_05` intégrées
+aux variantes) suffit-il à faire tenir les faits **et** à réduire la
+corruption de surface, sans casser le français ? Dernier test « cheap » avant
+la décision base 768 / clôture. CPU/NEON pour la mesure, GPU exclusif pour le
+seul run.
+
+### P7.a — Corpus gelé (`data/qa/qa_fr_pilot_v3.jsonl`)
+
+- **534 faits** (mêmes tables que v2, dont les **100 items `par_coeur`** de la
+  sonde), **40 variantes par fait × 10 répétitions = 213 600 paragraphes QA**,
+  aucune troncature. Variantes **composées de 3 à 6 phrases** (~90 tokens),
+  assemblant des **phrases réelles** de `tranche_05` (frontières de tokens,
+  6 max/fait, filtre « capitale » pour les capitales) et les trames de la
+  catégorie.
+- **3 014 docs de FR général** (22,09 % des tokens), soit **24 838 144
+  tokens** : 19,35 M QA + 5,49 M général. **SPE = 1 516 steps/époque** ;
+  depuis le step 22 740 de t08, **E_CUMUL = 16** = exactement **1 époque
+  neuve** (1 516 steps, schedule-guard OK).
+- Formulations `par_coeur` **uniquement** ; garde `assert_no_leak` sur les
+  100 formulations `reformule`, **aucun « ? »** dans le QA généré. Les 100
+  prompts pc restent des **préfixes exacts** d'une phrase d'entraînement.
+- SHA256 JSONL : `6a1ab5b0d60c98832bff2d9a15406f150af00dff718effefe42c12ed422db8f6`
+  (manifeste `data/qa/qa_fr_pilot_v3.manifest.json`). v1/v2 restent
+  reproductibles à l'identique (`eb5bfd64…`, `596d2eec…`, vérifié).
+- Le corpus contient **241 paragraphes (0,11 %) avec « capitaine »** issus
+  des phrases réelles (« le capitaine des pompiers ») : bruit naturel, aucune
+  trame QA. À garder en tête pour l'interprétation de la corruption.
+
+### P7.b — Run (GPU exclusif, un seul job)
+
+`tools/run_pilot_qa3.sh` : recette E identique (parent SmolLM-135M, KD α 0.7,
+T 2.0, lr 3e-4, resume `runs/E-t08/model.pt`, rewarmup 0.05, bs 8/accum 16,
+seq 128, seed 0, val gelée, eval-every 100). Lock `logs/gpu.lock` pris/libéré ;
+`ollama stop gemma3:1b` avant/après. Durée **13 650 s**, exit 0.
+**Poids livrés : `runs/E-pilot-qa3/model.bin`** (11,56 Mo), exporté depuis
+`model.pt` (step 24 256, fin d'époque).
+
+| val gelée | t08 (réf.) | E-pilot-qa3 |
+|---|---|---|
+| best-val (step 22 800) | 2,9851 / 19,8 | **3,0921 / 22,0** (+3,59 % CE, **+11,11 % PPL**) |
+| finale (step 24 256) | 2,9851 / 19,8 | 3,1021 / 22,2 (+3,92 % CE, +12,12 % PPL) |
+
+La val **culmine tôt** (22 800) puis se dégrade légèrement jusqu'à 24 256 :
+surapprentissage des faits, comme P5/P6, mais **la PPL reste au-delà du seuil
++10 %** quel que soit le checkpoint retenu. La CE reste, elle, sous +5 %.
+
+### P7.c — Mesure (sonde P4 inchangée, décodeur de déploiement inchangé)
+
+`docs/results/probe_Epilotqa3_v1.json` (source unique). Sonde SHA256 inchangé
+`d9817afb…` ; greedy pen 1,15 + no-repeat-3g ; max_new 32.
+
+| axe | t08 (réf.) | pilote #1 (×19, 7 %) | pilote #2 (×4, 35 %) | **pilote #3 (×10, 22 %)** |
+|---|---|---|---|---|
+| **global** | 4/200 = 2,00 % | 81/200 = 40,50 % | 21/200 = 10,50 % | **72/200 = 36,00 %** [29,67 ; 42,86] |
+| `capitales` `reformule` | 1/40 = 2,5 % | 23/40 = 57,5 % | 0/40 = 0 % | **10/40 = 25,0 %** [14,19 ; 40,19] |
+| `unites_sciences` `reformule` | 0/20 = 0 % | 10/20 = 50,0 % | 3/20 = 15,0 % | **3/20 = 15,0 %** [5,24 ; 36,04] |
+| `dates` (total) | 0/40 | 0/40 | 3/40 = 7,5 % | **11/40 = 27,5 %** [16,11 ; 42,84] |
+| `definitions` (total) | 0/40 | 0/40 | 7/40 = 17,5 % | **17/40 = 42,5 %** [28,51 ; 57,81] |
+| val-PPL (best) | 19,8 | 23,1 (**+16,7 %**) | 21,2 (+7,07 %) | **22,0 (+11,11 %)** |
+| « capitain » (occurrences) | 0 | 44 | 82 | **59 (-34,1 % vs #1)** |
+| EOS-collapse | 1/200 | 7/200 (3,5 %) | 15/200 (7,5 %) | **9/200 (4,5 %)** |
+
+Détail `categorie × slice` (hits/n, IC95 Wilson) :
+
+| catégorie | `par_coeur` | `reformule` |
+|---|---|---|
+| `capitales` | 25/40 = 62,5 % [47,03 ; 75,78] | **10/40 = 25,0 %** [14,19 ; 40,19] |
+| `dates` | 9/20 = 45,0 % [25,82 ; 65,79] | 2/20 = 10,0 % [2,79 ; 30,10] |
+| `definitions` | 12/20 = 60,0 % [38,66 ; 78,12] | 5/20 = 25,0 % [11,19 ; 46,87] |
+| `unites_sciences` | 6/20 = 30,0 % [14,55 ; 51,90] | 3/20 = 15,0 % [5,24 ; 36,04] |
+
+Sanité langue (`tools/eval_fixed.py`, 32 prompts, `eval/Epilotqa3-fixed/`) :
+- **déploiement** (greedy + pen 1,15 + no-repeat-3g) : `repet4g` **0,0000**,
+  boucle max **3**, distincts moy 17,3 → **propre** ;
+- greedy **nu** (1,0 / 0) : `repet4g` **0,3029**, boucle max **3**, distincts
+  moy 13,7 → moins dégénéré que P6 (0,3322 / boucle 59), mais le décodeur de
+  déploiement reste **obligatoire** (P3).
+
+**Corruption de surface : toujours systémique, et plus concentrée.**
+- `capitales` : **57/80 générations** contiennent « capitaine » ; en
+  `reformule`, **37/40**, et **les 10 hits sur 10** sont dans une trame
+  corrompue (« L'Italia est un pays dont **la capitaine** est Rome. »).
+- Les hits `reformule` sont donc **des faits réels dans une phrase fausse** :
+  le score exact compte le nom de capitale, pas la correction de la trame.
+- Défaut de secours visible : **9 générations** répondent « Londres » (dont
+  France, Suisse, Autriche…) → le modèle a mémorisé **une** capitale par
+  défaut, pas la table.
+- Comparaison : #1 44 occurrences (25/40 `reformule`), #2 82 (36/40),
+  #3 **59** (37/40). Le corpus naturel **n'a pas dilué** la corruption ; il
+  l'a légèrement **déplacée vers la trame reformulée**.
+
+### P7.d — Verdict : **PARTIEL**
+
+Règle pré-enregistrée : `reformule` (catégories entraînées) ≥ 20 % **et**
+borne basse IC95 > 5,03 % (borne haute t08) **et** val-PPL Δ ≤ +10 % **et**
+occurrences « capitain » ≤ 22 (réduction ≥ 50 % vs 44).
+
+- **Faits : critère atteint au fil.** 20/100 = **20,0 %** [13,34 ; 28,88] ;
+  borne basse **13,34 % > 5,03 %**. Mais **exactement** sur le plancher de
+  20 % (un item de moins = 19 %) et **2 catégories sur 4 restent < 20 %**
+  (`dates` 10 %, `unites` 15 %). Le gain vs #2 est net (7 % → 20 % ;
+  global 10,5 % → 36 %), le niveau de #1 (33 %) n'est pas retrouvé.
+- **Langue : critère NON atteint, de peu.** val-PPL **+11,11 %** (best) /
+  +12,12 % (final) > +10 % ; la CE reste à +3,59 %. `eval_fixed` est propre
+  au décodeur de déploiement (0,0000 ; boucle 3) et l'EOS-collapse **baisse**
+  (9/200 vs 15/200). La casse est donc **mesurable mais contenue**.
+- **Corruption : critère NON atteint, nettement.** 59 occurrences vs 44
+  (**+34 %**, seuil ≤ 22) ; 57/80 capitales, 37/40 en `reformule`, 10/10 des
+  hits. Le corpus naturel n'a **pas** corrigé « capitaine ».
+- **Lecture franche** : le budget ×3 **achète des faits** (rf 7 % → 20 %,
+  global 10,5 % → 36 %) mais **ne corrige pas la surface** et laisse la
+  langue **juste au-delà** du seuil. Ce n'est donc **pas un problème de
+  dose** : la corruption est **portée par la trame libre** et résiste à
+  l'augmentation de données. Le label pré-enregistré est **PARTIEL**
+  (« faits OK mais corruption non corrigée »), avec la réserve explicite que
+  **le critère de langue manque aussi de 1,11 point** : ce n'est pas un
+  SUCCÈS, et ce n'est pas un ÉCHEC (faits ≥ 15 %).
+
+### P7.e — Décision
+
+Aucun run supplémentaire dans cette étape (consigne : **STOP après verdict**).
+Le levier « plus de budget / plus de répétition / plus de général » est
+**épuisé** : il fait monter les faits, pas la propreté. Deux suites seulement :
+**base 768** (capacité, si l'on veut attaquer la confusion lexicale et la
+table de capitales) ou **clôture** (accepter un modèle à 20 % de reformulation
+correcte, avec corruption de surface). La décision appartient au porteur du
+projet ; rien n'est enchaîné ici.
+
+Étape 3 (pilote QA #3) close — verdict PARTIEL. DERNIER test cheap : décision
+suivante = base 768 ou clôture.
