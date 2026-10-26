@@ -1,0 +1,135 @@
+{
+ "items": "data/qa/g_passage_test_v1.jsonl",
+ "n_items": 300,
+ "generation": {
+  "temperature": 0.0,
+  "repetition_penalty": 1.15,
+  "no_repeat_ngram": 3,
+  "max_new": 12
+ },
+ "models": {
+  "E-t08": {
+   "model": "E-t08",
+   "path": "exports/E-t08.bin",
+   "elapsed_s": 295.0790719985962,
+   "summary": {
+    "n": 300,
+    "em": 0.0,
+    "em_ci95": [
+     0.0,
+     0.0
+    ],
+    "em_contains": 0.0,
+    "f1": 0.0007407407407407408,
+    "copy": 0.0,
+    "refusal": 0.94,
+    "by_source": {
+     "in_domain": {
+      "n": 150,
+      "em": 0.0
+     },
+     "ood": {
+      "n": 150,
+      "em": 0.0
+     }
+    },
+    "by_type": {
+     "annee": {
+      "n": 67,
+      "em": 0.0
+     },
+     "entite": {
+      "n": 200,
+      "em": 0.0
+     },
+     "nombre": {
+      "n": 33,
+      "em": 0.0
+     }
+    }
+   }
+  },
+  "F-B": {
+   "model": "F-B",
+   "path": "exports/F-B.bin",
+   "elapsed_s": 297.2722568511963,
+   "summary": {
+    "n": 300,
+    "em": 0.0,
+    "em_ci95": [
+     0.0,
+     0.0
+    ],
+    "em_contains": 0.0,
+    "f1": 0.0007407407407407408,
+    "copy": 0.0033333333333333335,
+    "refusal": 0.94,
+    "by_source": {
+     "in_domain": {
+      "n": 150,
+      "em": 0.0
+     },
+     "ood": {
+      "n": 150,
+      "em": 0.0
+     }
+    },
+    "by_type": {
+     "annee": {
+      "n": 67,
+      "em": 0.0
+     },
+     "entite": {
+      "n": 200,
+      "em": 0.0
+     },
+     "nombre": {
+      "n": 33,
+      "em": 0.0
+     }
+    }
+   }
+  },
+  "base768": {
+   "model": "base768",
+   "path": "exports/enfant_base_fr.bin",
+   "elapsed_s": 849.304407119751,
+   "summary": {
+    "n": 300,
+    "em": 0.0,
+    "em_ci95": [
+     0.0,
+     0.0
+    ],
+    "em_contains": 0.0,
+    "f1": 0.008331168831168832,
+    "copy": 0.0,
+    "refusal": 0.0,
+    "by_source": {
+     "in_domain": {
+      "n": 150,
+      "em": 0.0
+     },
+     "ood": {
+      "n": 150,
+      "em": 0.0
+     }
+    },
+    "by_type": {
+     "annee": {
+      "n": 67,
+      "em": 0.0
+     },
+     "entite": {
+      "n": 200,
+      "em": 0.0
+     },
+     "nombre": {
+      "n": 33,
+      "em": 0.0
+     }
+    }
+   }
+  }
+ }
+}

@@ -51,6 +51,25 @@ def test_batches_alignes():
     assert b1[0].shape[1] == 17
 
 
+def test_make_qa_batches_masque_le_prompt():
+    """G1 : labels -100 sur le prompt, réponse + eos conservés."""
+    tok = StubTok()
+    texts = ["bonjour le monde", "le monde est vaste", "bonjour vaste monde"]
+    vocab = D.build_reduced_vocab(tok, texts, vocab_size=32)
+    examples = [
+        {"prompt": "Passage : un deux trois\nRéponse :", "answer": "quatre"},
+        {"prompt": "Passage : cinq six\nRéponse :", "answer": "sept huit"},
+    ]
+    xs, ys = D.make_qa_batches(tok, vocab, examples, seq_len=64,
+                               batch_size=2, seed=0)
+    assert len(xs) == len(ys) == 1
+    assert xs[0].shape == ys[0].shape == (1, 65)
+    # Chaque ligne a au moins une réponse utile et les pads restent -100.
+    for row in ys[0]:
+        assert (row != -100).sum() >= 2  # au moins un token + eos
+        assert row[-1].item() == -100
+
+
 def test_split_sans_fuite():
     texts = [f"doc {i} " + "mot " * (i % 7) for i in range(40)]
     tr1, va1 = D.train_val_split(texts, 0.05, seed=3)

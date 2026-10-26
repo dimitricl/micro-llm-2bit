@@ -1,0 +1,53 @@
+{
+ "items": "data/qa/g_passage_test_v1.jsonl",
+ "n_items": 300,
+ "generation": {
+  "temperature": 0.0,
+  "repetition_penalty": 1.15,
+  "no_repeat_ngram": 3,
+  "max_new": 12
+ },
+ "models": {
+  "G1-ctrl-s0": {
+   "model": "G1-ctrl-s0",
+   "path": "runs/G1-ctrl-s0/model.bin",
+   "elapsed_s": 475.0994441509247,
+   "summary": {
+    "n": 300,
+    "em": 0.20333333333333334,
+    "em_ci95": [
+     0.15666666666666668,
+     0.25
+    ],
+    "em_contains": 0.20333333333333334,
+    "f1": 0.2893492063492064,
+    "copy": 0.4266666666666667,
+    "refusal": 0.09333333333333334,
+    "by_source": {
+     "in_domain": {
+      "n": 150,
+      "em": 0.08666666666666667
+     },
+     "ood": {
+      "n": 150,
+      "em": 0.32
+     }
+    },
+    "by_type": {
+     "annee": {
+      "n": 67,
+      "em": 0.0
+     },
+     "entite": {
+      "n": 200,
+      "em": 0.23
+     },
+     "nombre": {
+      "n": 33,
+      "em": 0.45454545454545453
+     }
+    }
+   }
+  }
+ }
+}

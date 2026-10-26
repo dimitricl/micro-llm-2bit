@@ -1,0 +1,13 @@
+{
+  "tokenizer_class": "ByteLevelBPETokenizer",
+  "vocab_size": 16000,
+  "model_max_length": 1024,
+  "padding_side": "right",
+  "truncation_side": "right",
+  "special_tokens": {
+    "eos_token": "<|endoftext|>",
+    "pad_token": "<|pad|>",
+    "unk_token": "<|endoftext|>"
+  },
+  "clean_up_tokenization_spaces": false
+}

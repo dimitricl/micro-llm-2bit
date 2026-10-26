@@ -1,0 +1,1732 @@
+{
+ "vocab": "exports/E-t08.bin.vocab.json",
+ "parent": "HuggingFaceTB/SmolLM-135M",
+ "n_kept": 12000,
+ "unk_distinct": false,
+ "unk_new": 0,
+ "frequences_corpus_train": {
+  "capitale": 23497,
+  "capitaine": 12699,
+  "capitole": 1073,
+  "capitalle": 2
+ },
+ "cible_prefixe_partage": true,
+ "cible_prefixe_longueur": 2,
+ "cible_prefixe_commun": [
+  "cap",
+  "it"
+ ],
+ "cible_suffixes": [
+  "ale",
+  "aine",
+  "ole"
+ ],
+ "mots": [
+  {
+   "mot": "capitale",
+   "n_tokens": 3,
+   "tokens_old": [
+    4600,
+    269,
+    1121
+   ],
+   "pieces": [
+    "cap",
+    "it",
+    "ale"
+   ],
+   "tokens_new": [
+    3676,
+    69,
+    101
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 4600,
+   "premiere_piece": "cap",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "capitaine",
+   "n_tokens": 3,
+   "tokens_old": [
+    4600,
+    269,
+    11581
+   ],
+   "pieces": [
+    "cap",
+    "it",
+    "aine"
+   ],
+   "tokens_new": [
+    3676,
+    69,
+    299
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 4600,
+   "premiere_piece": "cap",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "capitole",
+   "n_tokens": 3,
+   "tokens_old": [
+    4600,
+    269,
+    1747
+   ],
+   "pieces": [
+    "cap",
+    "it",
+    "ole"
+   ],
+   "tokens_new": [
+    3676,
+    69,
+    353
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 4600,
+   "premiere_piece": "cap",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "capitalle",
+   "n_tokens": 2,
+   "tokens_old": [
+    29721,
+    290
+   ],
+   "pieces": [
+    "capital",
+    "le"
+   ],
+   "tokens_new": [
+    0,
+    37
+   ],
+   "unk_par_token": [
+    true,
+    false
+   ],
+   "a_unk": true,
+   "premier_token": 29721,
+   "premiere_piece": "capital",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "la",
+   "n_tokens": 1,
+   "tokens_old": [
+    5825
+   ],
+   "pieces": [
+    "la"
+   ],
+   "tokens_new": [
+    359
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 5825,
+   "premiere_piece": "la",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "de",
+   "n_tokens": 1,
+   "tokens_old": [
+    1018
+   ],
+   "pieces": [
+    "de"
+   ],
+   "tokens_new": [
+    218
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 1018,
+   "premiere_piece": "de",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "est",
+   "n_tokens": 1,
+   "tokens_old": [
+    381
+   ],
+   "pieces": [
+    "est"
+   ],
+   "tokens_new": [
+    137
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 381,
+   "premiere_piece": "est",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "le",
+   "n_tokens": 1,
+   "tokens_old": [
+    290
+   ],
+   "pieces": [
+    "le"
+   ],
+   "tokens_new": [
+    37
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 290,
+   "premiere_piece": "le",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "du",
+   "n_tokens": 1,
+   "tokens_old": [
+    496
+   ],
+   "pieces": [
+    "du"
+   ],
+   "tokens_new": [
+    462
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 496,
+   "premiere_piece": "du",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "un",
+   "n_tokens": 1,
+   "tokens_old": [
+    419
+   ],
+   "pieces": [
+    "un"
+   ],
+   "tokens_new": [
+    117
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 419,
+   "premiere_piece": "un",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "en",
+   "n_tokens": 1,
+   "tokens_old": [
+    264
+   ],
+   "pieces": [
+    "en"
+   ],
+   "tokens_new": [
+    92
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 264,
+   "premiere_piece": "en",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "on",
+   "n_tokens": 1,
+   "tokens_old": [
+    258
+   ],
+   "pieces": [
+    "on"
+   ],
+   "tokens_new": [
+    72
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 258,
+   "premiere_piece": "on",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "une",
+   "n_tokens": 1,
+   "tokens_old": [
+    1935
+   ],
+   "pieces": [
+    "une"
+   ],
+   "tokens_new": [
+    126
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 1935,
+   "premiere_piece": "une",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "des",
+   "n_tokens": 1,
+   "tokens_old": [
+    4691
+   ],
+   "pieces": [
+    "des"
+   ],
+   "tokens_new": [
+    1029
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 4691,
+   "premiere_piece": "des",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "et",
+   "n_tokens": 1,
+   "tokens_old": [
+    305
+   ],
+   "pieces": [
+    "et"
+   ],
+   "tokens_new": [
+    211
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 305,
+   "premiere_piece": "et",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "pour",
+   "n_tokens": 2,
+   "tokens_old": [
+    96,
+    461
+   ],
+   "pieces": [
+    "p",
+    "our"
+   ],
+   "tokens_new": [
+    134,
+    225
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 96,
+   "premiere_piece": "p",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "les",
+   "n_tokens": 1,
+   "tokens_old": [
+    735
+   ],
+   "pieces": [
+    "les"
+   ],
+   "tokens_new": [
+    231
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 735,
+   "premiere_piece": "les",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "par",
+   "n_tokens": 1,
+   "tokens_old": [
+    1095
+   ],
+   "pieces": [
+    "par"
+   ],
+   "tokens_new": [
+    600
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 1095,
+   "premiere_piece": "par",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "lieu",
+   "n_tokens": 2,
+   "tokens_old": [
+    17011,
+    101
+   ],
+   "pieces": [
+    "lie",
+    "u"
+   ],
+   "tokens_new": [
+    1052,
+    51
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 17011,
+   "premiere_piece": "lie",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "qui",
+   "n_tokens": 2,
+   "tokens_old": [
+    385,
+    89
+   ],
+   "pieces": [
+    "qu",
+    "i"
+   ],
+   "tokens_new": [
+    88,
+    32
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 385,
+   "premiere_piece": "qu",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "date",
+   "n_tokens": 1,
+   "tokens_old": [
+    2759
+   ],
+   "pieces": [
+    "date"
+   ],
+   "tokens_new": [
+    4639
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 2759,
+   "premiere_piece": "date",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "comme",
+   "n_tokens": 2,
+   "tokens_old": [
+    824,
+    1558
+   ],
+   "pieces": [
+    "com",
+    "me"
+   ],
+   "tokens_new": [
+    1128,
+    70
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 824,
+   "premiere_piece": "com",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "sur",
+   "n_tokens": 1,
+   "tokens_old": [
+    10485
+   ],
+   "pieces": [
+    "sur"
+   ],
+   "tokens_new": [
+    834
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 10485,
+   "premiere_piece": "sur",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "eu",
+   "n_tokens": 1,
+   "tokens_old": [
+    13306
+   ],
+   "pieces": [
+    "eu"
+   ],
+   "tokens_new": [
+    736
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 13306,
+   "premiere_piece": "eu",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "retient",
+   "n_tokens": 2,
+   "tokens_old": [
+    3274,
+    1010
+   ],
+   "pieces": [
+    "ret",
+    "ient"
+   ],
+   "tokens_new": [
+    682,
+    138
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 3274,
+   "premiere_piece": "ret",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "au",
+   "n_tokens": 1,
+   "tokens_old": [
+    603
+   ],
+   "pieces": [
+    "au"
+   ],
+   "tokens_new": [
+    105
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 603,
+   "premiere_piece": "au",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "il",
+   "n_tokens": 1,
+   "tokens_old": [
+    301
+   ],
+   "pieces": [
+    "il"
+   ],
+   "tokens_new": [
+    131
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 301,
+   "premiere_piece": "il",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "qu",
+   "n_tokens": 1,
+   "tokens_old": [
+    385
+   ],
+   "pieces": [
+    "qu"
+   ],
+   "tokens_new": [
+    88
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 385,
+   "premiere_piece": "qu",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "dans",
+   "n_tokens": 2,
+   "tokens_old": [
+    84,
+    487
+   ],
+   "pieces": [
+    "d",
+    "ans"
+   ],
+   "tokens_new": [
+    148,
+    180
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 84,
+   "premiere_piece": "d",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "se",
+   "n_tokens": 1,
+   "tokens_old": [
+    313
+   ],
+   "pieces": [
+    "se"
+   ],
+   "tokens_new": [
+    106
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 313,
+   "premiere_piece": "se",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "que",
+   "n_tokens": 1,
+   "tokens_old": [
+    3806
+   ],
+   "pieces": [
+    "que"
+   ],
+   "tokens_new": [
+    107
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 3806,
+   "premiere_piece": "que",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "année",
+   "n_tokens": 2,
+   "tokens_old": [
+    1682,
+    20174
+   ],
+   "pieces": [
+    "ann",
+    "ée"
+   ],
+   "tokens_new": [
+    380,
+    33
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 1682,
+   "premiere_piece": "ann",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "valeur",
+   "n_tokens": 3,
+   "tokens_old": [
+    102,
+    1121,
+    315
+   ],
+   "pieces": [
+    "v",
+    "ale",
+    "ur"
+   ],
+   "tokens_new": [
+    98,
+    101,
+    58
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 102,
+   "premiere_piece": "v",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "vaut",
+   "n_tokens": 2,
+   "tokens_old": [
+    102,
+    1648
+   ],
+   "pieces": [
+    "v",
+    "aut"
+   ],
+   "tokens_new": [
+    98,
+    190
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 102,
+   "premiere_piece": "v",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "correspond",
+   "n_tokens": 2,
+   "tokens_old": [
+    7033,
+    4557
+   ],
+   "pieces": [
+    "cor",
+    "respond"
+   ],
+   "tokens_new": [
+    1353,
+    8312
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 7033,
+   "premiere_piece": "cor",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "compte",
+   "n_tokens": 3,
+   "tokens_old": [
+    824,
+    437,
+    85
+   ],
+   "pieces": [
+    "com",
+    "pt",
+    "e"
+   ],
+   "tokens_new": [
+    1128,
+    431,
+    13
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 824,
+   "premiere_piece": "com",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "situe",
+   "n_tokens": 2,
+   "tokens_old": [
+    39017,
+    546
+   ],
+   "pieces": [
+    "sit",
+    "ue"
+   ],
+   "tokens_new": [
+    0,
+    129
+   ],
+   "unk_par_token": [
+    true,
+    false
+   ],
+   "a_unk": true,
+   "premier_token": 39017,
+   "premiere_piece": "sit",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "sa",
+   "n_tokens": 1,
+   "tokens_old": [
+    16427
+   ],
+   "pieces": [
+    "sa"
+   ],
+   "tokens_new": [
+    2297
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 16427,
+   "premiere_piece": "sa",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "pays",
+   "n_tokens": 2,
+   "tokens_old": [
+    96,
+    646
+   ],
+   "pieces": [
+    "p",
+    "ays"
+   ],
+   "tokens_new": [
+    134,
+    1074
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 96,
+   "premiere_piece": "p",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "ville",
+   "n_tokens": 1,
+   "tokens_old": [
+    5559
+   ],
+   "pieces": [
+    "ville"
+   ],
+   "tokens_new": [
+    861
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 5559,
+   "premiere_piece": "ville",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "dont",
+   "n_tokens": 2,
+   "tokens_old": [
+    84,
+    1866
+   ],
+   "pieces": [
+    "d",
+    "ont"
+   ],
+   "tokens_new": [
+    148,
+    84
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 84,
+   "premiere_piece": "d",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "porte",
+   "n_tokens": 2,
+   "tokens_old": [
+    773,
+    85
+   ],
+   "pieces": [
+    "port",
+    "e"
+   ],
+   "tokens_new": [
+    606,
+    13
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 773,
+   "premiere_piece": "port",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "nom",
+   "n_tokens": 1,
+   "tokens_old": [
+    27446
+   ],
+   "pieces": [
+    "nom"
+   ],
+   "tokens_new": [
+    2654
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 27446,
+   "premiere_piece": "nom",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "mot",
+   "n_tokens": 1,
+   "tokens_old": [
+    24264
+   ],
+   "pieces": [
+    "mot"
+   ],
+   "tokens_new": [
+    6567
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 24264,
+   "premiere_piece": "mot",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "début",
+   "n_tokens": 3,
+   "tokens_old": [
+    84,
+    2756,
+    5476
+   ],
+   "pieces": [
+    "d",
+    "é",
+    "but"
+   ],
+   "tokens_new": [
+    148,
+    3,
+    508
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 84,
+   "premiere_piece": "d",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "référence",
+   "n_tokens": 4,
+   "tokens_old": [
+    27968,
+    86,
+    2756,
+    5043
+   ],
+   "pieces": [
+    "ré",
+    "f",
+    "é",
+    "rence"
+   ],
+   "tokens_new": [
+    157,
+    139,
+    3,
+    758
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 27968,
+   "premiere_piece": "ré",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "retenir",
+   "n_tokens": 3,
+   "tokens_old": [
+    257,
+    813,
+    337
+   ],
+   "pieces": [
+    "re",
+    "ten",
+    "ir"
+   ],
+   "tokens_new": [
+    29,
+    579,
+    123
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 257,
+   "premiere_piece": "re",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "plan",
+   "n_tokens": 1,
+   "tokens_old": [
+    12338
+   ],
+   "pieces": [
+    "plan"
+   ],
+   "tokens_new": [
+    4078
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 12338,
+   "premiere_piece": "plan",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "chef",
+   "n_tokens": 2,
+   "tokens_old": [
+    2916,
+    86
+   ],
+   "pieces": [
+    "che",
+    "f"
+   ],
+   "tokens_new": [
+    203,
+    139
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 2916,
+   "premiere_piece": "che",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "son",
+   "n_tokens": 1,
+   "tokens_old": [
+    2034
+   ],
+   "pieces": [
+    "son"
+   ],
+   "tokens_new": [
+    1872
+   ],
+   "unk_par_token": [
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 2034,
+   "premiere_piece": "son",
+   "est_sous_mot": false
+  },
+  {
+   "mot": "chimique",
+   "n_tokens": 3,
+   "tokens_old": [
+    322,
+    306,
+    1496
+   ],
+   "pieces": [
+    "ch",
+    "im",
+    "ique"
+   ],
+   "tokens_new": [
+    280,
+    422,
+    49
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 322,
+   "premiere_piece": "ch",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "administratif",
+   "n_tokens": 3,
+   "tokens_old": [
+    35019,
+    6095,
+    342
+   ],
+   "pieces": [
+    "administ",
+    "rat",
+    "if"
+   ],
+   "tokens_new": [
+    1967,
+    882,
+    189
+   ],
+   "unk_par_token": [
+    false,
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 35019,
+   "premiere_piece": "administ",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "guerre",
+   "n_tokens": 2,
+   "tokens_old": [
+    6058,
+    37040
+   ],
+   "pieces": [
+    "gu",
+    "erre"
+   ],
+   "tokens_new": [
+    987,
+    397
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 6058,
+   "premiere_piece": "gu",
+   "est_sous_mot": true
+  },
+  {
+   "mot": "eau",
+   "n_tokens": 2,
+   "tokens_old": [
+    85,
+    603
+   ],
+   "pieces": [
+    "e",
+    "au"
+   ],
+   "tokens_new": [
+    13,
+    105
+   ],
+   "unk_par_token": [
+    false,
+    false
+   ],
+   "a_unk": false,
+   "premier_token": 85,
+   "premiere_piece": "e",
+   "est_sous_mot": true
+  }
+ ],
+ "top_frequences": [
+  {
+   "mot": "la",
+   "n": 842684
+  },
+  {
+   "mot": "de",
+   "n": 819951
+  },
+  {
+   "mot": "est",
+   "n": 474537
+  },
+  {
+   "mot": "le",
+   "n": 400196
+  },
+  {
+   "mot": "capitale",
+   "n": 338536
+  },
+  {
+   "mot": "du",
+   "n": 236624
+  },
+  {
+   "mot": "un",
+   "n": 216702
+  },
+  {
+   "mot": "en",
+   "n": 206336
+  },
+  {
+   "mot": "on",
+   "n": 152647
+  },
+  {
+   "mot": "une",
+   "n": 137002
+  },
+  {
+   "mot": "des",
+   "n": 114328
+  },
+  {
+   "mot": "et",
+   "n": 109476
+  },
+  {
+   "mot": "pour",
+   "n": 109473
+  },
+  {
+   "mot": "les",
+   "n": 84365
+  },
+  {
+   "mot": "par",
+   "n": 74564
+  },
+  {
+   "mot": "lieu",
+   "n": 69690
+  },
+  {
+   "mot": "qui",
+   "n": 67388
+  },
+  {
+   "mot": "date",
+   "n": 65562
+  },
+  {
+   "mot": "comme",
+   "n": 60278
+  },
+  {
+   "mot": "sur",
+   "n": 53478
+  },
+  {
+   "mot": "eu",
+   "n": 47884
+  },
+  {
+   "mot": "retient",
+   "n": 45028
+  },
+  {
+   "mot": "au",
+   "n": 44132
+  },
+  {
+   "mot": "il",
+   "n": 43905
+  },
+  {
+   "mot": "qu",
+   "n": 43303
+  },
+  {
+   "mot": "dans",
+   "n": 42393
+  },
+  {
+   "mot": "se",
+   "n": 41342
+  },
+  {
+   "mot": "que",
+   "n": 39045
+  },
+  {
+   "mot": "année",
+   "n": 38316
+  },
+  {
+   "mot": "valeur",
+   "n": 36469
+  },
+  {
+   "mot": "vaut",
+   "n": 36309
+  },
+  {
+   "mot": "correspond",
+   "n": 34949
+  },
+  {
+   "mot": "compte",
+   "n": 34368
+  },
+  {
+   "mot": "situe",
+   "n": 29899
+  },
+  {
+   "mot": "sa",
+   "n": 28688
+  },
+  {
+   "mot": "pays",
+   "n": 27859
+  },
+  {
+   "mot": "ville",
+   "n": 25907
+  },
+  {
+   "mot": "dont",
+   "n": 25169
+  },
+  {
+   "mot": "porte",
+   "n": 23481
+  },
+  {
+   "mot": "nom",
+   "n": 23473
+  },
+  {
+   "mot": "mot",
+   "n": 22985
+  },
+  {
+   "mot": "début",
+   "n": 22906
+  },
+  {
+   "mot": "référence",
+   "n": 22808
+  },
+  {
+   "mot": "retenir",
+   "n": 22483
+  },
+  {
+   "mot": "plan",
+   "n": 22473
+  },
+  {
+   "mot": "chef",
+   "n": 21073
+  },
+  {
+   "mot": "son",
+   "n": 20206
+  },
+  {
+   "mot": "chimique",
+   "n": 20053
+  },
+  {
+   "mot": "administratif",
+   "n": 19965
+  },
+  {
+   "mot": "guerre",
+   "n": 19355
+  },
+  {
+   "mot": "eau",
+   "n": 19288
+  },
+  {
+   "mot": "appelle",
+   "n": 18718
+  },
+  {
+   "mot": "quand",
+   "n": 18418
+  },
+  {
+   "mot": "administrativement",
+   "n": 18261
+  },
+  {
+   "mot": "celle",
+   "n": 18085
+  },
+  {
+   "mot": "parle",
+   "n": 17855
+  },
+  {
+   "mot": "pense",
+   "n": 17618
+  },
+  {
+   "mot": "avec",
+   "n": 17484
+  },
+  {
+   "mot": "retenue",
+   "n": 17376
+  },
+  {
+   "mot": "symbole",
+   "n": 17327
+  },
+  {
+   "mot": "plus",
+   "n": 15979
+  },
+  {
+   "mot": "france",
+   "n": 15887
+  },
+  {
+   "mot": "nombre",
+   "n": 15697
+  },
+  {
+   "mot": "mètres",
+   "n": 15429
+  },
+  {
+   "mot": "bataille",
+   "n": 15234
+  },
+  {
+   "mot": "remonte",
+   "n": 15170
+  },
+  {
+   "mot": "traité",
+   "n": 15148
+  },
+  {
+   "mot": "faut",
+   "n": 14847
+  },
+  {
+   "mot": "rattacher",
+   "n": 14360
+  },
+  {
+   "mot": "création",
+   "n": 14166
+  },
+  {
+   "mot": "degrés",
+   "n": 14022
+  },
+  {
+   "mot": "définit",
+   "n": 13986
+  },
+  {
+   "mot": "terre",
+   "n": 13241
+  },
+  {
+   "mot": "ou",
+   "n": 12841
+  },
+  {
+   "mot": "aux",
+   "n": 11976
+  },
+  {
+   "mot": "révolution",
+   "n": 11847
+  },
+  {
+   "mot": "sait",
+   "n": 11826
+  },
+  {
+   "mot": "connaître",
+   "n": 11783
+  },
+  {
+   "mot": "paris",
+   "n": 11767
+  },
+  {
+   "mot": "repère",
+   "n": 11708
+  },
+  {
+   "mot": "élection",
+   "n": 11595
+  },
+  {
+   "mot": "sont",
+   "n": 11455
+  },
+  {
+   "mot": "formule",
+   "n": 11409
+  },
+  {
+   "mot": "constante",
+   "n": 11369
+  },
+  {
+   "mot": "mort",
+   "n": 11273
+  },
+  {
+   "mot": "rappel",
+   "n": 11171
+  },
+  {
+   "mot": "retenons",
+   "n": 10931
+  },
+  {
+   "mot": "ensemble",
+   "n": 10699
+  },
+  {
+   "mot": "cube",
+   "n": 10614
+  },
+  {
+   "mot": "kilomètres",
+   "n": 10602
+  },
+  {
+   "mot": "entre",
+   "n": 10499
+  },
+  {
+   "mot": "seconde",
+   "n": 10373
+  },
+  {
+   "mot": "ce",
+   "n": 10273
+  },
+  {
+   "mot": "première",
+   "n": 9919
+  },
+  {
+   "mot": "premier",
+   "n": 9861
+  },
+  {
+   "mot": "république",
+   "n": 9627
+  },
+  {
+   "mot": "elle",
+   "n": 9533
+  },
+  {
+   "mot": "ans",
+   "n": 9499
+  },
+  {
+   "mot": "ses",
+   "n": 9443
+  },
+  {
+   "mot": "mondiale",
+   "n": 9249
+  }
+ ],
+ "groupes_prefixe": [
+  {
+   "premier_token": 84,
+   "premiere_piece": "d",
+   "mots": [
+    "dans",
+    "dont",
+    "début"
+   ],
+   "n_mots": 3
+  },
+  {
+   "premier_token": 4600,
+   "premiere_piece": "cap",
+   "mots": [
+    "capitale",
+    "capitaine",
+    "capitole"
+   ],
+   "n_mots": 3
+  },
+  {
+   "premier_token": 96,
+   "premiere_piece": "p",
+   "mots": [
+    "pour",
+    "pays"
+   ],
+   "n_mots": 2
+  },
+  {
+   "premier_token": 102,
+   "premiere_piece": "v",
+   "mots": [
+    "valeur",
+    "vaut"
+   ],
+   "n_mots": 2
+  },
+  {
+   "premier_token": 385,
+   "premiere_piece": "qu",
+   "mots": [
+    "qui",
+    "qu"
+   ],
+   "n_mots": 2
+  },
+  {
+   "premier_token": 824,
+   "premiere_piece": "com",
+   "mots": [
+    "comme",
+    "compte"
+   ],
+   "n_mots": 2
+  }
+ ],
+ "global": {
+  "n_mots": 54,
+  "n_sous_mots": 27,
+  "taux_sous_mots": 0.5,
+  "n_mots_unk": 2,
+  "taux_mots_unk": 0.037037037037037035,
+  "n_tokens": 92,
+  "n_tokens_unk": 2,
+  "taux_tokens_unk": 0.021739130434782608,
+  "n_sous_mots_prefixe": 13,
+  "taux_sous_mots_prefixe": 0.48148148148148145
+ },
+ "verdict": "Les trois formes correctes (capitale, capitaine, capitole) partagent leurs 2 premiers sous-tokens (`cap + it`) ; elles ne diffèrent que par un unique sous-token final (`ale` / `aine` / `ole`). La distinction repose donc sur un seul token, ce qui rend la confusion PLAUSIBLE. `capitalle` (faute) est encore plus fragile : son premier morceau `capital` est hors vocabulaire et retombe sur l'id unk/eos. Le découpage n'explique pas tout à lui seul ; l'étape 3 (surface) et l'étape 4 (recette) trancheront.",
+ "lecture": "Le mécanisme pertinent n'est pas « le mot est inconnu » mais « le mot est connu en morceaux ». Si `cap` + `it` sont des tokens fréquents et que seuls `ale` / `aine` / `ole` changent, le modèle doit apprendre une distinction fine sur un unique sous-token, dans un espace d'embeddings de 512 dimensions partagé par des milliers de mots. C'est exactement le type de détail que le budget de 25 M paramètres peut sous-représenter, et qu'un surapprentissage des templates QA peut écraser au profit de la forme la plus fréquente (`capitaine`)."
+}

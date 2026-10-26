@@ -1,0 +1,93 @@
+{
+ "version": "g_passage_v1",
+ "seed": 0,
+ "tokenizer": "HuggingFaceTB/SmolLM-135M",
+ "vocab": "/Volumes/Lexar/micro-llm-2bit/tools/../runs/E-t08/model.pt.vocab.json",
+ "sources": {
+  "in_domain": "/Volumes/Lexar/micro-llm-2bit/tools/../runs/abl_data/val_E_frozen_clean32.jsonl",
+  "ood": "/Volumes/Lexar/micro-llm-2bit/tools/../runs/abl_data/ood.jsonl"
+ },
+ "n_test": 300,
+ "n_dev": 100,
+ "composition": {
+  "test_in_domain": 150,
+  "test_ood": 150,
+  "dev_in_domain": 50,
+  "dev_ood": 50
+ },
+ "types": {
+  "test": {
+   "annee": 67,
+   "nombre": 33,
+   "entite": 200
+  },
+  "dev": {
+   "annee": 21,
+   "nombre": 14,
+   "entite": 65
+  }
+ },
+ "templates_train": {
+  "annee": [
+   "Quelle année correspond à la phrase « {clue} » ?",
+   "En quelle année la phrase « {clue} » situe-t-elle les faits ?",
+   "Quelle est l'année citée dans « {clue} » ?"
+  ],
+  "nombre": [
+   "Quel nombre correspond à la phrase « {clue} » ?",
+   "Combien vaut le nombre cité dans « {clue} » ?",
+   "Quel est le nombre présent dans « {clue} » ?"
+  ],
+  "entite": [
+   "Quel nom propre complète « {clue} » ?",
+   "Quel nom propre est associé à « {clue} » ?",
+   "Quel est le nom propre cité dans « {clue} » ?"
+  ]
+ },
+ "templates_test": {
+  "annee": [
+   "Dans le passage, à quelle année renvoie la phrase « {clue} » ?",
+   "D'après le texte, quelle année est associée à « {clue} » ?",
+   "Le passage mentionne une année dans « {clue} » ; laquelle ?"
+  ],
+  "nombre": [
+   "Dans le passage, quel nombre complète la phrase « {clue} » ?",
+   "D'après le texte, quel nombre est associé à « {clue} » ?",
+   "Le passage cite un nombre dans « {clue} » ; lequel ?"
+  ],
+  "entite": [
+   "Dans le passage, quel nom propre correspond à « {clue} » ?",
+   "D'après le texte, quel nom propre est associé à « {clue} » ?",
+   "Le passage cite un nom propre dans « {clue} » ; lequel ?"
+  ]
+ },
+ "templates_dev": {
+  "annee": [
+   "Quelle année le passage donne-t-il pour « {clue} » ?",
+   "Repère l'année de « {clue} » dans le passage.",
+   "À quelle année la phrase « {clue} » fait-elle référence ?"
+  ],
+  "nombre": [
+   "Quel nombre le passage donne-t-il pour « {clue} » ?",
+   "Repère le nombre de « {clue} » dans le passage.",
+   "À quel nombre la phrase « {clue} » fait-elle référence ?"
+  ],
+  "entite": [
+   "Quel nom propre le passage donne-t-il pour « {clue} » ?",
+   "Repère le nom propre de « {clue} » dans le passage.",
+   "À quel nom propre la phrase « {clue} » fait-elle référence ?"
+  ]
+ },
+ "files": {
+  "data/qa/g_passage_test_v1.jsonl": "60be2f1b2b2aa98d2b412cb6d2d9f670986841884189741819d195cb4cd45830",
+  "data/qa/g_passage_dev_v1.jsonl": "5ce2d55b76bee80bd773c5d19422b12dfaab0c6331077ce868c8312ba87c3dec"
+ },
+ "audit": {
+  "answers_in_passage": 400,
+  "answers_unique_in_target": 400,
+  "answers_unique_in_passage": 387,
+  "n": 400,
+  "max_prompt_tokens": 200,
+  "max_answer_tokens": 12
+ }
+}

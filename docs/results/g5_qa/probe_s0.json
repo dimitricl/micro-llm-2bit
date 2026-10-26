@@ -1,0 +1,1840 @@
+{
+ "summary": {
+  "n": 200,
+  "hit": 0.0,
+  "hit_ci95": [
+   0.0,
+   0.0
+  ],
+  "by_slice": {
+   "par_coeur": {
+    "n": 100,
+    "hit": 0.0
+   },
+   "reformule": {
+    "n": 100,
+    "hit": 0.0
+   }
+  },
+  "by_categorie": {
+   "capitales": {
+    "n": 80,
+    "hit": 0.0
+   },
+   "dates": {
+    "n": 40,
+    "hit": 0.0
+   },
+   "definitions": {
+    "n": 40,
+    "hit": 0.0
+   },
+   "unites_sciences": {
+    "n": 40,
+    "hit": 0.0
+   }
+  }
+ },
+ "rows": [
+  {
+   "id": "cap-01-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La France est un pays dont la capitale est",
+   "gen": "la entité iliens Institut\n\n\n France\n\n Canadaatisatisatisackackack\n\n371\n\n Royaume71\n Royaume Âge",
+   "hit": false
+  },
+  {
+   "id": "cap-01-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la France ?",
+   "gen": "Union des la France\n\n CO CO\n\n ISO\n\n FI\n\n Collège\n\n College\n\n 1801\n\n Ivan",
+   "hit": false
+  },
+  {
+   "id": "cap-02-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Italie est",
+   "gen": "Institutooorororo\n\n Theriroro Crororoano\n\n'ioioioanaanaana",
+   "hit": false
+  },
+  {
+   "id": "cap-02-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Italie ?",
+   "gen": "L'Italie\n\nQuébec\n\n Armée\n\n Résid\n\n Institut\n\n Territoire\n\n Istitut\n ISO",
+   "hit": false
+  },
+  {
+   "id": "cap-03-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Espagne est un pays dont la capitale est",
+   "gen": "Uri\n\n\n Armée\n\n Division\n\n Uri Ar\n\n L RD\n\n IRN\n\n ISO\n\n ORN",
+   "hit": false
+  },
+  {
+   "id": "cap-03-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Espagne ?",
+   "gen": "L'Espagne\n\n Uatrographie\n\n Valiscographie\n Valncar\n\n nom Valnac\n\n- Musaulcan",
+   "hit": false
+  },
+  {
+   "id": "cap-04-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Allemagne est",
+   "gen": "Institut de la La Lettres\n\n Cet Tél Tél\n\n ix Tél Tél Télian\n\nix Tél Cin Tél\npt2",
+   "hit": false
+  },
+  {
+   "id": "cap-04-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Allemagne ?",
+   "gen": "L'Allemagne\n\n Parti Parti\n\n Armée\n\nArmée\nUNESCO\n\n Arcadi\n\n Île\n\n ZNIEFF",
+   "hit": false
+  },
+  {
+   "id": "cap-05-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Portugal est un pays dont la capitale est",
+   "gen": "une entité ilienscriptiongémontmontmontmermermerererer avec une autre En En En\n\n\n La Commissionuktive Portugal\n\n)",
+   "hit": false
+  },
+  {
+   "id": "cap-05-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Portugal ?",
+   "gen": "Institutooo A Q\n\n La capitale du Brésilien\n\nCanada UQ\n\n Ivan UQESCO\n\n In",
+   "hit": false
+  },
+  {
+   "id": "cap-06-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Belgique est",
+   "gen": "Institut de la compagnie\n\nJean Jean Jean Jean\n\n000000 0000\n00000\n00 1000\n0080",
+   "hit": false
+  },
+  {
+   "id": "cap-06-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Belgique ?",
+   "gen": "La Belgique\n\nLa Belgique\nitale UQESCO\n\nÉtienne Cess\n\n Étienne Cess-Val\n\n Éric Cess A",
+   "hit": false
+  },
+  {
+   "id": "cap-07-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Suisse est un pays dont la capitale est",
+   "gen": "la entité iliens CH\n\n\n France La Suisse\n\nCanada Radio Suisse\n IST\n\n Jeux Radio Suisse-Institut\n\n I ST",
+   "hit": false
+  },
+  {
+   "id": "cap-07-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Suisse ?",
+   "gen": "La Suisse\n\nLa Suisse\nitale\n\n ISO\n\n IBM\n\n.-\n ISO la Suisse\n 2022\n\n OPC",
+   "hit": false
+  },
+  {
+   "id": "cap-08-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Autriche est",
+   "gen": "Institutooorororo\n\n Cet Cet Cet\n\n France Cet Cet International\n\n Paris Cet Cet entité\n\nino Club",
+   "hit": false
+  },
+  {
+   "id": "cap-08-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Autriche ?",
+   "gen": "L'Autriche\n\nQuébec\n\n Armée\n\n RTL\n\n URSS\n\n IRSSN\n\n In",
+   "hit": false
+  },
+  {
+   "id": "cap-09-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Grèce est un pays dont la capitale est",
+   "gen": "la entité la Higaniga\n\n\n Institut\n\nInstitut\n Iniko\n\n Cet Tél Tél\n\n France Tél\nLa Nouvelle",
+   "hit": false
+  },
+  {
+   "id": "cap-09-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Grèce ?",
+   "gen": "La capitale de Grèce\n\n.-.-.- É É É �erl\n\nInstitut É �amma\n\n Institut É\n\n Musée",
+   "hit": false
+  },
+  {
+   "id": "cap-10-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Pologne est",
+   "gen": "Institut de la France\n\n Cet Cet Cet\n\n France\n France-Liv Nouvelle\n\n Royaume Cet Cetieuxieuxieuxieuieux",
+   "hit": false
+  },
+  {
+   "id": "cap-10-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Pologne ?",
+   "gen": "Jeux de la France\n\nQuatrographieographieographietique\n\nGeorges Georges\n\nÉtienne Georges\nsoit\n\n Étienne Georges\nsee",
+   "hit": false
+  },
+  {
+   "id": "cap-11-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Russie est un pays dont la capitale est",
+   "gen": "la Géorgie Gil\n\n\n Institut Gil\n Canada Canada Canada\n\n Armée Gil\n IST\n\n I ST\n\n Italien Gil\n entité",
+   "hit": false
+  },
+  {
+   "id": "cap-11-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Russie ?",
+   "gen": "La capitale de Russie\n\n.-\n Albert-Albert-Albert\n\n Institut\n\n Île-Albert Le\n\n nom Institut de",
+   "hit": false
+  },
+  {
+   "id": "cap-12-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Chine est",
+   "gen": "Institut de la entité\n\nio de la La Lettres\n\nJean-Étienne\n\n Jean-Étienne du\n\n France-Étienne le",
+   "hit": false
+  },
+  {
+   "id": "cap-12-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Chine ?",
+   "gen": "La Chine\n\nLa Chine\nitudif Uptmann\n\n.- Uptamen\n\nunicipalité Uptcan\n\n 1801",
+   "hit": false
+  },
+  {
+   "id": "cap-13-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Japon est un pays dont la capitale est",
+   "gen": "une entité ilienscriptionitainitanienitanienitantantanterantantaantant\n\n\n La Commission\n\n Le Japon\n\nLe",
+   "hit": false
+  },
+  {
+   "id": "cap-13-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Japon ?",
+   "gen": "Institut du Japon\n\n Savoie UQ\n\nois UQN\n\n Pays UQESCO\n\n Canada UQoa",
+   "hit": false
+  },
+  {
+   "id": "cap-14-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Inde est",
+   "gen": "Institutooorororo\n\n Cet Cet Cet\n\n France Tél La\n\n 2021\n\n Istitutoroalro",
+   "hit": false
+  },
+  {
+   "id": "cap-14-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Inde ?",
+   "gen": "L'Inde\n\n Arriv\n\n Luxembourg Comm\n\n Conférence\n\n IBM\n\n ISO\n\n OPC\n\n U",
+   "hit": false
+  },
+  {
+   "id": "cap-15-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Brésil est un pays dont la capitale est",
+   "gen": "une entité ilienscriptiongéarchgéarchger\n\n\n La Commission\n\nCanada Lin\n\nLe Brésil\n\nYves Lin\nLe\n\n Yves",
+   "hit": false
+  },
+  {
+   "id": "cap-15-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Brésil ?",
+   "gen": "Institut du Brésil\n\n Opéra Ral\n\n Ipéra Rale\n\n Institut du Portugal\n\n Musée Musée\n\n Museum",
+   "hit": false
+  },
+  {
+   "id": "cap-16-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Argentine est",
+   "gen": "la entité il la seule entité il legémontmontmontmer\n\n\n Assemblée de la La\n\niourourouroinoinoinoiniini",
+   "hit": false
+  },
+  {
+   "id": "cap-16-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Argentine ?",
+   "gen": "L'Argentine\n\n Armée\n\n Luxembourgqueté\n\nÎle\n\n Île\n\nsee\n\narte\n\n ZNIEFF",
+   "hit": false
+  },
+  {
+   "id": "cap-17-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Canada est un pays dont la capitale est",
+   "gen": "une entité ilienscriptionitainitanienitanienitantantanterantantaantant\n\n\nCanada Canada\n\n Le Canada\n 96",
+   "hit": false
+  },
+  {
+   "id": "cap-17-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Canada ?",
+   "gen": "Institut du Canada\n\n Savoie UQ\n\nois UQN\n\n Pays UQESCO\n\n IBM\n\n Isrom",
+   "hit": false
+  },
+  {
+   "id": "cap-18-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Mexique est",
+   "gen": "etc Îles\n\n\n Îlesatily\n\n Uls\n\n Royaume As As As\n\n00\n\n Ar As Asal",
+   "hit": false
+  },
+  {
+   "id": "cap-18-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Mexique ?",
+   "gen": "Institutooo A Q\n\n La Commission des des des du du du au du du Duaujojojoachachach Rach",
+   "hit": false
+  },
+  {
+   "id": "cap-19-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Égypte est un pays dont la capitale est",
+   "gen": "Uitiss\n\n\n Armée\n\n Division\n\n Uitifs\n\n TGV\n\n SNCF\n\n Institut\n\n ISO\n\n entité",
+   "hit": false
+  },
+  {
+   "id": "cap-19-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Égypte ?",
+   "gen": "L'Égypte\n\nQuébec\n\n L'Égypte-Ville\n\n Avec Orient\n\n Institut\n\n Île Orient\nVal d",
+   "hit": false
+  },
+  {
+   "id": "cap-20-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Maroc est",
+   "gen": "Institut du Maroc\n\n France France France\n\n Chix France France A\n\n00\n000000 0000\n10000",
+   "hit": false
+  },
+  {
+   "id": "cap-20-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Maroc ?",
+   "gen": "Institut du Maroc\n\n Maison du Maroc-Ville\n\n Musée du Maroc A remplacée\n\n Palais du Maroc Posé\n\n Savoie du",
+   "hit": false
+  },
+  {
+   "id": "cap-21-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Algérie est un pays dont la capitale est",
+   "gen": "Uri Lan\n\n\n Armée\n\n Division\n\n Uri\n\ndivision\n\n Iambette\n\n ISO\n\n Oise",
+   "hit": false
+  },
+  {
+   "id": "cap-21-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Algérie ?",
+   "gen": "L'Algérie\n\nQuébec\n\n L'Algérie du\n\n.- Chianglâtre\n\n Chianglaise\n\nÎleéryolle",
+   "hit": false
+  },
+  {
+   "id": "cap-22-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Tunisie est",
+   "gen": "Institut de la Algérie\n\n Cet Cet Cet\n\n France Cet Cetieux\n\n Paris Cet Cetean\n\n Canada Cet Cetello",
+   "hit": false
+  },
+  {
+   "id": "cap-22-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Tunisie ?",
+   "gen": "La radio la Tunisie\n\nCanada U\n\n Royaume U\nESCO\n\n États U\n 2015\n\n Jeux U\nhui\n\n I",
+   "hit": false
+  },
+  {
+   "id": "cap-23-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Sénégal est un pays dont la capitale est",
+   "gen": "une entité ilienscriptiongémontmontmontmermermerererer avec une autre En En En\n\n\n La Commission\n\nCanada Company",
+   "hit": false
+  },
+  {
+   "id": "cap-23-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Sénégal ?",
+   "gen": "Institutooo A Q\n\n La capitale du Mali\n\n Institutoro A Qines\n\n Oublithithith",
+   "hit": false
+  },
+  {
+   "id": "cap-24-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Nigeria est",
+   "gen": "Institutooorororo\n\n Cet Cet Cet\n\n France Tél La\n\n 2021\n\n Istitutoroalro",
+   "hit": false
+  },
+  {
+   "id": "cap-24-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Nigeria ?",
+   "gen": "Institutooo A Q\n\n La Commission des des des\n\n Savoie UQ\n\n Musée Musée\n\n Palais Musée\nitu",
+   "hit": false
+  },
+  {
+   "id": "cap-25-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Kenya est un pays dont la capitale est",
+   "gen": "une entité ilienscriptionitainitanien\n\n\n La Commission\n\nLa Commission\n La Chambre\n\nLe Centre\n\n Le Centre\nhuidif",
+   "hit": false
+  },
+  {
+   "id": "cap-25-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Kenya ?",
+   "gen": "Institut du Kenyr\n\nL'Île du Kenore\n\nJean-Pierre-Pierre\n\n Jean-Pierre du Qetteur",
+   "hit": false
+  },
+  {
+   "id": "cap-26-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Afrique du Sud est",
+   "gen": "Institut du Sud\n\nInstitut du Pacifique\n\n Maison du Pacifique Nord\n\n Palais du Pacifique Ouest\n\n Savoie du Pacifique Sud",
+   "hit": false
+  },
+  {
+   "id": "cap-26-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Afrique du Sud ?",
+   "gen": "Institut du Sud\n\n Jeuxalisation Ukraine\n\n Armée du Sud-Ur\n\nArmée du Pacifique\n\n France du Pacifique",
+   "hit": false
+  },
+  {
+   "id": "cap-27-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Australie est un pays dont la capitale est",
+   "gen": "Utretytytylytyty LytytynotynoIS\n\n\n.\n\n Utre ISO\n\n CLL\n\n Ar",
+   "hit": false
+  },
+  {
+   "id": "cap-27-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Australie ?",
+   "gen": "L'Australie\n\n.-\n Albert-Albert-Albert\n\n Institut\n\n Îlestitut\n Île Morbihan\n\nÎle Morbihan\nVal",
+   "hit": false
+  },
+  {
+   "id": "cap-28-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Norvège est",
+   "gen": "Institut de la compagnie\n\n Cet Cet Cet\n\n France Cet Cetieux\n\n Paris Cet Cetean\n\n Canada Cet Cet entité",
+   "hit": false
+  },
+  {
+   "id": "cap-28-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Norvège ?",
+   "gen": "Jeux de Norvège\n\n Armée\n\nArmée\nitale UQESCO\n\n Odif\n\n ISO\n\n IST",
+   "hit": false
+  },
+  {
+   "id": "cap-29-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Suède est un pays dont la capitale est",
+   "gen": "la entité iliens Étataryashiashiashiawaawaawaawawaawaowawaawa\n\n\n France La Suède\n\nCanada Canada Canada Canada",
+   "hit": false
+  },
+  {
+   "id": "cap-29-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Suède ?",
+   "gen": "Jeux de la France\n\nQuatrographieographieographietique\n\n Cet Patrographieographie\n\n atrographie Histoire\n\n Institut Patr",
+   "hit": false
+  },
+  {
+   "id": "cap-30-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Danemark est",
+   "gen": "Institut du Danemark\n\n France France France\n\n Suisse France\n 2011\n\n Istitut du Japon\n\n Canadastitut du Brésil",
+   "hit": false
+  },
+  {
+   "id": "cap-30-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Danemark ?",
+   "gen": "Institut du Danemark\n\n Arté UQ\n\nArté U Q\n\n Institut du Japon\n\n Ité Uvironnement",
+   "hit": false
+  },
+  {
+   "id": "cap-31-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Finlande est un pays dont la capitale est",
+   "gen": "la entité iliens Institut\n\n\n France La Finlande\n\nCanada Canada Canada Canada\n\n.\n\n Armée\n\n Canadi Canada Canada Amérique",
+   "hit": false
+  },
+  {
+   "id": "cap-31-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Finlande ?",
+   "gen": "La Finlande\n\n.-\n Albert-Albert-Albert\n\n Institut\n\n Îlestitut\n Îleyre\n\nÎleyre\n ISO",
+   "hit": false
+  },
+  {
+   "id": "cap-32-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Irlande est",
+   "gen": "Institut\n\n Ustitut\n U ZNIEFF\n\n Royaume ZNIEFF\n Royaume Philipp\n\n États ZNIEFF\n 2015\n\n ISO\n ISO la La",
+   "hit": false
+  },
+  {
+   "id": "cap-32-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Irlande ?",
+   "gen": "L'Irlande\n\n Armée\n\n Luxembourgqueté\n\nÎle\n\n Île\n\n Proveté\nÎle d 2022\n\n In",
+   "hit": false
+  },
+  {
+   "id": "cap-33-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Les Pays-Bas est un pays dont la capitale est",
+   "gen": "la France France France\n\n\nStix Éiné\n\n Stix Édid\n\n Jean Édidès\n\nJean Édidat\n\n Claude",
+   "hit": false
+  },
+  {
+   "id": "cap-33-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale des Pays-Bas ?",
+   "gen": "La capitale des États-Bas\n\n Les Uéleines\n\nLes Uéleires\n\n''« Les Upeires\n 2023",
+   "hit": false
+  },
+  {
+   "id": "cap-34-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Turquie est",
+   "gen": "Institut de la péninsule\n\n Cetstitut de La\n\n stitut de Lung\n\n Île de la compagnie\n\n 2011",
+   "hit": false
+  },
+  {
+   "id": "cap-34-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Turquie ?",
+   "gen": "La Turquie\n\nLa Turquie\nQuébec Centre\n\n Musée Centre\nsee Centre\n entité\nsee centre\n\nMunicipalité Centre",
+   "hit": false
+  },
+  {
+   "id": "cap-35-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Iran est un pays dont la capitale est",
+   "gen": "Utretytytylytyty LytytynotynoIS\n\n\n CLL\n\n Utrelytynolyty Lyts",
+   "hit": false
+  },
+  {
+   "id": "cap-35-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Iran ?",
+   "gen": "L'Irak\n\n Armée\n\n Luxembourgqueté\n\nÎle deté\nCharles Charles Charles Charles\n\nRécep",
+   "hit": false
+  },
+  {
+   "id": "cap-36-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Corée du Sud est",
+   "gen": "Institut du Sud\n\nInstitut du Pacifique\n\n Maison du Pacifique Nord\n\n Palais du Pacifique Ouest\n\n Savoie du Pacifique Sud",
+   "hit": false
+  },
+  {
+   "id": "cap-36-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Corée du Sud ?",
+   "gen": "Institut du Sud\n\n Jeux des Sud\nYves Montagnagnagn Magnagnagn magn Magnagn Magn Magnagn\n\n' Jeux des",
+   "hit": false
+  },
+  {
+   "id": "cap-37-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Viêt Nam est un pays dont la capitale est",
+   "gen": "une entité ilienscriptionitainitanienitanienitititttt\n\n\n La Commission Viêt Nam\n\n Armée\n\nArmée",
+   "hit": false
+  },
+  {
+   "id": "cap-37-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Viêt Nam ?",
+   "gen": "Institut du Viêt\n\n Jeux du Viêt-Nord\n\n Arté UQ\n\nArté U Q\n\n Institut du Vi",
+   "hit": false
+  },
+  {
+   "id": "cap-38-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Thaïlande est",
+   "gen": "Institut\n\n Ustitut\n U ZNIEFF\n\n Royaume ZNIEFF\n Royaume Philipp\n\n États Philipp\n 2015\n\n Pays Philipp\n 2022",
+   "hit": false
+  },
+  {
+   "id": "cap-38-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Thaïlande ?",
+   "gen": "La capitale de Thaïlande\n\n Ukraine\n\n Opéra\n\n.-\n.-ulien\n\n-\n\nvé\nvé dudit",
+   "hit": false
+  },
+  {
+   "id": "cap-39-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Ukraine est un pays dont la capitale est",
+   "gen": "Ukraine\n\n\n Armée\n\n Division\n\n Ukraine Au\n\n Institut\n\n Opéra Au\n son territoire\n entité commence alors la",
+   "hit": false
+  },
+  {
+   "id": "cap-39-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Ukraine ?",
+   "gen": "L'Ukraineitaleitaleitale Titane\n\n) Ukraineitaleitale ISO\n\n Arméeitaleitaletalitaletaltaltal",
+   "hit": false
+  },
+  {
+   "id": "cap-40-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Roumanie est",
+   "gen": "Institutooorororoanoanoanoanaanaanaawaawaawaawawawowawawianawaw Amériqueawaw",
+   "hit": false
+  },
+  {
+   "id": "cap-40-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Roumanie ?",
+   "gen": "Jeux de la France\n\nQuatrographieographieographietique\n\nGeorges Georges\n\nÉtienne Georges\nsoit\n\n Étienne Georges\nsee",
+   "hit": false
+  },
+  {
+   "id": "dat-01-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la Révolution française date de",
+   "gen": "la la la le le le nouveau nouveau nouveau 2020\n\n\n 2020\n 2020uk\n\n Puisieuxuk\nmontuk\narinuk\ndontuk",
+   "hit": false
+  },
+  {
+   "id": "dat-01-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la Révolution française ?",
+   "gen": "Armée\n\nQuorient La\n\nYves Le\n\n Yves Le\nYves\n\n Atlantique\n\n 1988\n\nhui\n\nille",
+   "hit": false
+  },
+  {
+   "id": "dat-02-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la prise de la Bastille a eu lieu en",
+   "gen": "ce ce ce cette cette cetteiscisciscespespesp Esp Esp Esp\n\n\nPr Esp Espisciscini\n\nGeorges Espiscini Bernier",
+   "hit": false
+  },
+  {
+   "id": "dat-02-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la prise de la Bastille ?",
+   "gen": "La liste\n\nLa liste\nLa L'île\n\nLe nom officiel\n\nGeorges Georges Georges\n\n00\n\n-clès",
+   "hit": false
+  },
+  {
+   "id": "dat-03-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le sacre de Napoléon date de",
+   "gen": "Napoléon\n\n\n'''’’’\n\n Restauration\n\n Iconès\n\n 1801\n\nIGN\n\ngarde\n\n 1933",
+   "hit": false
+  },
+  {
+   "id": "dat-03-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu le sacre de Napoléon ?",
+   "gen": "La liste du Morbihan\n\nQuorient Autrich\n\n Cet Étoile\n\n Dauphiné Étoile-Nord\n\n00\n\n Arté",
+   "hit": false
+  },
+  {
+   "id": "dat-04-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la bataille de Waterloo a eu lieu en",
+   "gen": "jeujeujeueuxeuxeux Jeuxeuxeux Amériqueeuxeux Asieeux Asieents\n\n\n'esteresteresterauréinéinéiné Gé Gé Gégé Gé",
+   "hit": false
+  },
+  {
+   "id": "dat-04-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la bataille de Waterloo ?",
+   "gen": "La liste du monde Waterroo\n\nRécep\n\nGeorges Ral\n\nLe du du monde\n\nThe Ral",
+   "hit": false
+  },
+  {
+   "id": "dat-05-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la chute de Constantinople date de",
+   "gen": "Constantinople\n\n\n'''’’’\n\n Cetieuxieuxieuxreuxreuxreuxueuxreuxreuxreusereuxreuxhalreuxreuxseereuxreuxouti",
+   "hit": false
+  },
+  {
+   "id": "dat-05-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la chute de Constantinople ?",
+   "gen": "La liste du Morbihan Morbihan Morbihan\n\nÉvénements\n\n Armée\n\n Église\n\n Émile d'Alb\n\noinland",
+   "hit": false
+  },
+  {
+   "id": "dat-06-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la découverte de l'Amérique a eu lieu en",
+   "gen": "ce ce ce cette cette cetteiscisciscespespesp 14\n\n\nio record Brésil Brésil Brésil\n\n Enûûû 2020\n\n'autre",
+   "hit": false
+  },
+  {
+   "id": "dat-06-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la découverte de l'Amérique ?",
+   "gen": "La liste du Canada\n\nL'île du Canadajijijihrjijiskjijiellijijianojijianaioio",
+   "hit": false
+  },
+  {
+   "id": "dat-07-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la mort de Louis XIV date de",
+   "gen": "la la la plus la plusidgeidgeidge arch le la la suivante avec la nouvelle nouvelle nouvelle éponyme\n\n\n'après la la seconde\n\nÉglise",
+   "hit": false
+  },
+  {
+   "id": "dat-07-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la mort de Louis XIV ?",
+   "gen": "La liste du Morbihan Morbihan Morbihan département\n\nGeorges Georges Georges\n\n00\n000000 0000\n 00500000ical",
+   "hit": false
+  },
+  {
+   "id": "dat-08-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la Révolution russe a eu lieu en",
+   "gen": "la la ladididi Di Di Di\n\n\nGeorges Georges Georges Georges\n\nEF2\nEFC\nEFF\nEF\nEFR",
+   "hit": false
+  },
+  {
+   "id": "dat-08-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la Révolution russe ?",
+   "gen": "': 1997\n\n La Révolution\n\nLa Révolution\nLa République\nLa Constitution\nLa Commission\nLa\nLa Région\nLa Cathédrale",
+   "hit": false
+  },
+  {
+   "id": "dat-09-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la fin de la Première Guerre mondiale date de",
+   "gen": "la ville de la mémoire de la France\n\n\n.\n\n Vi Vi Vi\n\nitan Vi\nty\nty College\ntyUF\nty Philadelph",
+   "hit": false
+  },
+  {
+   "id": "dat-09-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la fin de la Première Guerre mondiale ?",
+   "gen": "Armée\n\nQuestre\n\nArmée\nQuinois\n\n Arcadi\n\n Le Morbihan\n\n Avec Loire\n\n Île Morbihan",
+   "hit": false
+  },
+  {
+   "id": "dat-10-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la fin de la Seconde Guerre mondiale a eu lieu en",
+   "gen": "mémoire avec le nouveau nouveau nouveauasséasséasséashiashiashieriashierierieriérierieri 87\n\n\n'autres Seconde Guerre\n\n) Seconde",
+   "hit": false
+  },
+  {
+   "id": "dat-10-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la fin de la Seconde Guerre mondiale ?",
+   "gen": "': 2016\n\n La Seconde Guerre\n\nÉvé\nÉté Ral\n\n Été Rial\n\n Éricette Église",
+   "hit": false
+  },
+  {
+   "id": "dat-11-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la libération de Paris date de",
+   "gen": "ce ce ce cette cette cetteisciscisc 2020\n\n\n Il d'autresisciscistre 2020\nio d'autreautreautre seconde\n\nio",
+   "hit": false
+  },
+  {
+   "id": "dat-11-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la libération de Paris ?",
+   "gen": "La liste du Morbihan Morbihan\n\nGeorges Clem\n\n Georges Clemois\n\n Édouard Clemui\n\nÉdouard Clemuy",
+   "hit": false
+  },
+  {
+   "id": "dat-12-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la bataille de Verdun a eu lieu en",
+   "gen": "'''’’’\n\nGeorges\n\nEF\n\ngarde\n\n 1933\n\n 1988\n\n entité\ngarde doin",
+   "hit": false
+  },
+  {
+   "id": "dat-12-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la bataille de Verdun ?",
+   "gen": "La liste du monde Verdun\n\nEn 2017\n\n En 2017\n Arbre\n\n Armée\n\nArmée\nAndré\n\n Albert",
+   "hit": false
+  },
+  {
+   "id": "dat-13-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le traité de Versailles date de",
+   "gen": "Versailles\n\n\n'''’’’\n\n Restaur\n\n Icon\n\ngarde\n\n 1933\n\n 1988\n\n ZNIEFF",
+   "hit": false
+  },
+  {
+   "id": "dat-13-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu le traité de Versailles ?",
+   "gen": "Armée\n\nQuorient La\n\nÉ RD\n\n É RD\nÉmer la\n\n Éricette\n\n Ermont",
+   "hit": false
+  },
+  {
+   "id": "dat-14-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le traité de Rome a eu lieu en",
+   "gen": "hommage avec learnarnarnernernernergergergolsolsolsofofofififif\n\n\n'\n\n Race\n\neron",
+   "hit": false
+  },
+  {
+   "id": "dat-14-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu le traité de Rome ?",
+   "gen": "'excëlslslsauxauxauxolsolsolsololol Solia\n\nGeorges Cépina\n\n Georges Cépine",
+   "hit": false
+  },
+  {
+   "id": "dat-15-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la chute du mur de Berlin date de",
+   "gen": "Berlin\n\n\n Six Six Six\n\narin Bernlalala\n\nEFF\n\n EFF\n IFF-\n\n IFF",
+   "hit": false
+  },
+  {
+   "id": "dat-15-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la chute du mur de Berlin ?",
+   "gen": "La liste du Morbihan\n\nQuorient Land Cover\n\n Cet Étoile\n\n 00\n\n Jeux Étoile-Nord\n\n00",
+   "hit": false
+  },
+  {
+   "id": "dat-16-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Mai 68 a eu lieu en",
+   "gen": "la la ladi Élisabeth\n\n\n SAR\n\n23\n\n Armée\n\n CIR\n\n Radi\n\n RhR\n\n M",
+   "hit": false
+  },
+  {
+   "id": "dat-16-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu Mai 68 ?",
+   "gen": "'est Ral\n\n La liste MC\n\nLa liste MCC\n\n Sa liste MAC\n\n Son principal MCN",
+   "hit": false
+  },
+  {
+   "id": "dat-17-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la création de l'ONU date de",
+   "gen": "son premier ex Clark Clark Clark\n\n\n' 1998\n\ntytyty Lyty Lyical\n\n Claudety Lyural\n\nClaudety Lyeral",
+   "hit": false
+  },
+  {
+   "id": "dat-17-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la création de l'ONU ?",
+   "gen": "La liste du Pacifique Pacifique\n\nÉvénements\n\n Armée\n\n Église Notre-Dame\n\noin 1800\n\n Institut",
+   "hit": false
+  },
+  {
+   "id": "dat-18-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le premier pas sur la Lune a eu lieu en",
+   "gen": "olispes\n\n\n'''’’’\n\n Rencontre\n\nIGN\n\n IGN\n\ngarde\n\n 1933\n\nstitut",
+   "hit": false
+  },
+  {
+   "id": "dat-18-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu le premier pas sur la Lune ?",
+   "gen": "'une URSS\n\n Le\n\nLe UR SS\n\nJean Raphaël\n\n Jean Raphaël-\n\n Jacques R",
+   "hit": false
+  },
+  {
+   "id": "dat-19-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la Révolution de 1848 date de",
+   "gen": "sa sa sa son son sonouxouxouxaultouxouxwaldouxoux mise mise mise nouvelle nouvelle nouvelle par la la la communautaire communautaire\n\n\n Illin",
+   "hit": false
+  },
+  {
+   "id": "dat-19-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la Révolution de 1848 ?",
+   "gen": "La Révolution de République\n\nÉvénements Éstr\n\n00\n\n Armée de République-Nord\n\n 00\n Armé",
+   "hit": false
+  },
+  {
+   "id": "dat-20-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "l'abdication de Napoléon a eu lieu en",
+   "gen": "olisolisolisOl\n\n\n'ab DRSS\n\n) F RRSSI\n\n I I I\n\nitanien Yves Yves Yves",
+   "hit": false
+  },
+  {
+   "id": "dat-20-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu l'abdication de Napoléon ?",
+   "gen": "La liste du monde\n\nLa liste du Canada\n\nLe Dictionnaire\n\n Le Dictionnaire\nLe dictionnaire\nLe Manuel\nLe Musée",
+   "hit": false
+  },
+  {
+   "id": "def-01-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « photosynthèse » désigne",
+   "gen": "ériériéri 87 87 87\n\n\n Jeuxronstitutstitutstitutéryéryéryiniiniiniowowowokokokikokokoshokok",
+   "hit": false
+  },
+  {
+   "id": "def-01-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on la photosynthèse ?",
+   "gen": ".\n\n Ral\n\nRal\n RAl\n\n28\n\n BAL\n\n ISO\n\n PIB\n\n BiUF",
+   "hit": false
+  },
+  {
+   "id": "def-02-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la gravité est",
+   "gen": "ainsi par par par la L L L\n\n\n Réalisé\n\n Ar L LESCO\n\n Jeux LUF\n\n Savoie UUF\n etc Savoie",
+   "hit": false
+  },
+  {
+   "id": "def-02-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « gravité » ?",
+   "gen": "Institutstitutstitutetonetonetonetéetéeté Tangeté\n\n'\n\n Institutstitut Jésetonetonoroores\n\n Iss",
+   "hit": false
+  },
+  {
+   "id": "def-03-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « monarchie » désigne",
+   "gen": "Forberberber\n\n\narinifté Forberke\n\nukukukarkarkark\n\n naturukukakarkarketh",
+   "hit": false
+  },
+  {
+   "id": "def-03-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on la monarchie ?",
+   "gen": "Sixel\n\nLe nom du pays du monde monde mondeawawawawaawaawaashiashiashieriashiashiériashiashi Asie",
+   "hit": false
+  },
+  {
+   "id": "def-04-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la démocratie est",
+   "gen": "le le le Lis Lis Lis\n\n\n Ar Ar Ar\n\nitan Lis\n entité\n\n Six Lis\n I\n\n 1998\n\n Iang Lis",
+   "hit": false
+  },
+  {
+   "id": "def-04-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « démocratie » ?",
+   "gen": "Institutstitutstitutetonetonetonetéetéeté Tangeté\n\n'\n\n Institutstituttechniqueetoneté\n Issssssstr",
+   "hit": false
+  },
+  {
+   "id": "def-05-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « ADN » désigne",
+   "gen": "lit\n\n\n Institut\n\nukukukarkarkark\n\n#ukukakarkarketh\n\nInstitut\n entité\n\n Mill",
+   "hit": false
+  },
+  {
+   "id": "def-05-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on l'ADN ?",
+   "gen": ".\n\n Ral\n\nLe Ral du\n\nLes Ralistes\n\n00\n\n Le Ral de\n\n TGV",
+   "hit": false
+  },
+  {
+   "id": "def-06-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "une métaphore est",
+   "gen": "une seule avec le cadreorioriorianaanaana\n\n\n'ancienorioriantianaanaawaawaawaawawawmermermeraterater",
+   "hit": false
+  },
+  {
+   "id": "def-06-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « métaphore » ?",
+   "gen": "Institut de la la la France française\n\n'aventure CQ\n\n1998\n\n Ivan CQ du\n\n.- 1998",
+   "hit": false
+  },
+  {
+   "id": "def-07-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « péninsule » désigne",
+   "gen": "berberberkekekelin\n\n\n Jeuxron représentant une entité ilienscription\n\n'article définiary\n\nInstitut du Pacifique",
+   "hit": false
+  },
+  {
+   "id": "def-07-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on une péninsule ?",
+   "gen": "Sixel\n\n'\n\nLe\n\n TGV\n\n1999\n\nIGN\n\n entité\n IGN\n\n IRN",
+   "hit": false
+  },
+  {
+   "id": "def-08-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un archipel est",
+   "gen": "remplacée remplacée remplacée remplacé remplacé remplacé remplacement remplacement remplacement Als Als Alsonne\n\n\n'archipel Alsace\n\nériécurop Alsace-Wawawa",
+   "hit": false
+  },
+  {
+   "id": "def-08-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « archipel » ?",
+   "gen": "Institut de la la la France française\n\n'aventure CQ\n\n Savoie CQN\n\n Maison CQAN\n\n Musée",
+   "hit": false
+  },
+  {
+   "id": "def-09-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « fleuve » désigne",
+   "gen": "erberberbersersersarbersarbiaarbiaiaia\n\n\n La liste du Pacifique\n\n'article Le\n\nInstitut Le",
+   "hit": false
+  },
+  {
+   "id": "def-09-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on un fleuve ?",
+   "gen": "Sixel la la la France\n\n00\n\n23\n\nLe\n\n TGV\n\n1999\n\n ISO\n\n entité\n I",
+   "hit": false
+  },
+  {
+   "id": "def-10-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "une rivière est",
+   "gen": "associé associé associéoin associéoinoinoinoisoisois Horoisois\n\n\n France France France\n\nClaude France France Club\n\n Claude France France Football",
+   "hit": false
+  },
+  {
+   "id": "def-10-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « rivière » ?",
+   "gen": "Institutstitutstitutetonetonetonetéetéeté Tangeté\n\n'\n\n Institutstitut Jésetonetonoroores\n\n Iss",
+   "hit": false
+  },
+  {
+   "id": "def-11-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « climat » désigne",
+   "gen": "Scalalalala\n\n\n Jeuxronalalaryala\n entité\n\nÉvé\n\nukatralalauxalaalaala\n#",
+   "hit": false
+  },
+  {
+   "id": "def-11-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on le climat ?",
+   "gen": "Georges Sch Sch Sch\n\nRénnn\n\nClaude Sch Sch Company\n\nInstitut du Comois\n\n Institut du",
+   "hit": false
+  },
+  {
+   "id": "def-12-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "l'économie est",
+   "gen": "une Lune Lune Luneollesollesollesookookook 64\n\n\n C Lune Luneyoollesolleselloollesollesièresookooktelierookooktistookook",
+   "hit": false
+  },
+  {
+   "id": "def-12-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « économie » ?",
+   "gen": "Institutstitutstitutetonetonetonetéetéeté Tangeté\n\n'\n\n Institutstituttechniqueetoneté\n''\n' I",
+   "hit": false
+  },
+  {
+   "id": "def-13-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « philosophie » désigne",
+   "gen": "Forberberber\n\n\narin Bernois\n\nukPC\n\n PC\n\nPC\nLe PC\nhuidif\n\n entité\n\n FM",
+   "hit": false
+  },
+  {
+   "id": "def-13-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on la philosophie ?",
+   "gen": "Sixel\n\n Le Le Le\n\narinarinarinçonçonçonilléilléillétréhaltréhaltrehaltre Haltrehalter",
+   "hit": false
+  },
+  {
+   "id": "def-14-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un roman est",
+   "gen": "arrearrearrerelrelrel Chan Chan Chan\n\n\naë Vi Chan\narin\narin XII\narinellementarin\ndont Form Form Form\narin",
+   "hit": false
+  },
+  {
+   "id": "def-14-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « roman » ?",
+   "gen": "En En EnEn En En\n\nStaryaryary Mal\n\n Aveceth52\n\n Institut En\n Valorbitale",
+   "hit": false
+  },
+  {
+   "id": "def-15-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « symphonie » désigne",
+   "gen": "Forberberber\n\n\n Sixièmealité\n\narinalité\nornemann\n\n naturarinalité vaut la entité\nRhinarinalité de la France",
+   "hit": false
+  },
+  {
+   "id": "def-15-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on une symphonie ?",
+   "gen": "Sixel Com\n\n Cet-L Com\n Cet Tél\n Cet Français\n Cet France\n Cet Canada\n Cet\n Cet Québec\n Cet République",
+   "hit": false
+  },
+  {
+   "id": "def-16-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un vaccin est",
+   "gen": "une une uneanthanthanth Panth Panth Panth\n\n\n- Li Li Li\n\n Institutstitutstitutetonetonetonetéetéetéoireoireoire 2022",
+   "hit": false
+  },
+  {
+   "id": "def-16-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « vaccin » ?",
+   "gen": "Institut de la la la France française\n\n'aventure CQ\n\n1998\n\n Ivan CQ du\n\n.- 1998",
+   "hit": false
+  },
+  {
+   "id": "def-17-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « inflation » désigne",
+   "gen": "Fres Fres Fres\n\n\n Jeuxron 2023\n\n 96\n\nukukukark\n\n entité\n Mematrographlif\n\n Memorial",
+   "hit": false
+  },
+  {
+   "id": "def-17-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on l'inflation ?",
+   "gen": ".\n\n Ral\n\nRal\n RAl\n\n28\n\n BAL\n\n ISO\n\n PIB\n\n BiUF",
+   "hit": false
+  },
+  {
+   "id": "def-18-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un écosystème est",
+   "gen": "une une uneanthanthanth Panthanthanthththth ThththThththgengengenétiétiétialliétialliallialliinoisallialli",
+   "hit": false
+  },
+  {
+   "id": "def-18-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « écosystème » ?",
+   "gen": "Institut de la la la France française\n\n'aventure CQ\n\n-aventure C Q\n\n.-aventure C Que\n\nM",
+   "hit": false
+  },
+  {
+   "id": "def-19-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « altitude » désigne",
+   "gen": "Preslestontontonterterterindindind Lind Lind Lind\n\n\n La liste du Pacifique Nord\n\nInstitutcription Le\n\n Institut",
+   "hit": false
+  },
+  {
+   "id": "def-19-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on une altitude ?",
+   "gen": "Sixel\n\nLe nom du Du Du Du\n\nGuy Com\n\n Guy Com A\n\n Iuy Comal",
+   "hit": false
+  },
+  {
+   "id": "def-20-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la génétique est",
+   "gen": "ainsiieuxieuxieuxouxouxouxierierier Premier Premier Premier\n\n\nieuxieuxesterouxouxowierier Deux Premier PremierAncien Premier Ancien Premier",
+   "hit": false
+  },
+  {
+   "id": "def-20-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « génétique » ?",
+   "gen": "Le Le Lealalalererer\n\n''« Lealaryaler\n Obivernements débuts débuts débuts premiers premiers premiers",
+   "hit": false
+  },
+  {
+   "id": "uni-01-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "L'eau bout à",
+   "gen": "sonawawawirawawiaawia\n\n\n00\n\n ISO\n\n  ISO\n ISO la L Compagnie\n\n000\n\n O",
+   "hit": false
+  },
+  {
+   "id": "uni-01-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'eau bout-elle ?",
+   "gen": "00\n\n Jeux Jeux Jeux\n\n Armis Jeux\n 2018\n Armi Jeux\n Armée\n\nArmée\n Armé Jeux",
+   "hit": false
+  },
+  {
+   "id": "uni-02-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "L'eau gèle à",
+   "gen": "l'espaceespaceespace\n\n\n00\n\n Armée\n\n 00\n Armé\n\n Institut\n\n ISO\n\n Imil",
+   "hit": false
+  },
+  {
+   "id": "uni-02-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'eau gèle-t-elle ?",
+   "gen": "00\n\n Le Le Le\n\nRé Résul\n\nGeorges Georges Georges\n\n TGV\n\n SNCF\n\n Georges Georges Georgesty",
+   "hit": false
+  },
+  {
+   "id": "uni-03-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un kilomètre vaut",
+   "gen": "vaut vaut avec une un un un Un Un Un\n\n\n Instituttélslslsargargarg Arg Arg Arg\n\nioioiooo",
+   "hit": false
+  },
+  {
+   "id": "uni-03-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de mètres contient un kilomètre ?",
+   "gen": "'exc ligne\n\n00\n\n23\n\n TGV\n\nLe TGV\nChampan\nChampa\nChampene\nChampena",
+   "hit": false
+  },
+  {
+   "id": "uni-04-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un mètre contient",
+   "gen": "2021 2021 2021\n\n\nériorphorphorphropropropawawaw Martin\n\n Il Il Il\n\n Partiorphropware Ununo",
+   "hit": false
+  },
+  {
+   "id": "uni-04-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de centimètres contient un mètre ?",
+   "gen": "'exc Conc Conc Conc\n\n00\n\n Arté Conc Conc II\n\n000\n\n IBM\n\n ISO\n\n OM",
+   "hit": false
+  },
+  {
+   "id": "uni-05-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Une heure dure",
+   "gen": "un retour son retour du retour du passage du passage le passage le départ\n\n\n'exc franc du passage\n\n00\n\n-clomclom",
+   "hit": false
+  },
+  {
+   "id": "uni-05-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de minutes dure une heure ?",
+   "gen": "'une Albiste\n\n Famille Le\n\n Arbre\n\nArme Le\n Armi\n Armen\n Armis",
+   "hit": false
+  },
+  {
+   "id": "uni-06-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un kilogramme vaut",
+   "gen": "anthanthanth Asie Asie AsieAsie Asie Asie Amérique Amérique AmériqueAmérique Amérique Amérique Canada Amérique Amérique\n\n\nioffvadoranthanth Haw Asie Asieino Amérique Amérique",
+   "hit": false
+  },
+  {
+   "id": "uni-06-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de grammes contient un kilogramme ?",
+   "gen": "'excogramme\n\nL'île de la baie du monde\n\nLe , éponyme\n\nThe\n\n The\n\n 1933",
+   "hit": false
+  },
+  {
+   "id": "uni-07-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un litre vaut",
+   "gen": "vaut vaut avec une un Un Un Un\n\n\nilém Robinarin 2023\n\n Artéatiatiatiat 2023\n Institut Un\n Insee",
+   "hit": false
+  },
+  {
+   "id": "uni-07-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de millilitres contient un litre ?",
+   "gen": "'exc Conc Conc Conc\n\nRécep\n\nÉvé du Conc\nChâteau du Conc Concet\n\nTrophée du Conc",
+   "hit": false
+  },
+  {
+   "id": "uni-08-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La vitesse de la lumière est de",
+   "gen": "la entité\n\n\ninoern Lamaerve\n\nInstitut\n\n Institut\n In ZNIEFF\n\n Cet Atlantique\n\n Chapeau Atlantique\n Bourg",
+   "hit": false
+  },
+  {
+   "id": "uni-08-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est la vitesse de la lumière ?",
+   "gen": "Jeux Jeux Jeux\n\n Ar Jeux Jeuxal\n\nAr Jeux Jeuxéral\n\n Albert Jeux Jeuxtien\n\n Éric Jeux Jeuxeral",
+   "hit": false
+  },
+  {
+   "id": "uni-09-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le corps humain compte",
+   "gen": "une une une disparue disparue disparue entité\n\n\noinetéialeialeialeialialialaryaryaryanaanaanaanoanaanainoanaanaokana",
+   "hit": false
+  },
+  {
+   "id": "uni-09-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien d'os compte le corps humain ?",
+   "gen": "00\n\n23\n\n Armée\n\nGeorges II\n\n28\n\n Georges II\n ISO\n\n86\n\n George II",
+   "hit": false
+  },
+  {
+   "id": "uni-10-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La température du corps humain est de",
+   "gen": "la entité\n\n\n Assemblée\n\nAssemblée\n Asistrat\n\nJeanistrat-La La\n\nClaudeistrat Ami",
+   "hit": false
+  },
+  {
+   "id": "uni-10-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est la température normale du corps humain ?",
+   "gen": "Georges Ral\n\nYves Ral-\n\n Yves Ral A\n\nÉ Yves Rial\n\n É Yves RAL",
+   "hit": false
+  },
+  {
+   "id": "uni-11-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le système solaire compte",
+   "gen": "une entitélisli Ol Ol Ol\n\n\n La liste\n\nLa liste\nLa Lette\n\nLe Le\n\n Lock Le\nettmann",
+   "hit": false
+  },
+  {
+   "id": "uni-11-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de planètes compte le système solaire ?",
+   "gen": "'une Alb Alb\n\nRécep\n\n Récep de la Alb\nThe\n\n00\n\n Arbre Alb\nTr",
+   "hit": false
+  },
+  {
+   "id": "uni-12-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Une journée compte",
+   "gen": "19\n\n\n'’’’\n\n’’ W W W\n\n000000505050808080308080388080",
+   "hit": false
+  },
+  {
+   "id": "uni-12-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de secondes compte une journée ?",
+   "gen": "'une Albitimb Sch Sch Sch\n\n)\n\n00\n000000icalicalicaltryicalicalicsicalicalter",
+   "hit": false
+  },
+  {
+   "id": "uni-13-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La Terre tourne autour du Soleil en",
+   "gen": "Soleil\n\n\n Institut\n\nInstitut\n entité\n\noin Télal\n\nJean Télal de La\n\n Jean Télal du La",
+   "hit": false
+  },
+  {
+   "id": "uni-13-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En combien de jours la Terre tourne-t-elle autour du Soleil ?",
+   "gen": "'exc réun la Terreasasasrarara\n\n00\n\nRécep\n\nLe Dictionnaire\n\n Le Dictionnaire\nLe",
+   "hit": false
+  },
+  {
+   "id": "uni-14-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le symbole chimique de l'or est",
+   "gen": "une entité ilienscriptiongéarchives\n\n\n La liste du département\n\nLe Dictionnaire\n\n Le Dictionnaire\nLe\n\n Chiatriquement",
+   "hit": false
+  },
+  {
+   "id": "uni-14-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quel est le symbole chimique de l'or ?",
+   "gen": "L'or R Anne\n\n00\n\n Arbre R Anne-Évilien\n\n000\n\n Ibre Ronse\n\n ISO",
+   "hit": false
+  },
+  {
+   "id": "uni-15-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La molécule d'eau est",
+   "gen": "Institut d'Amérique\n\n Cet Cet Cet\n\n France Cet Cetieux\n\n Paris Cet Cetean\n\n Canada Cet Cet entité",
+   "hit": false
+  },
+  {
+   "id": "uni-15-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est la formule chimique de l'eau ?",
+   "gen": "Jeux Jeux Jeux\n\n Aristi Jeux\n Arsen Jeux\nArsen Jeux Histor\n\nArmer Jeux Histor Utre\n\n 2018",
+   "hit": false
+  },
+  {
+   "id": "uni-16-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "L'accélération de la pesanteur est de",
+   "gen": "de de Dein\n\n\n00\n\n Armée\n\n  ZNIEFF\n\n ZNIEFF\n Imil\n\n ISO\n\n I Mil\n\n entité",
+   "hit": false
+  },
+  {
+   "id": "uni-16-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est l'accélération de la pesanteur sur Terre ?",
+   "gen": "L'ambèque de la Roumanie\n\n00\n\n Albert-Albert-Albert\n\n 00\n Albert\n\nical\n Albert le",
+   "hit": false
+  },
+  {
+   "id": "uni-17-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le point d'ébullition de l'azote est de",
+   "gen": "son propre avec un simpleula du sanglier celui associé associé associé durant une seule avec un nouveau nouveaulorant du sangelier\n\n\n La liste du Mérite",
+   "hit": false
+  },
+  {
+   "id": "uni-17-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'azote bout-il ?",
+   "gen": "00\n\n Armée\n\n 1800\n\n Musté\n\neral\n\n 1935\n\n ZNIEFF\n\n XI\n\n Musée",
+   "hit": false
+  },
+  {
+   "id": "uni-18-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le nombre de chromosomes humains est de",
+   "gen": "0\n\n\n La liste du territoire\n\nUnitéstre\n\nLe Conseil\n\n Le Conseil\nLe conseil\nLe Bureau\n\nLes États",
+   "hit": false
+  },
+  {
+   "id": "uni-18-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de chromosomes compte une cellule humaine ?",
+   "gen": "'excanthanthanth Panth\n\n00\n\n Dil C'\n\nLe Dil\n\n Le Dil du\n\nThe",
+   "hit": false
+  },
+  {
+   "id": "uni-19-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Une année compte",
+   "gen": "7\n\n\n'estique du du du\n\nGeorges du du Du\n\n Georges du du Dé\n\narin du du Pacifique\n\nClaude du",
+   "hit": false
+  },
+  {
+   "id": "uni-19-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de jours compte une année non bissextile ?",
+   "gen": "La liste du Mérite\n\n'une Uriature\n\n00\n\n23\n\n TGV\n\nLe TGV\nLe SNCF",
+   "hit": false
+  },
+  {
+   "id": "uni-20-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La température d'ébullition de l'eau est de",
+   "gen": "la seule la seule entité ilurier du La\n\n\niodiflorent de la Laelline\n\n'ébaujoliition de l’",
+   "hit": false
+  },
+  {
+   "id": "uni-20-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'eau bout-elle en Fahrenheit ?",
+   "gen": "00\n\n Le Le Le\n\narinmannmannmannmanmanmanmermanmanmannmanmannmann entité\n\n''« Le Le",
+   "hit": false
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+ "init": "models/llm_25m_fr/model.safetensors",
+ "data": "runs/G6-chat-data/chat_packed.npz",
+ "steps": 20,
+ "batch_size": 2,
+ "accum": 1,
+ "seq_len": 256,
+ "lr": 1e-05,
+ "warmup_ratio": 0.1,
+ "weight_decay": 0.01,
+ "seed": 0,
+ "duration_s": 4.3
+}

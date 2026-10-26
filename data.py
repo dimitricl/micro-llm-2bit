@@ -225,6 +225,74 @@ def encode_mapped(tokenizer, vocab: dict, text: str, add_eos: bool = True) -> li
     return ids
 
 
+def make_qa_batches(
+    tokenizer,
+    vocab: dict,
+    examples: list[dict],
+    seq_len: int,
+    batch_size: int,
+    seed: int = 0,
+    field: str = "prompt",
+) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
+    """Batchs QA packés : entrées + labels alignés (prompt masqué).
+
+    Chaque exemple est `prompt + answer + eos`. Les labels valent -100 sur
+    le prompt et les pads ; seuls les tokens de réponse et l'eos comptent.
+    Plusieurs exemples sont concaténés dans une fenêtre de `seq_len + 1`
+    pour ne pas gaspiller le budget. Retourne deux listes de tenseurs
+    (B, seq_len+1), alignées.
+    """
+    import random as _random
+
+    rows: list[list[int]] = []
+    labs: list[list[int]] = []
+    cur: list[int] = []
+    curlab: list[int] = []
+    eos = vocab["eos_new"]
+
+    def flush() -> None:
+        nonlocal cur, curlab
+        if not cur:
+            return
+        pad = seq_len + 1 - len(cur)
+        rows.append(cur + [eos] * pad)
+        labs.append(curlab + [-100] * pad)
+        cur, curlab = [], []
+
+    order = list(range(len(examples)))
+    _random.Random(seed).shuffle(order)
+    skipped = 0
+    for idx in order:
+        ex = examples[idx]
+        prompt = ex.get(field, "")
+        answer = ex.get("answer", "")
+        if not prompt or not answer:
+            skipped += 1
+            continue
+        p = encode_mapped(tokenizer, vocab, prompt, add_eos=False)
+        a = encode_mapped(tokenizer, vocab, answer, add_eos=False)
+        seq = p + a + [eos]
+        lab = [-100] * len(p) + a + [eos]
+        if len(seq) > seq_len + 1:
+            skipped += 1
+            continue
+        if cur and len(cur) + len(seq) > seq_len + 1:
+            flush()
+        cur.extend(seq)
+        curlab.extend(lab)
+    flush()
+    if not rows:
+        raise ValueError("Aucun exemple QA ne tient dans seq_len.")
+    n_tok = sum(sum(1 for x in lab if x != -100) for lab in labs)
+    print(f"[qa-data] {len(examples)} exemples, {len(rows)} fenêtres, "
+          f"{n_tok/1e6:.1f}M tokens de réponse utiles, {skipped} sautés")
+    xs = [torch.tensor(rows[i:i + batch_size], dtype=torch.long)
+          for i in range(0, len(rows), batch_size)]
+    ys = [torch.tensor(labs[i:i + batch_size], dtype=torch.long)
+          for i in range(0, len(rows), batch_size)]
+    return xs, ys
+
+
 def make_batches(
     all_ids: list[int],
     seq_len: int,

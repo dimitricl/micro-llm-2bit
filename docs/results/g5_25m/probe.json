@@ -1,0 +1,1840 @@
+{
+ "summary": {
+  "n": 200,
+  "hit": 0.185,
+  "hit_ci95": [
+   0.135,
+   0.2401249999999993
+  ],
+  "by_slice": {
+   "par_coeur": {
+    "n": 100,
+    "hit": 0.21
+   },
+   "reformule": {
+    "n": 100,
+    "hit": 0.16
+   }
+  },
+  "by_categorie": {
+   "capitales": {
+    "n": 80,
+    "hit": 0.375
+   },
+   "dates": {
+    "n": 40,
+    "hit": 0.05
+   },
+   "definitions": {
+    "n": 40,
+    "hit": 0.125
+   },
+   "unites_sciences": {
+    "n": 40,
+    "hit": 0.0
+   }
+  }
+ },
+ "rows": [
+  {
+   "id": "cap-01-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La France est un pays dont la capitale est",
+   "gen": "Paris.\nLe pays est une région de l'Europe centrale, où les populations sont très nombreuses et variées. La France est le premier pays à avoir",
+   "hit": true
+  },
+  {
+   "id": "cap-01-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la France ?",
+   "gen": "La ville de Paris est une ville qui a été le théâtre de nombreuses manifestations culturelles et sportives.\nLe théâtre de la Ville, inauguré en , est un",
+   "hit": true
+  },
+  {
+   "id": "cap-02-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Italie est",
+   "gen": "à Rome, à l'exception du palais de la Cité.\nAu , la ville est le siège d'une province romaine et le siège de la",
+   "hit": true
+  },
+  {
+   "id": "cap-02-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Italie ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe château de la Motte-Berlioz, construit en 1750 par l'architecte Jean",
+   "hit": false
+  },
+  {
+   "id": "cap-03-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Espagne est un pays dont la capitale est",
+   "gen": "Madrid.\nLe Portugal est une région de l’Europe centrale, avec une population d’environ en 2020.\nLa ville de Lisbonne est une des villes",
+   "hit": true
+  },
+  {
+   "id": "cap-03-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Espagne ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe château de la Motte-Bertrand, construit en 1740 par le duc d'Orléans",
+   "hit": false
+  },
+  {
+   "id": "cap-04-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Allemagne est",
+   "gen": "à Berlin, à l'est de Berlin.\nAu début du , la ville est le théâtre d'un conflit entre les deux puissances européennes, la",
+   "hit": true
+  },
+  {
+   "id": "cap-04-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Allemagne ?",
+   "gen": "Liste des villes du Land de Rhénanie-du-Nord-Westphalie\nCommunes d'Alsace\nSite officiel de",
+   "hit": false
+  },
+  {
+   "id": "cap-05-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Portugal est un pays dont la capitale est",
+   "gen": "la ville de Lisbonne.\nLa ville est le siège du gouvernement de l'Union européenne depuis le .\nHistoire\nL’histoire de Lisbonne est liée à",
+   "hit": true
+  },
+  {
+   "id": "cap-05-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Portugal ?",
+   "gen": "Culture et patrimoine\nLangues\nLe portugais est une langue parlée par environ 80 % de la population.\nLa langue portugaise est parl",
+   "hit": false
+  },
+  {
+   "id": "cap-06-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Belgique est",
+   "gen": "Bruxelles.\nLe , la ville de Bruxelles est officiellement renommée Bruxelles-Midi, en raison de la proximité de Bruxelles et de la présence du gouvernement belge dans",
+   "hit": true
+  },
+  {
+   "id": "cap-06-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Belgique ?",
+   "gen": "La ville de Bruxelles, en Belgique, est une ville qui compte en 2018.\nHistoire\nL'histoire de la ville remonte à l'époque romaine",
+   "hit": true
+  },
+  {
+   "id": "cap-07-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Suisse est un pays dont la capitale est",
+   "gen": "Genève.\nLe canton de Genève est divisé en deux cantons : le canton de Vaud et le canton du Valais.\nHistoire\nL'histoire de la",
+   "hit": false
+  },
+  {
+   "id": "cap-07-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Suisse ?",
+   "gen": "La ville de Genève, en Suisse, est une des villes les plus peuplées du monde. Elle compte environ , dont en France métropolitaine et en Suisse rom",
+   "hit": false
+  },
+  {
+   "id": "cap-08-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Autriche est",
+   "gen": "à l'origine de la ville de Vienne.\nAu , Vienne est le siège d'une des plus importantes villes du royaume, la ville étant alors",
+   "hit": true
+  },
+  {
+   "id": "cap-08-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Autriche ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe château de la Motte-Berlioz, construit en 1750 par l'architecte Jean",
+   "hit": false
+  },
+  {
+   "id": "cap-09-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Grèce est un pays dont la capitale est",
+   "gen": "la Grèce.\nLe pays est divisé en trois régions :\nle nord-ouest, qui comprend la Grèce centrale et la Grèce orientale ;\nl'est",
+   "hit": false
+  },
+  {
+   "id": "cap-09-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Grèce ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe musée de la ville de Athènes, qui présente une collection d'objets du passé grec antique, est",
+   "hit": true
+  },
+  {
+   "id": "cap-10-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Pologne est",
+   "gen": "à l'origine de la ville de Varsovie.\nAu , la ville est le siège d'une cour impériale, la cour impériale de Pologne.",
+   "hit": true
+  },
+  {
+   "id": "cap-10-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Pologne ?",
+   "gen": "La ville de Varsovie a été le théâtre d'un épisode de la série télévisée Les Simpson, où le personnage principal, le capitaine de l'armée",
+   "hit": true
+  },
+  {
+   "id": "cap-11-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Russie est un pays dont la capitale est",
+   "gen": "la ville de Moscou.\nLe pays est également connu pour son économie, notamment grâce à l'industrie du pétrole et des gaz naturel.\nHistoire\nL",
+   "hit": true
+  },
+  {
+   "id": "cap-11-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Russie ?",
+   "gen": "La ville de Moscou est une des villes les plus peuplées du monde. Elle est le centre économique et culturel de l'oblast de Moscou, avec",
+   "hit": true
+  },
+  {
+   "id": "cap-12-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Chine est",
+   "gen": "à l'est, à l’ouest, à la frontière avec la Chine.\nLe territoire de la province du Shandong est divisé en deux parties",
+   "hit": false
+  },
+  {
+   "id": "cap-12-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Chine ?",
+   "gen": "La ville de Pékin, capitale du royaume de Qin, est fondée en 1600 par le roi de Qi. Elle est alors appelée « la ville",
+   "hit": true
+  },
+  {
+   "id": "cap-13-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Japon est un pays dont la capitale est",
+   "gen": "Tokyo.\nLa ville de Tokyo est une des villes les plus importantes du monde, avec plus de de population en 2020.\nHistoire\nPréhistoire et",
+   "hit": true
+  },
+  {
+   "id": "cap-13-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Japon ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe musée de l'histoire de la ville de Tokyo, qui présente des œuvres d'art et d",
+   "hit": true
+  },
+  {
+   "id": "cap-14-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Inde est",
+   "gen": "la ville de Peshawar, dans le district de Pisan.\nHistoire\nPeshawa est fondée en 1779 par le roi",
+   "hit": false
+  },
+  {
+   "id": "cap-14-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Inde ?",
+   "gen": "Liste des villes du Pakistan\nSite officiel de la ville de Peshawar\nVille en Inde\nPeuplement de l’",
+   "hit": false
+  },
+  {
+   "id": "cap-15-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Brésil est un pays dont la capitale est",
+   "gen": "Rio de Janeiro.\nLa ville est le siège du gouvernement de l'État brésilien, qui a été créé en 1960.\nGéographie\nS",
+   "hit": false
+  },
+  {
+   "id": "cap-15-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Brésil ?",
+   "gen": "Culture\nLa ville de Rio de Janeiro, capitale du pays, est le siège d'une université et d'un centre universitaire.\nS",
+   "hit": false
+  },
+  {
+   "id": "cap-16-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Argentine est",
+   "gen": "la ville la plus peuplée du pays.\nGéographie\nSituation\nLocalisation\nLe territoire de la municipalité de Santiago del Es",
+   "hit": false
+  },
+  {
+   "id": "cap-16-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Argentine ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe musée de la ville de Córdoba, qui présente une collection d'objets anciens.",
+   "hit": false
+  },
+  {
+   "id": "cap-17-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Canada est un pays dont la capitale est",
+   "gen": "Québec.\nL'État du Québec est divisé en trois régions :\nle Bas-Saint-Laurent, qui comprend le Bas-St-Laurent et la",
+   "hit": false
+  },
+  {
+   "id": "cap-17-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Canada ?",
+   "gen": "La ville de Québec, en Ontario, a été fondée en 1780 par le roi Louis XV. Elle est située à l'extrémité sud-",
+   "hit": false
+  },
+  {
+   "id": "cap-18-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Mexique est",
+   "gen": "située à l'est de la ville.\nGéographie\nSituation\nCapitale du Mexique, la ville est située dans le nord-",
+   "hit": false
+  },
+  {
+   "id": "cap-18-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Mexique ?",
+   "gen": "La ville de Mexico, qui compte environ , est le siège de l'État du Mexique.\nHistoire\nPériode pré-coloniale",
+   "hit": true
+  },
+  {
+   "id": "cap-19-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Égypte est un pays dont la capitale est",
+   "gen": "la ville de Karnak.\nLe pays est divisé en trois régions :\nle nord-ouest, qui comprend le pays de Koutaïssi et",
+   "hit": false
+  },
+  {
+   "id": "cap-19-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Égypte ?",
+   "gen": "La ville est aussi le siège du gouvernement de la République, qui a été créé en 1992.\nGéographie\nSituation\nLa commune de",
+   "hit": false
+  },
+  {
+   "id": "cap-20-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Maroc est",
+   "gen": "située à au sud-ouest de la ville.\nGéographie\nSituation\nLe territoire de la commune de Saint-Martin-de-la",
+   "hit": false
+  },
+  {
+   "id": "cap-20-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Maroc ?",
+   "gen": "La ville de Tanger, en Algérie, a été fondée en 1788 par le roi Louis XV.\nAu , la ville de Mostagan",
+   "hit": false
+  },
+  {
+   "id": "cap-21-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Algérie est un pays dont la capitale est",
+   "gen": "Alger.\nLe pays est divisé en trois régions :\nle nord-ouest, qui comprend les régions de Tizi Ouzou et de T",
+   "hit": true
+  },
+  {
+   "id": "cap-21-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Algérie ?",
+   "gen": "La ville de Tanger, en Algérie, a été fondée en 1685 par le roi Louis XIV.\nAu , la ville de Mostagan",
+   "hit": false
+  },
+  {
+   "id": "cap-22-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Tunisie est",
+   "gen": "située à au sud-ouest de Tunis.\nLe territoire de la commune est limitrophe de ceux de six communes :\nGéologie et relief\nLa superficie",
+   "hit": true
+  },
+  {
+   "id": "cap-22-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Tunisie ?",
+   "gen": "La ville de Tunis a été choisie pour accueillir le premier tour de l'élection présidentielle de 2007.\nLe , la ville de Mostaganem",
+   "hit": true
+  },
+  {
+   "id": "cap-23-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Sénégal est un pays dont la capitale est",
+   "gen": "la ville de Tombouctou.\nGéographie\nSituation\nLa ville de Ouagadougou est située dans le nord-",
+   "hit": false
+  },
+  {
+   "id": "cap-23-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Sénégal ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe musée de l'Égalité, situé dans le quartier de la Mare aux Pins.",
+   "hit": false
+  },
+  {
+   "id": "cap-24-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Nigeria est",
+   "gen": "située à au sud-ouest de la ville.\nGéographie\nSituation\nLe territoire de la commune de Santiago est situé dans le",
+   "hit": false
+  },
+  {
+   "id": "cap-24-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Nigeria ?",
+   "gen": "Culture\nLe Nigeria est une région de langue bantoue, qui comprend le nord-est du pays. Elle est aussi connue pour son dialecte",
+   "hit": false
+  },
+  {
+   "id": "cap-25-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Kenya est un pays dont la capitale est",
+   "gen": "la ville de Kinshasa.\nGéographie\nSituation\nLa ville de Kenya se trouve dans le nord-est du pays,",
+   "hit": false
+  },
+  {
+   "id": "cap-25-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Kenya ?",
+   "gen": "Aujourd'hui, la ville de Kinshasa a été le théâtre d'un épisode de la série télévisée Les Simpson.\nD",
+   "hit": false
+  },
+  {
+   "id": "cap-26-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Afrique du Sud est",
+   "gen": "à l'est, à l’ouest, à la frontière avec le Zimbabwe.\nLe pays est divisé en trois régions :\nle Z",
+   "hit": false
+  },
+  {
+   "id": "cap-26-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Afrique du Sud ?",
+   "gen": "Liste des villes et villages d'Afrique\nSite officiel de la ville de Bangkok\nVille en Afrique du Sud\nCapitale",
+   "hit": false
+  },
+  {
+   "id": "cap-27-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Australie est un pays dont la capitale est",
+   "gen": "la Nouvelle-Zélande.\nLe pays est divisé en trois régions :\nle nord, qui comprend les provinces de l'île de Nouvelle-Guinée",
+   "hit": false
+  },
+  {
+   "id": "cap-27-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Australie ?",
+   "gen": "Liste des villes australiennes par nombre d'habitants\nAutres villes australienne par nombre de population\nCulture\nMusées\nLe",
+   "hit": false
+  },
+  {
+   "id": "cap-28-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Norvège est",
+   "gen": "à l'origine de la ville de Kiel, qui a été fondée en 1636 par le roi Christian IV.\nAu , la ville est le",
+   "hit": false
+  },
+  {
+   "id": "cap-28-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Norvège ?",
+   "gen": "La ville de Kolborg, en Suède, a été fondée en 1709 par le roi de Suède Frédéric-Guillaume IV de Danemark. Elle",
+   "hit": false
+  },
+  {
+   "id": "cap-29-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Suède est un pays dont la capitale est",
+   "gen": "la Suède.\nLe pays est divisé en trois régions :\nle nord-est, qui comprend la Suède et la Finlande ;\nl'ouest, qui",
+   "hit": false
+  },
+  {
+   "id": "cap-29-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Suède ?",
+   "gen": "La ville de Stockholm, en Suède, a été fondée en 1779 par le roi de Suède Frédéric-Guillaume IV de Suède.\nLe ,",
+   "hit": true
+  },
+  {
+   "id": "cap-30-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale du Danemark est",
+   "gen": "à l'origine de la ville de Copenhague, qui a été fondée en 1610 par le roi Christian IV.\nAu , la ville est",
+   "hit": true
+  },
+  {
+   "id": "cap-30-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale du Danemark ?",
+   "gen": "Le , le roi de Norvège, , fait une entrée triomphale à Copenhague. Il y a un grand nombre d'hôtels",
+   "hit": true
+  },
+  {
+   "id": "cap-31-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La Finlande est un pays dont la capitale est",
+   "gen": "la Finlande.\nLe pays compte également une importante communauté juive, qui comprend aussi des communautés juives et juives.\nLangues\nLes langues officielles",
+   "hit": false
+  },
+  {
+   "id": "cap-31-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de la Finlande ?",
+   "gen": "La ville de Kolomno, située dans le nord-est de la Suède, est aussi connue pour son port de commerce et sa gare.",
+   "hit": false
+  },
+  {
+   "id": "cap-32-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de l'Irlande est",
+   "gen": "Dublin.\nLe , le Parlement du Royaume-Uni adopte une loi qui prévoit que les deux villes sont séparées par un seul État, mais que les",
+   "hit": true
+  },
+  {
+   "id": "cap-32-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de l'Irlande ?",
+   "gen": "Liste des villes d'Irlande du Nord\nLien externe\nSite officiel de la ville d'Idar-Ghazali",
+   "hit": false
+  },
+  {
+   "id": "cap-33-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Les Pays-Bas est un pays dont la capitale est",
+   "gen": "la ville de Bruxelles.\nLa ville est le siège du gouvernement fédéral belge, qui a succédé à la ville en 1970.\nGéographie\nS",
+   "hit": false
+  },
+  {
+   "id": "cap-33-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale des Pays-Bas ?",
+   "gen": "La ville de Bruxelles, capitale du royaume de Belgique, est le siège de l'administration de la province.\nListe des villes et villages d'",
+   "hit": false
+  },
+  {
+   "id": "cap-34-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Turquie est",
+   "gen": "à l'origine de la ville de Kızır, qui a été fondée en 1492 par les Ottomans.\nAu",
+   "hit": false
+  },
+  {
+   "id": "cap-34-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Turquie ?",
+   "gen": "La ville de Kızır, en Turquie, a été fondée en 1536 par les Ottomans. Elle est aujourd'hui",
+   "hit": false
+  },
+  {
+   "id": "cap-35-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Iran est un pays dont la capitale est",
+   "gen": "la ville de Téhéran.\nLe pays est divisé en trois régions :\nle district de Taza, qui comprend les villes suivantes :",
+   "hit": true
+  },
+  {
+   "id": "cap-35-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Iran ?",
+   "gen": "Autres\nListe des villes du Pakistan\nSite officiel de la ville d'Oman\nVille en Iran\nCapitale en Inde",
+   "hit": false
+  },
+  {
+   "id": "cap-36-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Corée du Sud est",
+   "gen": "à l'origine de la ville de Kwangju, située dans le nord-est de la province.\nHistoire\nPréhistoire et Antiquité",
+   "hit": false
+  },
+  {
+   "id": "cap-36-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Corée du Sud ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe musée de la ville de Canton, situé dans le quartier de la gare de Cogny,",
+   "hit": false
+  },
+  {
+   "id": "cap-37-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "Le Viêt Nam est un pays dont la capitale est",
+   "gen": "la ville de Nouméa.\nLa ville de Kourou est une région du nord-ouest de l'Afrique, située dans le Sud-",
+   "hit": false
+  },
+  {
+   "id": "cap-37-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale du Viêt Nam ?",
+   "gen": "Culture et patrimoine\nLieux et monuments\nLe musée de la ville de Cochinchine, qui présente une collection d'objets anciens et",
+   "hit": false
+  },
+  {
+   "id": "cap-38-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Thaïlande est",
+   "gen": "située à au sud-ouest de la ville.\nGéographie\nSituation\nLe territoire de la commune de Thai est situé dans le nord",
+   "hit": false
+  },
+  {
+   "id": "cap-38-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Thaïlande ?",
+   "gen": "La ville de Pondichéry, située dans le district de Pendjab, compte en 2020.\nHistoire\nPondichery est une",
+   "hit": false
+  },
+  {
+   "id": "cap-39-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "L'Ukraine est un pays dont la capitale est",
+   "gen": "la ville de Kiev.\nLe pays est divisé en trois régions :\nle nord-ouest, qui comprend la région de Krasnodar et",
+   "hit": true
+  },
+  {
+   "id": "cap-39-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle ville est la capitale de l'Ukraine ?",
+   "gen": "Liste des villes et villages d'Ukraine\nSite officiel de la ville de Kiev\nVille en Ukraine\nVille dans l'oblast",
+   "hit": true
+  },
+  {
+   "id": "cap-40-pc",
+   "categorie": "capitales",
+   "slice": "par_coeur",
+   "perimetre": "domaine_etroit",
+   "prompt": "La capitale de la Roumanie est",
+   "gen": "à l'origine de la ville de Bucarest, qui a été fondée en 1336 par le roi de Hongrie.\nAu , la ville est",
+   "hit": true
+  },
+  {
+   "id": "cap-40-rf",
+   "categorie": "capitales",
+   "slice": "reformule",
+   "perimetre": "domaine_etroit",
+   "prompt": "Quelle est la capitale de la Roumanie ?",
+   "gen": "La ville de Bucarest, en Roumanie, a été fondée en 1600 par les Romains. Elle est aujourd'hui le siège du diocèse de Buc",
+   "hit": true
+  },
+  {
+   "id": "dat-01-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la Révolution française date de",
+   "gen": "1778.\nLe , la commune est rattachée à la nouvelle province du Languedoc-Roussillon.\nPolitique et administration\nAdministration municipale",
+   "hit": false
+  },
+  {
+   "id": "dat-01-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la Révolution française ?",
+   "gen": "La Révolution française est une période de crise qui va durer jusqu'à la fin du .\nLe , la Convention nationale, qui avait été créée le",
+   "hit": false
+  },
+  {
+   "id": "dat-02-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la prise de la Bastille a eu lieu en",
+   "gen": ".\nLe , le roi Louis XIII, qui avait pris le château de Saint-Germain-en-Laye, est assassiné par un officier de l'",
+   "hit": false
+  },
+  {
+   "id": "dat-02-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la prise de la Bastille ?",
+   "gen": "Le , le roi Louis XIII, qui avait été couronné roi de France à Paris, est couronné à Paris.\nAprès la mort du roi",
+   "hit": false
+  },
+  {
+   "id": "dat-03-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le sacre de Napoléon date de",
+   "gen": "1816.\nLe monument aux morts, situé dans le cimetière, est inauguré en .\nPersonnalités liées à la commune\nHéraldique\nListe",
+   "hit": false
+  },
+  {
+   "id": "dat-03-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu le sacre de Napoléon ?",
+   "gen": "Le , le roi Louis-Philippe est couronné roi de France à Versailles.\nEn 1823, le roi est couronnés roi de Naples et de",
+   "hit": false
+  },
+  {
+   "id": "dat-04-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la bataille de Waterloo a eu lieu en",
+   "gen": ".\nLa bataille de la rivière Kwaï, qui se déroula à l'est du fleuve Kwaku, a été un échec.",
+   "hit": false
+  },
+  {
+   "id": "dat-04-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la bataille de Waterloo ?",
+   "gen": "Cette bataille est l'occasion pour les Français d'une retraite rapide et sans succès.\nLa bataille de la Marne\nLe , les troupes françaises",
+   "hit": false
+  },
+  {
+   "id": "dat-05-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la chute de Constantinople date de",
+   "gen": "380.\nL'empereur byzantin Justinien (330-340) est un empereur d'Occident, qui règne sur l'Empire byzantin en",
+   "hit": false
+  },
+  {
+   "id": "dat-05-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la chute de Constantinople ?",
+   "gen": "Conséquences\nLa chute de l'Empire romain d'Occident, qui avait été une période de prospérité et de prospérité pour l'Église,",
+   "hit": false
+  },
+  {
+   "id": "dat-06-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la découverte de l'Amérique a eu lieu en",
+   "gen": "1779.\nEn 1780, le roi Louis XV ordonne la construction d'une nouvelle église à Saint-Germain-en-Laye.\nLe",
+   "hit": false
+  },
+  {
+   "id": "dat-06-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la découverte de l'Amérique ?",
+   "gen": "Dans les années 1950, le gouvernement américain a décidé de mettre en place un système d’information sur les pays en voie de développement. Le gouvernement américain",
+   "hit": false
+  },
+  {
+   "id": "dat-07-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la mort de Louis XIV date de",
+   "gen": "1778.\nLe château de la Motte-Blanche, construit en 1779 par le duc d'Orléans, est un des plus anciens du royaume",
+   "hit": false
+  },
+  {
+   "id": "dat-07-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la mort de Louis XIV ?",
+   "gen": "Le , Louis XIV, qui avait été le premier roi de France à se rendre en France, est couronné roi de Navarre par le roi de Suède.",
+   "hit": false
+  },
+  {
+   "id": "dat-08-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la Révolution russe a eu lieu en",
+   "gen": "1788.\nLa ville est le siège de la province du même nom, créée en 1778.\nAu , la ville est l'une des",
+   "hit": false
+  },
+  {
+   "id": "dat-08-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la Révolution russe ?",
+   "gen": "La révolution russe de 1917\nLe , la Russie et l'Union soviétique signent un traité d'amitié et de coopération avec l'URSS. Le",
+   "hit": true
+  },
+  {
+   "id": "dat-09-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la fin de la Première Guerre mondiale date de",
+   "gen": "l'année 1914.\nLe monument aux morts, inauguré le , est situé dans le cimetière communal.\nPersonnalités liées à la commune\nHéraldique",
+   "hit": false
+  },
+  {
+   "id": "dat-09-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la fin de la Première Guerre mondiale ?",
+   "gen": "Le , le gouvernement français décide de supprimer les deux tiers des communes de la commune.\nPolitique et administration\nAdministration municipale\nListe des",
+   "hit": false
+  },
+  {
+   "id": "dat-10-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la fin de la Seconde Guerre mondiale a eu lieu en",
+   "gen": "1945.\nLa ville est le siège du gouvernement de la République française, qui a succédé à la République en 1946.\nPolitique et administration\nR",
+   "hit": true
+  },
+  {
+   "id": "dat-10-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la fin de la Seconde Guerre mondiale ?",
+   "gen": "Le , le général de Gaulle, qui avait été nommé commandant en chef des forces françaises libres, est remplacé par le général Louis-Napoléon Bonaparte.",
+   "hit": false
+  },
+  {
+   "id": "dat-11-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la libération de Paris date de",
+   "gen": "la Révolution française.\nLe , le roi Louis XVI, qui avait été couronné roi d'Espagne par le pape Pie VII, est élu roi des Français",
+   "hit": false
+  },
+  {
+   "id": "dat-11-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la libération de Paris ?",
+   "gen": "Le , le président de la République François Hollande annonce qu'il ne sera pas candidat à l’élection présidentielle.\nLe président de l'Assemblée nationale",
+   "hit": false
+  },
+  {
+   "id": "dat-12-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la bataille de Verdun a eu lieu en",
+   "gen": "1453.\nLa ville est prise par les Français en 1513, puis reprise par les Anglais en 1514.\nEn 1515, la ville est",
+   "hit": false
+  },
+  {
+   "id": "dat-12-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu la bataille de Verdun ?",
+   "gen": "Contexte historique\nLa bataille de la Marne est une victoire des troupes françaises du général de Gaulle, qui a été le premier à faire face à l",
+   "hit": false
+  },
+  {
+   "id": "dat-13-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le traité de Versailles date de",
+   "gen": "1685.\nLe , le roi Louis XIV ordonne la construction d'une nouvelle église, dédiée à Notre-Dame de Paris, dans l'ancien couvent",
+   "hit": false
+  },
+  {
+   "id": "dat-13-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu le traité de Versailles ?",
+   "gen": "Le traité de Paris, signé le , entre la France et l'Angleterre, est signé à Versailles le .\nLa France, qui n'a pas",
+   "hit": false
+  },
+  {
+   "id": "dat-14-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le traité de Rome a eu lieu en",
+   "gen": "1214.\nLa ville est le siège du comté de Flandre, qui comprend les comtés de Flandre et de Hainaut.\nEn 1215, le roi",
+   "hit": false
+  },
+  {
+   "id": "dat-14-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu le traité de Rome ?",
+   "gen": "Le traité de Paris, signé le , entre la France et l'Angleterre, est signé à Paris le .\nLa France, qui avait été en guerre",
+   "hit": false
+  },
+  {
+   "id": "dat-15-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la chute du mur de Berlin date de",
+   "gen": "la fin de la Seconde Guerre mondiale.\nLe , le gouvernement allemand annonce que la ville sera libérée par les troupes allemandes.\nPolitique et administration",
+   "hit": false
+  },
+  {
+   "id": "dat-15-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la chute du mur de Berlin ?",
+   "gen": "Le , le président de la République française, François Hollande, annonce que la France sera officiellement libérée par les troupes françaises.\nLe président de l'",
+   "hit": false
+  },
+  {
+   "id": "dat-16-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Mai 68 a eu lieu en",
+   "gen": "mai 68.\nLe , le président de la République François Mitterrand, qui avait été nommé ministre des Affaires étrangères, annonce que le gouvernement de Jacques Chirac est prêt",
+   "hit": false
+  },
+  {
+   "id": "dat-16-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu Mai 68 ?",
+   "gen": ", le , la ville de Paris a été choisie pour accueillir les Jeux olympiques d'été de 2024.\nLe , la Ville de Paris annonce que",
+   "hit": false
+  },
+  {
+   "id": "dat-17-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la création de l'ONU date de",
+   "gen": "la fin des années 1970.\nLe , le président de la République française François Mitterrand, en visite officielle à Paris, annonce que le président du Conseil de l",
+   "hit": false
+  },
+  {
+   "id": "dat-17-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la création de l'ONU ?",
+   "gen": "L’ONU est une organisation internationale qui regroupe des pays membres de l’Organisation des Nations unies. Elle est membre du Conseil de sécurité des Nations Unies",
+   "hit": false
+  },
+  {
+   "id": "dat-18-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "le premier pas sur la Lune a eu lieu en",
+   "gen": ".\nLe , le président de la République Nicolas Sarkozy annonce que le projet de la Lune est abandonné.\nLe président de l'Assemblée nationale, François Hollande",
+   "hit": false
+  },
+  {
+   "id": "dat-18-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu le premier pas sur la Lune ?",
+   "gen": "Le , le président de la République François Hollande annonce que la Lune sera la première planète à être découverte en orbite autour du Soleil.\nContexte",
+   "hit": false
+  },
+  {
+   "id": "dat-19-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la Révolution de 1848 date de",
+   "gen": "l'indépendance du pays.\nLe , la ville est le théâtre d'un coup d'État militaire, qui met fin à la guerre civile espagnole et",
+   "hit": false
+  },
+  {
+   "id": "dat-19-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quand a eu lieu la Révolution de 1848 ?",
+   "gen": "La Révolution de 1789\nLe , la Convention nationale (1792-1795) est créée.\nEn 1793, la commune est le chef-lieu",
+   "hit": false
+  },
+  {
+   "id": "dat-20-pc",
+   "categorie": "dates",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "l'abdication de Napoléon a eu lieu en",
+   "gen": ".\nLe , le roi Louis-Philippe est couronné roi de Naples.\nEn 1823, le roi de France Louis-Napoléon Bonaparte est cour",
+   "hit": false
+  },
+  {
+   "id": "dat-20-rf",
+   "categorie": "dates",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En quelle année a eu lieu l'abdication de Napoléon ?",
+   "gen": "Le , le roi Louis-Philippe est couronné roi de Prusse à Berlin.\nLe roi de France, qui n'a pas d'héritier",
+   "hit": false
+  },
+  {
+   "id": "def-01-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « photosynthèse » désigne",
+   "gen": "un ensemble de cellules qui sont des cellules qui ont une structure particulière.\nLes cellules de la photosynthétique sont des organismes qui possèdent des cellules de l'",
+   "hit": false
+  },
+  {
+   "id": "def-01-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on la photosynthèse ?",
+   "gen": "Cette étude a été menée par le professeur de biologie et de biologie de l'université de Californie à Berkeley, John C. Coleman",
+   "hit": false
+  },
+  {
+   "id": "def-02-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la gravité est",
+   "gen": "de .\nLe nombre de jours de pluie est de , soit le nombre de mois le plus important.\nLes jours de neige sont généralement de , mais ils",
+   "hit": false
+  },
+  {
+   "id": "def-02-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « gravité » ?",
+   "gen": "Cette définition est très proche de celle du concept de « gravité ».\nDans le cas où le terme « gravité », qui est un nombre réel,",
+   "hit": false
+  },
+  {
+   "id": "def-03-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « monarchie » désigne",
+   "gen": "une forme de gouvernement, qui est un système politique et social.\nLa monarchie est le nom donné à la personne du roi par l'empereur, qui a",
+   "hit": true
+  },
+  {
+   "id": "def-03-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on la monarchie ?",
+   "gen": "Cette notion de monarchie est une notion qui s'applique à tous les États, et qui n'est pas un concept. Elle est donc une notion",
+   "hit": false
+  },
+  {
+   "id": "def-04-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la démocratie est",
+   "gen": "un système de démocratie directe.\nLe système de la démocratie directe est une forme d'organisation politique qui consiste à mettre en place des institutions et des moyens pour",
+   "hit": false
+  },
+  {
+   "id": "def-04-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « démocratie » ?",
+   "gen": "Le terme de démocratie est utilisé dans le langage courant pour désigner une forme d'organisation politique qui consiste à désigner un ensemble de personnes, et qui peut être",
+   "hit": false
+  },
+  {
+   "id": "def-05-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « ADN » désigne",
+   "gen": "un ensemble de mots qui ont été utilisés dans le langage courant pour désigner les mots qui ne sont pas des mots.\nCependant, le terme « A",
+   "hit": false
+  },
+  {
+   "id": "def-05-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on l'ADN ?",
+   "gen": "Cette notion de « génération » est une notion qui permet de définir les gènes et les gènes. Elle est définie par la définition de la génération, c",
+   "hit": false
+  },
+  {
+   "id": "def-06-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "une métaphore est",
+   "gen": "un concept de l'univers, qui se trouve dans le monde réel.\nL’idée d’un univers est une idée de l’univers, c",
+   "hit": false
+  },
+  {
+   "id": "def-06-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « métaphore » ?",
+   "gen": "Cette phrase est une référence à la pensée de l'écrivain, qui a été reprise par le poète et critique littéraire Jean-Jacques Rousseau dans son roman",
+   "hit": false
+  },
+  {
+   "id": "def-07-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « péninsule » désigne",
+   "gen": "un ensemble de vallées qui s'étendent sur les départements du Nord-Pas-de-Calais et de l’Artois.\nCette région est caractér",
+   "hit": false
+  },
+  {
+   "id": "def-07-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on une péninsule ?",
+   "gen": "Cette péninsule est un ensemble de îles, dont les plus importantes sont :\nla péninsule de l'île de la Cité (ou de la Grande-",
+   "hit": false
+  },
+  {
+   "id": "def-08-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un archipel est",
+   "gen": "un archipel de l'océan Pacifique, situé à l'ouest du détroit de Tasmanie.\nLe détroit de l’île de Temar",
+   "hit": false
+  },
+  {
+   "id": "def-08-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « archipel » ?",
+   "gen": "L'île de la Cité est une île située à l'ouest du continent américain, au large des côtes de la mer des Caraïbes.",
+   "hit": false
+  },
+  {
+   "id": "def-09-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « fleuve » désigne",
+   "gen": "un cours d'eau qui se jette dans la mer Méditerranée.\nGéographie\nLocalisation\nLa commune est située à au sud-ouest de",
+   "hit": true
+  },
+  {
+   "id": "def-09-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on un fleuve ?",
+   "gen": "Cours d'eau dans le Pas-de-Calais\nSystème hydrologique de la France\nCommune du Conflent\nVilles et",
+   "hit": false
+  },
+  {
+   "id": "def-10-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "une rivière est",
+   "gen": "située à au sud-ouest de la ville.\nLa commune est limitrophe de la France, elle est traversée par la rivière de la Loire qui prend sa source",
+   "hit": false
+  },
+  {
+   "id": "def-10-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « rivière » ?",
+   "gen": "Le nom de la ville est attesté sous les formes latinisées de Sancti Petri en 1066, Sanctis Petri vers 1070,",
+   "hit": false
+  },
+  {
+   "id": "def-11-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « climat » désigne",
+   "gen": "l'ensemble des climats de montagne qui s’étend de la montagne à l'ouest, le long du littoral.\nLes paramètres climatiques qui ont permis d",
+   "hit": false
+  },
+  {
+   "id": "def-11-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on le climat ?",
+   "gen": ", Paris, Éditions du Cerf, coll. « Les Belles Lettres », 2007,\n« Le climat est un phénomène de la vie quotidienne : l'",
+   "hit": false
+  },
+  {
+   "id": "def-12-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "l'économie est",
+   "gen": "de plus en plus marquée par la crise économique et sociale.\nLa croissance économique est très rapide, avec un taux d’inflation de 7,5 %",
+   "hit": false
+  },
+  {
+   "id": "def-12-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « économie » ?",
+   "gen": "L'économie de la ville est essentiellement tournée vers l'agriculture et l'élevage.\nLa ville est également le siège du parc national des Casc",
+   "hit": false
+  },
+  {
+   "id": "def-13-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « philosophie » désigne",
+   "gen": "une forme de philosophie qui consiste à étudier les faits et à la comprendre.\nL'expression « philosophie de l’esprit » est utilisée pour désigner les éléments",
+   "hit": false
+  },
+  {
+   "id": "def-13-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on la philosophie ?",
+   "gen": "Cette philosophie est une science qui étudie les phénomènes physiques et les phénomènes de l'univers. Elle est fondée sur la connaissance des phénomènes physiques, mais aussi",
+   "hit": false
+  },
+  {
+   "id": "def-14-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un roman est",
+   "gen": "un roman de science-fiction, écrit en collaboration avec le scénariste et réalisateur français Jean-Claude Brialy.\nLe roman est adapté en film d'animation",
+   "hit": true
+  },
+  {
+   "id": "def-14-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « roman » ?",
+   "gen": "Le roman de la série télévisée Les Aventures de Tintin, intitulé Le Secret de la Licorne, est un roman de science-fiction écrit par le",
+   "hit": true
+  },
+  {
+   "id": "def-15-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « symphonie » désigne",
+   "gen": "un ensemble de mouvements qui se produisent dans le temps et qui sont des mouvements qui s'insèrent dans le sens du mouvement.\nLorsque l’",
+   "hit": false
+  },
+  {
+   "id": "def-15-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on une symphonie ?",
+   "gen": "Cette œuvre est un hommage à la musique classique, et non pas à la danse.\nL'œuvre de Jerzy Kawalcz",
+   "hit": false
+  },
+  {
+   "id": "def-16-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un vaccin est",
+   "gen": "un vaccin de la famille des cancers.\nChez l'homme, le virus est responsable d'une infection virale (inf",
+   "hit": false
+  },
+  {
+   "id": "def-16-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « vaccin » ?",
+   "gen": "Le vaccin est un vaccin qui consiste à éliminer les virus et les virus. Il peut être utilisé pour le traitement de la maladie infectie",
+   "hit": true
+  },
+  {
+   "id": "def-17-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « inflation » désigne",
+   "gen": "un système de production d'énergie qui permet de produire des biens et des services.\nDans le domaine de l’économie, le terme « infl",
+   "hit": false
+  },
+  {
+   "id": "def-17-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on l'inflation ?",
+   "gen": "Cette définition est une des premières définitions de la notion d'influorescence. Elle est utilisée dans le cadre de la théorie des équations",
+   "hit": false
+  },
+  {
+   "id": "def-18-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "un écosystème est",
+   "gen": "un ensemble de structures qui sont des structures de l'univers, et qui peuvent être des structures d'une même espèce.\nLes structures de la Terre sont",
+   "hit": false
+  },
+  {
+   "id": "def-18-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « écosystème » ?",
+   "gen": "L'écologie est une science qui étudie les écosystèmes et les éco-familles.\nLa science est un domaine de recherche",
+   "hit": false
+  },
+  {
+   "id": "def-19-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le mot « altitude » désigne",
+   "gen": "un ensemble de points d'altitude, qui se trouvent dans le sens des aiguilles d'une montre.\nLes points d’altitude sont les points d",
+   "hit": false
+  },
+  {
+   "id": "def-19-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Comment définit-on une altitude ?",
+   "gen": "Cette définition est la plus simple et la plus précise, mais elle ne peut être utilisée que pour des raisons de sécurité.\nLa définition de la distance",
+   "hit": false
+  },
+  {
+   "id": "def-20-pc",
+   "categorie": "definitions",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "la génétique est",
+   "gen": "la plus importante de tous les animaux.\nCette espèce est très commune dans les régions tempérées et subtropicales, notamment en Amérique du Nord et",
+   "hit": false
+  },
+  {
+   "id": "def-20-rf",
+   "categorie": "definitions",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Que signifie « génétique » ?",
+   "gen": "Cette notion de génétique est à l'origine du concept d'« génétique » qui a été utilisé par les chercheurs pour décrire la génétique.\nDans",
+   "hit": false
+  },
+  {
+   "id": "uni-01-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "L'eau bout à",
+   "gen": "la fin de l'été est très peu dense.\nCette eau est aussi utilisée pour la production d'huile essentielle, notamment dans les pays du",
+   "hit": false
+  },
+  {
+   "id": "uni-01-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'eau bout-elle ?",
+   "gen": "Cette eau est un des éléments qui permettent de la distinguer de la matière organique.\nLa matière organique est une matière organique, c’est-à",
+   "hit": false
+  },
+  {
+   "id": "uni-02-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "L'eau gèle à",
+   "gen": "l'air libre.\nCulture et société\nDans le domaine de la musique, le terme « geek » désigne une forme musicale qui se",
+   "hit": false
+  },
+  {
+   "id": "uni-02-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'eau gèle-t-elle ?",
+   "gen": "Cette eau est très peu dense, mais elle peut aussi être utilisée pour la production de gaz à effet de serre.\nLa quantité d'eau",
+   "hit": false
+  },
+  {
+   "id": "uni-03-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un kilomètre vaut",
+   "gen": ".\nLe nombre de kilomètres parcourus par le fleuve est de .\nLa ville de Saint-Malo est située à environ au sud-ouest du centre",
+   "hit": false
+  },
+  {
+   "id": "uni-03-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de mètres contient un kilomètre ?",
+   "gen": "L'épave du Poteau, située à l'entrée du village, est en fait une des plus anciennes traces de l'histoire de la",
+   "hit": false
+  },
+  {
+   "id": "uni-04-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un mètre contient",
+   "gen": "un nombre de points de la surface de la Terre.\nLa surface de l'eau est composée de deux éléments : le plus grand, le plus petit,",
+   "hit": false
+  },
+  {
+   "id": "uni-04-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de centimètres contient un mètre ?",
+   "gen": "Méthode d'analyse\nLorsqu'un échantillon est composé d'une seule pièce, on parle de « phase » (ou phase",
+   "hit": false
+  },
+  {
+   "id": "uni-05-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Une heure dure",
+   "gen": "de long, avec une température moyenne de .\nLe , la température moyenne annuelle est de , avec un maximum moyen de . La température la plus basse a été",
+   "hit": false
+  },
+  {
+   "id": "uni-05-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de minutes dure une heure ?",
+   "gen": "Le , le président de la République François Hollande annonce qu'il ne sera pas candidat à l'élection présidentielle.\nLe président de l'Assemblée nationale",
+   "hit": false
+  },
+  {
+   "id": "uni-06-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un kilogramme vaut",
+   "gen": "1,5 kg/kg.\nLe kilogramme est le plus souvent utilisé en France pour les voitures de tourisme et les voitures d'affaires.",
+   "hit": false
+  },
+  {
+   "id": "uni-06-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de grammes contient un kilogramme ?",
+   "gen": "Le gramme de grain est composé d'un seul élément : le gramme d'eau, qui est constitué d'une seule pièce. Le",
+   "hit": false
+  },
+  {
+   "id": "uni-07-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Un litre vaut",
+   "gen": "1,5 % de la masse du corps.\nLe nombre de paires de pions est égal à 1,25 % de l'ensemble des p",
+   "hit": false
+  },
+  {
+   "id": "uni-07-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de millilitres contient un litre ?",
+   "gen": "Le litre est une pièce d'une pièce de théâtre, composée de trois parties :\nle litre de scène (ou litre) ;",
+   "hit": false
+  },
+  {
+   "id": "uni-08-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La vitesse de la lumière est de",
+   "gen": ".\nLe principe de la relativité générale est que le temps est nul, et que le mouvement est nul.\nDans le cas d'un système",
+   "hit": false
+  },
+  {
+   "id": "uni-08-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est la vitesse de la lumière ?",
+   "gen": "La vitesse de l'onde est la constante de Planck, qui est la valeur de la vitesse du rayonnement électromagnétique.\nDans le cas",
+   "hit": false
+  },
+  {
+   "id": "uni-09-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le corps humain compte",
+   "gen": "environ .\nLes corps humains sont en général plus petits que les corps humains, mais ils ne sont pas tous plus grands que les autres. Les corps humains ont",
+   "hit": false
+  },
+  {
+   "id": "uni-09-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien d'os compte le corps humain ?",
+   "gen": "Le corps humain est un élément de la physique, c'est-à-dire une partie du corps qui est en fait un corps.\nUn corps",
+   "hit": false
+  },
+  {
+   "id": "uni-10-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La température du corps humain est de",
+   "gen": ", avec une moyenne de .\nLe corps humain a une température de , et une température d'environ , avec un maximum de . La température de la surface",
+   "hit": false
+  },
+  {
+   "id": "uni-10-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est la température normale du corps humain ?",
+   "gen": "Cette notion de température est une des caractéristiques de l'environnement. Elle est définie par la relation suivante :\noù est le nombre d'éléments chimiques",
+   "hit": false
+  },
+  {
+   "id": "uni-11-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le système solaire compte",
+   "gen": "de nombreuses planètes, dont la planète Vénus.\nLes planètes sont des planètes géantes, qui ont une orbite autour du Soleil et qui ont un diamètre compris entre",
+   "hit": false
+  },
+  {
+   "id": "uni-11-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de planètes compte le système solaire ?",
+   "gen": "Le système solaire est un système qui a pour but d'assurer la stabilité des planètes et de les maintenir dans l'espace. Il est composé de deux",
+   "hit": false
+  },
+  {
+   "id": "uni-12-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Une journée compte",
+   "gen": "plus de .\nLe , le président de la République François Hollande annonce qu'il ne sera pas candidat à l'élection présidentielle.\nLe président de l",
+   "hit": false
+  },
+  {
+   "id": "uni-12-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de secondes compte une journée ?",
+   "gen": "Le , le président de la République François Hollande annonce qu'il ne sera pas candidat à l'élection présidentielle.\nLe président de l'Assemblée nationale",
+   "hit": false
+  },
+  {
+   "id": "uni-13-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La Terre tourne autour du Soleil en",
+   "gen": "raison de la présence d'un système de coordonnées célestes.\nDans le cas des planètes, la Terre est une planète dont l'orbite est",
+   "hit": false
+  },
+  {
+   "id": "uni-13-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "En combien de jours la Terre tourne-t-elle autour du Soleil ?",
+   "gen": "Cette série est en fait une adaptation de la nouvelle La Terre, écrite par Jean-Claude Carrière.\nSynopsis\nDans le futur",
+   "hit": false
+  },
+  {
+   "id": "uni-14-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le symbole chimique de l'or est",
+   "gen": "le « d » (ou « d »).\nDans les autres domaines, le symbole peut être utilisé pour représenter des éléments chimiques ou chimiques.\nEn chimie",
+   "hit": false
+  },
+  {
+   "id": "uni-14-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quel est le symbole chimique de l'or ?",
+   "gen": "Cette figure a été utilisée dans la construction des bâtiments publics et dans les travaux de restauration.\nDans le domaine de l’architecture, la figure",
+   "hit": false
+  },
+  {
+   "id": "uni-15-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La molécule d'eau est",
+   "gen": "un acide aminé, qui se lie à l'acide aminé.\nCes molécules sont appelées « acides aminés » ou « acides de la mer",
+   "hit": false
+  },
+  {
+   "id": "uni-15-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est la formule chimique de l'eau ?",
+   "gen": "Cette formule chimique est utilisée dans les domaines de la chimie, de la physique et des sciences de la Terre.\nDans le domaine de la biologie",
+   "hit": false
+  },
+  {
+   "id": "uni-16-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "L'accélération de la pesanteur est de",
+   "gen": "l'ordre de .\nLa pesanteur peut être utilisée pour mesurer la masse volumique de l’air, ou pour mesurer le volume d’un",
+   "hit": false
+  },
+  {
+   "id": "uni-16-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Quelle est l'accélération de la pesanteur sur Terre ?",
+   "gen": "Lorsque l'on a une masse de , on a une vitesse de rotation de .\nLa masse de la planète est égale à la masse de",
+   "hit": false
+  },
+  {
+   "id": "uni-17-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le point d'ébullition de l'azote est de",
+   "gen": "l’ordre de .\nLorsque l'oxygène est en phase gazeuse, le point d’ébullisation est situé à la surface de",
+   "hit": false
+  },
+  {
+   "id": "uni-17-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'azote bout-il ?",
+   "gen": "Cependant, la température de l’air est très élevée et les températures sont plus élevées que dans le cas des gaz à effet de serre.",
+   "hit": false
+  },
+  {
+   "id": "uni-18-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Le nombre de chromosomes humains est de",
+   "gen": "3, mais il n'y a pas d'un seul chromosome.\nCette espèce est très proche des autres espèces de lépidoptères (par",
+   "hit": false
+  },
+  {
+   "id": "uni-18-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de chromosomes compte une cellule humaine ?",
+   "gen": "Les cellules de la mère sont les cellules de l'enfant. Elles ont pour fonction de protéger les cellules du corps et de la mémoire, elles sont responsables",
+   "hit": false
+  },
+  {
+   "id": "uni-19-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "Une année compte",
+   "gen": "tenu de la situation du pays.\nLe , le président de la République François Hollande annonce que le gouvernement de la république de Chine est en cours d'élaboration",
+   "hit": false
+  },
+  {
+   "id": "uni-19-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "Combien de jours compte une année non bissextile ?",
+   "gen": "L'année de l'an 2000 est celle du cycle de vie des espèces menacées.\nLes espèces menacée sont :\nla truite f",
+   "hit": false
+  },
+  {
+   "id": "uni-20-pc",
+   "categorie": "unites_sciences",
+   "slice": "par_coeur",
+   "perimetre": "wiki_general",
+   "prompt": "La température d'ébullition de l'eau est de",
+   "gen": ".\nCette température est très élevée, mais elle peut être plus basse que dans le cas des eaux de surface.\nLorsque la température augmente,",
+   "hit": false
+  },
+  {
+   "id": "uni-20-rf",
+   "categorie": "unites_sciences",
+   "slice": "reformule",
+   "perimetre": "wiki_general",
+   "prompt": "À quelle température l'eau bout-elle en Fahrenheit ?",
+   "gen": "Cette situation est très difficile à déterminer.\nLa température de la surface de la planète est très élevée, mais elle peut être très basse (de quelques",
+   "hit": false
+  }
+ ]
+}

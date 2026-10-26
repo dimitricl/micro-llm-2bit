@@ -26,7 +26,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model import CONFIGS, TinyTransformer
+from model import CONFIGS, TernaryLinear, TinyTransformer
 
 # Les opérateurs MPS manquants retombent sur CPU (requis sur certains Macs).
 os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
@@ -402,6 +402,65 @@ def cosine_with_warmup(optimizer, warmup_steps: int, total_steps: int):
     return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_fn)
 
 
+def wsd_with_warmup(
+    optimizer,
+    warmup_steps: int,
+    total_steps: int,
+    decay_frac: float = 0.2,
+    min_ratio: float = 0.1,
+):
+    """Scheduler WSD (warmup -> stable -> decay) pour une tranche courte.
+
+    - warmup linéaire sur `warmup_steps` ;
+    - plateau à 1,0x jusqu'à `(1 - decay_frac) * total_steps` ;
+    - décroissance cosinus jusqu'à `min_ratio` sur la fin.
+
+    Contraste avec `cosine_with_warmup`, qui décroît dès la fin du warmup :
+    sur 924 steps, le WSD garde le LR haut plus longtemps puis le coupe.
+    """
+    decay_frac = min(max(decay_frac, 0.0), 1.0)
+    min_ratio = min(max(min_ratio, 0.0), 1.0)
+    decay_start = int(round(total_steps * (1.0 - decay_frac)))
+    decay_start = max(min(decay_start, total_steps), warmup_steps)
+
+    def lr_fn(step: int) -> float:
+        if step < warmup_steps:
+            return (step + 1) / max(warmup_steps, 1)
+        if step < decay_start:
+            return 1.0
+        prog = (step - decay_start) / max(total_steps - decay_start, 1)
+        return min_ratio + (1.0 - min_ratio) * 0.5 * (
+            1.0 + math.cos(math.pi * min(prog, 1.0)))
+
+    return torch.optim.lr_scheduler.LambdaLR(optimizer, lr_fn)
+
+
+def ternary_snapshot(student) -> dict:
+    """Photographie des poids ternaires quantifiés (CPU, int8)."""
+    snap = {}
+    for name, mod in student.named_modules():
+        if isinstance(mod, TernaryLinear):
+            q, _ = mod.ternary_weights()
+            snap[name] = q.detach().to("cpu", copy=True)
+    return snap
+
+
+def ternary_flips(student, snapshot: dict) -> tuple[int, int]:
+    """Nombre de poids ternaires changés depuis `snapshot` (et total)."""
+    flipped, total = 0, 0
+    for name, mod in student.named_modules():
+        if isinstance(mod, TernaryLinear):
+            prev = snapshot.get(name)
+            if prev is None:
+                continue
+            q, _ = mod.ternary_weights()
+            q = q.detach().to("cpu")
+            if q.shape == prev.shape:
+                flipped += int((q != prev).sum().item())
+                total += q.numel()
+    return flipped, total
+
+
 def stall_exceeded(last_log_time: float, now: float,
                    interval: float = 900.0) -> bool:
     """Prédicat pur de la règle stall S1 : True si aucun log depuis plus
@@ -521,10 +580,19 @@ def train(
     device: torch.device | None = None,
     val_parent_batches: list | None = None,  # batchs val parent (même format)
     val_student_batches: list | None = None,  # batchs val enfant alignés
+    label_batches: list | None = None,  # QA : labels alignés (-100 prompt)
     eval_every: int = 0,  # >0 : évalue la val tous les N steps (0 = désactivé)
     patience: int = 0,  # >0 : early stopping après N evals sans progrès
     lr_resume: float = 0.0,  # >0 : remplace le LR à la reprise
     rewarmup_ratio: float = 0.0,  # >0 : reconstruit le scheduler sur les steps restants
+    sched_kind: str = "cosine",  # "cosine" (défaut) ou "wsd"
+    wsd_warmup_frac: float = 0.05,  # WSD : fraction de warmup
+    wsd_decay_frac: float = 0.2,  # WSD : fraction finale de décroissance
+    wsd_min_ratio: float = 0.1,  # WSD : LR final = min_ratio x LR de pointe
+    weight_decay: float = 0.01,  # AdamW (défaut torch)
+    wd_zero_frac: float = 0.0,  # >0 : WD -> 0 après cette fraction des steps
+    reset_optimizer: bool = False,  # reprise poids seuls (moments AdamW neufs)
+    track_flips: bool = False,  # compte les flips ternaires à chaque éval
 ) -> str:
     """Entraîne l'enfant par distillation. Retourne le chemin du checkpoint."""
     device = device or pick_device()
@@ -535,6 +603,15 @@ def train(
     # --- Plan d'epoch AVANT tout chargement parent (échec rapide, sans
     # télécharger 135M de poids si --batch-size est incohérent). ---
     plan = plan_epoch(student_batches, batch_size, accum)
+
+    if label_batches is not None:
+        if len(label_batches) != len(student_batches):
+            raise ValueError("label_batches et student_batches désalignés.")
+        if alpha != 0.0 or hidden_weight != 0.0 or top_k_cache > 0:
+            raise ValueError(
+                "label_batches (prompt masqué) exige alpha=0, hidden=0, "
+                "sans cache top-k.")
+        print("[train] QA : CE masquée sur les tokens de réponse uniquement.")
 
     # --- Parent (inférence seule) ou cache mmap (parent non chargé). ---
     cache = None
@@ -595,10 +672,20 @@ def train(
     params = list(student.parameters()) + (
         list(proj.parameters()) if proj is not None else []
     )
-    opt = torch.optim.AdamW(params, lr=lr)
+    opt = torch.optim.AdamW(params, lr=lr, weight_decay=weight_decay)
     steps_per_epoch = plan["steps"]
     total_steps = steps_per_epoch * epochs
-    sched = cosine_with_warmup(opt, int(total_steps * warmup_ratio), total_steps)
+
+    def _make_scheduler(n_steps: int, warm_ratio: float):
+        if sched_kind == "wsd":
+            return wsd_with_warmup(
+                opt, int(n_steps * wsd_warmup_frac), n_steps,
+                wsd_decay_frac, wsd_min_ratio)
+        if sched_kind != "cosine":
+            raise ValueError(f"sched_kind inconnu : {sched_kind!r}")
+        return cosine_with_warmup(opt, int(n_steps * warm_ratio), n_steps)
+
+    sched = _make_scheduler(total_steps, warmup_ratio)
     criterion = DistillationLoss(alpha, temperature, hidden_weight)
 
     start_step, global_step = 0, 0
@@ -613,7 +700,12 @@ def train(
         student.load_state_dict(ckpt["model"])
         if proj is not None and ckpt.get("proj") is not None:
             proj.load_state_dict(ckpt["proj"])
-        if ckpt.get("opt") is not None:
+        if reset_optimizer:
+            # Bras F : on repart des poids seuls, moments AdamW neufs. Sinon
+            # la recette (lr, WD, WSD) serait mélangée aux moments de t08.
+            print("[train] optimiseur réinitialisé (--reset-optimizer) : "
+                  "moments AdamW neufs.")
+        elif ckpt.get("opt") is not None:
             # Reprise classique : on garde l'optimiseur.
             opt.load_state_dict(ckpt["opt"])
         else:
@@ -625,18 +717,19 @@ def train(
             for g in opt.param_groups:
                 g["lr"] = lr_resume
             print(f"[train] LR reprise forcé : {lr_resume}")
-        if rewarmup_ratio and rewarmup_ratio > 0:
+        remaining = max(total_steps - ckpt["step"], 1)
+        if reset_optimizer or (rewarmup_ratio and rewarmup_ratio > 0):
             # Scheduler reconstruit sur les steps restants (warmup frais),
             # adapté à l'enchaînement sur nouvelles données.
-            remaining = max(total_steps - ckpt["step"], 1)
-            sched = cosine_with_warmup(opt, int(remaining * rewarmup_ratio), remaining)
-            print(f"[train] scheduler reconstruit : {remaining} steps restants")
+            warm = rewarmup_ratio if rewarmup_ratio > 0 else warmup_ratio
+            sched = _make_scheduler(remaining, warm)
+            print(f"[train] scheduler {sched_kind} reconstruit : "
+                  f"{remaining} steps restants")
         elif ckpt.get("sched") is not None:
             sched.load_state_dict(ckpt["sched"])
         else:
             # Best-val sans scheduler : reconstruction standard.
-            sched = cosine_with_warmup(opt, int(total_steps * warmup_ratio),
-                                       total_steps)
+            sched = _make_scheduler(total_steps, warmup_ratio)
             print("[train] scheduler reconstruit (défaut, pas d'état).")
         start_step = ckpt["step"]
         global_step = start_step
@@ -651,6 +744,12 @@ def train(
             print(f"[train] états RNG restaurés (epoch {start_epoch}, "
                   f"micro {resume_micro}).")
 
+    remaining_steps = max(total_steps - start_step, 1)
+    flip_prev = ternary_snapshot(student) if track_flips else None
+    if track_flips:
+        n_flip = sum(q.numel() for q in (flip_prev or {}).values())
+        print(f"[train] suivi des flips ternaires activé "
+              f"({n_flip / 1e6:.1f}M poids quantifiés).")
     n_params = sum(p.numel() for p in student.parameters())
     print(
         f"[train] enfant: {n_params / 1e6:.1f}M params latents, "
@@ -738,10 +837,21 @@ def train(
         Factorise le pas "tous les `accum` micros" ET le pas de fin d'epoch
         sur les micros restants (B1 : plus aucun gradient jeté).
         """
-        nonlocal global_step, best_val, best_step, no_improve, stopped_early, last_log_time
+        nonlocal global_step, best_val, best_step, no_improve, stopped_early, last_log_time, flip_prev
         # Stall detection S1 : alerte si mtime log > 15 min, stop si CPU < 5 %
         if _check_stall():
             return True
+        # WD programmable (bras F) : constant, ou -> 0 après wd_zero_frac
+        # des steps de la tranche. Le switch est appliqué AVANT opt.step().
+        if wd_zero_frac > 0:
+            prog_wd = (global_step - start_step) / remaining_steps
+            wd_target = weight_decay if prog_wd < wd_zero_frac else 0.0
+            for g in opt.param_groups:
+                if g.get("weight_decay", 0.0) != wd_target:
+                    g["weight_decay"] = wd_target
+                    print(f"[train] step {global_step} : weight_decay -> "
+                          f"{wd_target:g} (progression {prog_wd:.0%}).",
+                          flush=True)
         nn.utils.clip_grad_norm_(params, max_grad_norm)
         opt.step()
         sched.step()
@@ -755,6 +865,8 @@ def train(
                 f"[train] step {global_step}/{total_steps} "
                 f"loss={loss_val:.4f} kl={last_parts['kl'].item():.4f} "
                 f"ce={last_parts['ce'].item():.4f} ppl~{ppl:.1f} "
+                f"lr={opt.param_groups[0]['lr']:.2e} "
+                f"wd={opt.param_groups[0].get('weight_decay', 0.0):g} "
                 f"{tok_total / dt:.0f} tok/s",
                 flush=True,
             )
@@ -779,9 +891,15 @@ def train(
                 tag = " [best]"
             else:
                 no_improve += 1
+            flip_txt = ""
+            if track_flips and flip_prev is not None:
+                flips, n_tern = ternary_flips(student, flip_prev)
+                flip_txt = (f" flips={flips}/{n_tern} "
+                            f"({flips / max(n_tern, 1):.3%})")
+                flip_prev = ternary_snapshot(student)
             print(
                 f"[val] step {global_step}/{total_steps} "
-                f"val_ce={val_ce:.4f} val_ppl~{val_ppl:.1f}{tag}",
+                f"val_ce={val_ce:.4f} val_ppl~{val_ppl:.1f}{tag}{flip_txt}",
                 flush=True,
             )
             last_log_time = time.time()
@@ -823,6 +941,10 @@ def train(
                     continue
                 x = sb[off : off + batch_size][:, :-1].to(device)
                 y = sb[off : off + batch_size][:, 1:].to(device)
+                ylab = (label_batches[bi][off : off + batch_size][:, 1:].to(device)
+                        if label_batches is not None else None)
+                if ylab is not None:
+                    y = ylab  # -100 sur le prompt ; CE les ignore.
                 px = pb[off : off + batch_size][:, :-1].to(device)
                 ci = off // batch_size
                 if cache is not None and proj is None:

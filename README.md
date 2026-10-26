@@ -74,6 +74,12 @@ Le greedy « nu » (1,0 / 0) boucle sur 32/32 prompts de contrôle : il est
   #3 **72/200** (20/100) avec ×10, 24,8 M tokens et 534 faits. Verdict #3 :
   **PARTIEL** — les faits montent, la corruption de surface (« capitaine »)
   ne recule pas (59 occurrences vs 44 en #1). Voir §P5-P7.
+- **Chaîne F close (21 oct 2026)** : trois recettes testées depuis t08, à
+  budget constant (924 steps). A (contrôle) reproduit t09 ; B (CE seule,
+  lr 1e-3) améliore la val-PPL à **15,8** et le Δc val_big à **−0,2830**
+  mais **régresse l'OOD** (−0,1471) ; C (KD à lr 1e-3) est pire partout.
+  Critère pré-enregistré non atteint : **pas d'étape 5**, t08 reste la
+  référence. Voir `docs/CHAINE_F.md`.
 - **Décision en attente** : lancer **base 768 from-scratch** (seul levier de
   capacité dans l'enveloppe < 100 Mo) ou **clôturer/livrer t08**. Aucun run
   n'est lancé dans l'état actuel.
@@ -100,15 +106,16 @@ Le greedy « nu » (1,0 / 0) boucle sur 32/32 prompts de contrôle : il est
 |---|---|---|---|
 | Params latents | **25,0 M** | **72,9 M** | `runs/E-t08/train.log`, `checkpoints/train_base2.log` |
 | Poids packés (.bin) | **12,13 Mo** | **29,25 Mo** | fichiers ; `checkpoints/bench_base.log` |
-| Structurel (poids + KV + activations) | n.d. | 30,21 Mo | `checkpoints/bench_base.log` |
-| Débit CPU | n.d. | 42,3 tok/s | `checkpoints/bench_base.log` |
-| Delta RSS | n.d. | +84,7 Mo au chargement, +159,3 Mo après génération | `checkpoints/bench_base.log` |
+| Structurel (poids + KV + activations) | **12,12 Mo** | 30,21 Mo | `logs/F/step1-bench-Et08-128.log` ; `checkpoints/bench_base.log` |
+| Débit CPU | **118,9 tok/s** (gén. 128) ; 67,9 tok/s (32) | 42,3 tok/s | `logs/F/step1-bench-Et08-128.log` ; `checkpoints/bench_base.log` |
+| Delta RSS | **+0,3 Mo** au chargement, **+28,0 Mo** après génération | +84,7 Mo au chargement, +159,3 Mo après génération | `logs/F/step1-bench-Et08-128.log` ; `checkpoints/bench_base.log` |
 
-- Le critère projet reste **delta RSS < 100 Mo**. Le dernier bench committed
-  porte sur `base` : +84,7 Mo au chargement mais **+159,3 Mo après génération
-  depuis un process à vide** → la marge n'est pas démontrée pour `base`.
-  **Aucun bench RSS/débit n'est committed pour l'export E-t08** ; les anciens
-  chiffres « tiny 9,6 Mo / ~110 tok/s / +26 Mo » ne s'appliquent plus.
+- Le critère projet reste **delta RSS < 100 Mo**. L'export `exports/E-t08.bin`
+  (copie de `runs/E-t08/model.bin`) est mesuré : **+28,0 Mo après génération**
+  depuis un process à vide, soit une marge de 72 Mo. Le bench `base` reste
+  au-dessus du budget après génération (+159,3 Mo).
+- Mesures faites le 2026-10-20 avec `.venv/bin/python main.py bench
+  --model exports/E-t08.bin [--bench-tokens 128]` (noyau NEON, CPU).
 - Entraînement (seq 128, 30 steps + 5 warmup, `tools/bench_train.md`) :
 
 | Enfant | Parent | bs 2 | bs 8 | bs 16 |
@@ -199,8 +206,9 @@ Marqueur `slow` déclaré dans `pyproject.toml` (`addopts = -m 'not slow'`,
   le run) cache un surapprentissage massif.
 - **Base 768 from-scratch non lancée** : la décision base 768 / clôture est
   ouverte ; aucune mesure de qualité ni de RSS n'existe pour ce futur run.
-- **Débit/RSS de l'export E-t08 non mesurés** : ne pas réutiliser les
-  chiffres des exports 9,6 Mo.
+- **Débit/RSS de l'export E-t08 mesurés le 2026-10-20** : 118,9 tok/s
+  (128 tokens), +28,0 Mo après génération. Ne pas réutiliser les chiffres
+  des exports 9,6 Mo.
 
 ## Historique phases C/D (9 oct 2026)
 

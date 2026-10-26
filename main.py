@@ -232,10 +232,47 @@ def prepare_corpus(tok, a: argparse.Namespace, save_vocab_to: str = ""):
     return pb, sb, vpb, vsb, vocab
 
 
+def prepare_qa_corpus(tok, a: argparse.Namespace):
+    """Charge un JSONL QA (prompt/answer) et packe des batchs masqués."""
+    if not getattr(a, "vocab_from", ""):
+        raise ValueError("--qa-data exige --vocab-from (vocab du checkpoint).")
+    with open(a.vocab_from, encoding="utf-8") as f:
+        vocab = json.load(f)
+    D.check_parent_vocab_match(getattr(a, "parent", ""), vocab,
+                               getattr(a, "from_scratch", False))
+    examples = []
+    with open(a.qa_data, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                examples.append(json.loads(line))
+    field = "control_prompt" if getattr(a, "control", False) else "prompt"
+    if field not in (examples[0] if examples else {}):
+        raise ValueError(f"Champ {field!r} absent de {a.qa_data}.")
+    xs, ys = D.make_qa_batches(
+        tok, vocab, examples, a.seq_len, getattr(a, "save_batch", 8),
+        seed=getattr(a, "seed", 0), field=field)
+    qa_steps = getattr(a, "qa_steps", 0)
+    if qa_steps:
+        n_batches = qa_steps * getattr(a, "accum", 16)
+        if len(xs) < n_batches:
+            raise ValueError(
+                f"--qa-steps {qa_steps} exige {n_batches} batchs, "
+                f"seulement {len(xs)} disponibles ; augmentez --qa-data.")
+        xs, ys = xs[:n_batches], ys[:n_batches]
+        print(f"[qa-data] calibrage exact : {n_batches} batchs x "
+              f"{xs[0].shape[0]} lignes, {qa_steps} steps.")
+    # Parent inutile : alpha=0 et labels masqués. On réutilise xs comme
+    # flux parent factice pour ne pas changer la signature de dist.train.
+    return xs, xs, [], [], vocab, ys
+
+
 def cmd_train(a: argparse.Namespace) -> None:
     if getattr(a, "from_scratch", False) and getattr(a, "resume", ""):
         raise ValueError("--from-scratch interdit avec --resume "
                          "(bypass réservé aux runs frais).")
+    if not getattr(a, "qa_data", "") and not getattr(a, "data", None):
+        raise SystemExit("train exige --data ou --qa-data.")
     if getattr(a, "vocab_from", ""):
         # F0a précoce : refuse le mismatch avant même load_tokenizer.
         import json as _json
@@ -245,8 +282,19 @@ def cmd_train(a: argparse.Namespace) -> None:
                                    _vocab_early,
                                    getattr(a, "from_scratch", False))
     tok = load_tokenizer(a.parent)
-    pb, sb, vpb, vsb, vocab = prepare_corpus(
-        tok, a, save_vocab_to=a.vocab_out or (a.out + ".vocab.json"))
+    label_batches = None
+    if getattr(a, "qa_data", ""):
+        pb, sb, vpb, vsb, vocab, label_batches = prepare_qa_corpus(tok, a)
+        with open(a.vocab_out or (a.out + ".vocab.json"), "w",
+                  encoding="utf-8") as f:
+            json.dump(vocab, f)
+    else:
+        if getattr(a, "mask_prompt", "") == "answer":
+            raise ValueError("--mask-prompt answer exige --qa-data.")
+        pb, sb, vpb, vsb, vocab = prepare_corpus(
+            tok, a, save_vocab_to=a.vocab_out or (a.out + ".vocab.json"))
+    if getattr(a, "mask_prompt", "") != "answer":
+        label_batches = None
     cfg = CONFIGS[a.config]
     import dataclasses
 
@@ -279,10 +327,19 @@ def cmd_train(a: argparse.Namespace) -> None:
         device=None,
         val_parent_batches=vpb,
         val_student_batches=vsb,
+        label_batches=label_batches,
         eval_every=getattr(a, "eval_every", 0),
         patience=getattr(a, "patience", 0),
         lr_resume=getattr(a, "lr_resume", 0.0),
         rewarmup_ratio=getattr(a, "rewarmup_ratio", 0.0),
+        sched_kind=getattr(a, "sched", "cosine"),
+        wsd_warmup_frac=getattr(a, "wsd_warmup_frac", 0.05),
+        wsd_decay_frac=getattr(a, "wsd_decay_frac", 0.2),
+        wsd_min_ratio=getattr(a, "wsd_min_ratio", 0.1),
+        weight_decay=getattr(a, "weight_decay", 0.01),
+        wd_zero_frac=getattr(a, "wd_zero_frac", 0.0),
+        reset_optimizer=getattr(a, "reset_optimizer", False),
+        track_flips=getattr(a, "track_flips", False),
     )
 
 
@@ -535,9 +592,9 @@ def build_parser() -> argparse.ArgumentParser:
     pt = sub.add_parser("train", help="Distillation parent -> enfant.")
     pt.add_argument(
         "--data",
-        required=True,
         nargs="+",
-        help="Dossier(s) ou fichier(s) .txt/.jsonl/.xml.",
+        default=None,
+        help="Dossier(s) ou fichier(s) .txt/.jsonl/.xml (ou --qa-data).",
     )
     pt.add_argument("--parent", required=True, help="Nom HF du parent.")
     pt.add_argument("--out", required=True, help="Checkpoint .pt de sortie.")
@@ -582,11 +639,38 @@ def build_parser() -> argparse.ArgumentParser:
     pt.add_argument("--vocab-from", default="",
                     help="Réutilise un .vocab.json existant au lieu de recalculer "
                     "(requis pour enchaîner les tranches à vocab constant).")
+    pt.add_argument("--qa-data", default="",
+                    help="JSONL QA (champs prompt/answer) au lieu de --data.")
+    pt.add_argument("--qa-steps", type=int, default=0,
+                    help="Tronque les batchs QA à steps*accum (calibrage).")
+    pt.add_argument("--mask-prompt", default="", choices=["", "answer"],
+                    help="Avec --qa-data : CE uniquement sur la réponse.")
+    pt.add_argument("--control", action="store_true",
+                    help="Avec --qa-data : utilise le champ control_prompt.")
     pt.add_argument("--lr-resume", type=float, default=0.0,
                     help="Remplace le LR à la reprise (0 = garde celui du checkpoint).")
     pt.add_argument("--rewarmup-ratio", type=float, default=0.0,
                     help="Reconstruit le scheduler sur les steps restants à la "
                     "reprise (0 = garde celui du checkpoint).")
+    pt.add_argument("--sched", default="cosine", choices=["cosine", "wsd"],
+                    help="Scheduler : cosine (chaîne E) ou wsd "
+                    "(warmup-plateau-decay, bras F).")
+    pt.add_argument("--wsd-warmup-frac", type=float, default=0.05,
+                    help="WSD : fraction de warmup (défaut 0,05).")
+    pt.add_argument("--wsd-decay-frac", type=float, default=0.2,
+                    help="WSD : fraction finale de décroissance (défaut 0,20).")
+    pt.add_argument("--wsd-min-ratio", type=float, default=0.1,
+                    help="WSD : LR final / LR de pointe (défaut 0,1).")
+    pt.add_argument("--weight-decay", type=float, default=0.01,
+                    help="AdamW weight decay (défaut torch 0,01).")
+    pt.add_argument("--wd-zero-frac", type=float, default=0.0,
+                    help=">0 : weight decay -> 0 après cette fraction des "
+                    "steps de la tranche (0 = WD constant).")
+    pt.add_argument("--reset-optimizer", action="store_true",
+                    help="Reprise poids seuls : moments AdamW neufs "
+                    "(comparaison de recettes depuis un même checkpoint).")
+    pt.add_argument("--track-flips", action="store_true",
+                    help="Compte les flips des poids ternaires à chaque éval.")
     pt.add_argument("--from-scratch", action="store_true",
                     help="Bypass explicite du garde-fou tokenizer-vs-vocab "
                     "(F0a) : run frais sans resume, vocab assumé. Refusé "

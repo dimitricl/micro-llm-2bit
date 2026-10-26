@@ -1,0 +1,7 @@
+[pilot-qa3] SPE=1516 steps/époque ; reprise step 22740 -> E_CUMUL=16 (restants=1516, cible~1516)
+[pilot-qa3] lock pris (logs/gpu.lock, pid 13077)
+GO
+ - val initiale : 22.0
+ - val-PPL jamais > 2× initiale
+ - aucune val postérieure dans le premier quart (contrôle 25 % N/A)
+[pilot-qa3] lock libéré

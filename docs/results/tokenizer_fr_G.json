@@ -1,0 +1,1811 @@
+{
+ "parent": "HuggingFaceTB/SmolLM-135M",
+ "vocab_reduit": "exports/E-t08.bin.vocab.json",
+ "train_tokenizer": "/Volumes/Lexar/clean-corpus/dedup/tranche_01.jsonl (40 Mo)",
+ "eval": "runs/abl_data/val_E_frozen.jsonl",
+ "n_docs_eval": 500,
+ "n_mots_eval": 821771,
+ "smollm": {
+  "vocab_size": 49152,
+  "tokens_par_mot": 2.210899386812141,
+  "mots_evalues": 821771,
+  "types_evalues": 58604,
+  "taux_mots_fragmentes_pondere": 0.5351664064857207,
+  "tokens_par_mot_types": 1.8950596229781316,
+  "cible": {
+   "capitale": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "ale"
+    ]
+   },
+   "capitaine": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "aine"
+    ]
+   },
+   "capitole": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "ole"
+    ]
+   },
+   "capitalle": {
+    "n_tokens": null,
+    "pieces": [
+     "Ġcapital",
+     "le"
+    ]
+   }
+  },
+  "exemples_50": [
+   {
+    "mot": "de",
+    "freq": 49756,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġde"
+    ]
+   },
+   {
+    "mot": "la",
+    "freq": 28003,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġla"
+    ]
+   },
+   {
+    "mot": "le",
+    "freq": 20605,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġle"
+    ]
+   },
+   {
+    "mot": "et",
+    "freq": 19565,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġet"
+    ]
+   },
+   {
+    "mot": "en",
+    "freq": 15649,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġen"
+    ]
+   },
+   {
+    "mot": "les",
+    "freq": 13986,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġles"
+    ]
+   },
+   {
+    "mot": "des",
+    "freq": 13392,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdes"
+    ]
+   },
+   {
+    "mot": "du",
+    "freq": 12179,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdu"
+    ]
+   },
+   {
+    "mot": "est",
+    "freq": 10098,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġest"
+    ]
+   },
+   {
+    "mot": "un",
+    "freq": 8417,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġun"
+    ]
+   },
+   {
+    "mot": "une",
+    "freq": 8024,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġune"
+    ]
+   },
+   {
+    "mot": "par",
+    "freq": 7304,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpar"
+    ]
+   },
+   {
+    "mot": "dans",
+    "freq": 7078,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdans"
+    ]
+   },
+   {
+    "mot": "il",
+    "freq": 5897,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġil"
+    ]
+   },
+   {
+    "mot": "au",
+    "freq": 5733,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġau"
+    ]
+   },
+   {
+    "mot": "pour",
+    "freq": 5546,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpour"
+    ]
+   },
+   {
+    "mot": "qui",
+    "freq": 4728,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqui"
+    ]
+   },
+   {
+    "mot": "sur",
+    "freq": 4022,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsur"
+    ]
+   },
+   {
+    "mot": "que",
+    "freq": 3710,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġque"
+    ]
+   },
+   {
+    "mot": "avec",
+    "freq": 3247,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġa",
+     "vec"
+    ]
+   },
+   {
+    "mot": "plus",
+    "freq": 3141,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġplus"
+    ]
+   },
+   {
+    "mot": "son",
+    "freq": 3019,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġson"
+    ]
+   },
+   {
+    "mot": "se",
+    "freq": 2762,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġse"
+    ]
+   },
+   {
+    "mot": "sont",
+    "freq": 2741,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġs",
+     "ont"
+    ]
+   },
+   {
+    "mot": "ou",
+    "freq": 2570,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġou"
+    ]
+   },
+   {
+    "mot": "ce",
+    "freq": 2104,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġce"
+    ]
+   },
+   {
+    "mot": "sa",
+    "freq": 2033,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsa"
+    ]
+   },
+   {
+    "mot": "elle",
+    "freq": 1890,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġel",
+     "le"
+    ]
+   },
+   {
+    "mot": "aux",
+    "freq": 1884,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġaux"
+    ]
+   },
+   {
+    "mot": "qu",
+    "freq": 1876,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqu"
+    ]
+   },
+   {
+    "mot": "comme",
+    "freq": 1836,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcomm",
+     "e"
+    ]
+   },
+   {
+    "mot": "cette",
+    "freq": 1658,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġc",
+     "ette"
+    ]
+   },
+   {
+    "mot": "pas",
+    "freq": 1572,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpas"
+    ]
+   },
+   {
+    "mot": "deux",
+    "freq": 1563,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġde",
+     "ux"
+    ]
+   },
+   {
+    "mot": "été",
+    "freq": 1482,
+    "n_tokens": 3,
+    "pieces": [
+     "Ġ",
+     "ét",
+     "é"
+    ]
+   },
+   {
+    "mot": "mais",
+    "freq": 1463,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġm",
+     "ais"
+    ]
+   },
+   {
+    "mot": "ses",
+    "freq": 1451,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġs",
+     "es"
+    ]
+   },
+   {
+    "mot": "ne",
+    "freq": 1357,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġne"
+    ]
+   },
+   {
+    "mot": "entre",
+    "freq": 1291,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġent",
+     "re"
+    ]
+   },
+   {
+    "mot": "on",
+    "freq": 1276,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġon"
+    ]
+   },
+   {
+    "mot": "après",
+    "freq": 1205,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġapr",
+     "ès"
+    ]
+   },
+   {
+    "mot": "commune",
+    "freq": 1177,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcommun",
+     "e"
+    ]
+   },
+   {
+    "mot": "fait",
+    "freq": 1159,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġf",
+     "ait"
+    ]
+   },
+   {
+    "mot": "france",
+    "freq": 1144,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġf",
+     "rance"
+    ]
+   },
+   {
+    "mot": "être",
+    "freq": 1143,
+    "n_tokens": 3,
+    "pieces": [
+     "ĠÃ",
+     "ª",
+     "tre"
+    ]
+   },
+   {
+    "mot": "ont",
+    "freq": 1138,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġont"
+    ]
+   },
+   {
+    "mot": "saint",
+    "freq": 1095,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsaint"
+    ]
+   },
+   {
+    "mot": "même",
+    "freq": 1088,
+    "n_tokens": 3,
+    "pieces": [
+     "Ġm",
+     "ê",
+     "me"
+    ]
+   },
+   {
+    "mot": "sous",
+    "freq": 1073,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġs",
+     "ous"
+    ]
+   },
+   {
+    "mot": "où",
+    "freq": 1011,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġo",
+     "ù"
+    ]
+   }
+  ]
+ },
+ "smollm_reduit": {
+  "vocab_size": 12000,
+  "tokens_par_mot": 2.210899386812141,
+  "mots_evalues": 821771,
+  "types_evalues": 58604,
+  "taux_mots_fragmentes_pondere": 0.5351664064857207,
+  "tokens_par_mot_types": 1.8950596229781316,
+  "cible": {
+   "capitale": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "ale"
+    ]
+   },
+   "capitaine": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "aine"
+    ]
+   },
+   "capitole": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "ole"
+    ]
+   },
+   "capitalle": {
+    "n_tokens": null,
+    "pieces": [
+     "Ġcapital",
+     "le"
+    ]
+   }
+  },
+  "exemples_50": [
+   {
+    "mot": "de",
+    "freq": 49756,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġde"
+    ]
+   },
+   {
+    "mot": "la",
+    "freq": 28003,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġla"
+    ]
+   },
+   {
+    "mot": "le",
+    "freq": 20605,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġle"
+    ]
+   },
+   {
+    "mot": "et",
+    "freq": 19565,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġet"
+    ]
+   },
+   {
+    "mot": "en",
+    "freq": 15649,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġen"
+    ]
+   },
+   {
+    "mot": "les",
+    "freq": 13986,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġles"
+    ]
+   },
+   {
+    "mot": "des",
+    "freq": 13392,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdes"
+    ]
+   },
+   {
+    "mot": "du",
+    "freq": 12179,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdu"
+    ]
+   },
+   {
+    "mot": "est",
+    "freq": 10098,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġest"
+    ]
+   },
+   {
+    "mot": "un",
+    "freq": 8417,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġun"
+    ]
+   },
+   {
+    "mot": "une",
+    "freq": 8024,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġune"
+    ]
+   },
+   {
+    "mot": "par",
+    "freq": 7304,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpar"
+    ]
+   },
+   {
+    "mot": "dans",
+    "freq": 7078,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdans"
+    ]
+   },
+   {
+    "mot": "il",
+    "freq": 5897,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġil"
+    ]
+   },
+   {
+    "mot": "au",
+    "freq": 5733,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġau"
+    ]
+   },
+   {
+    "mot": "pour",
+    "freq": 5546,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpour"
+    ]
+   },
+   {
+    "mot": "qui",
+    "freq": 4728,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqui"
+    ]
+   },
+   {
+    "mot": "sur",
+    "freq": 4022,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsur"
+    ]
+   },
+   {
+    "mot": "que",
+    "freq": 3710,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġque"
+    ]
+   },
+   {
+    "mot": "avec",
+    "freq": 3247,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġa",
+     "vec"
+    ]
+   },
+   {
+    "mot": "plus",
+    "freq": 3141,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġplus"
+    ]
+   },
+   {
+    "mot": "son",
+    "freq": 3019,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġson"
+    ]
+   },
+   {
+    "mot": "se",
+    "freq": 2762,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġse"
+    ]
+   },
+   {
+    "mot": "sont",
+    "freq": 2741,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġs",
+     "ont"
+    ]
+   },
+   {
+    "mot": "ou",
+    "freq": 2570,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġou"
+    ]
+   },
+   {
+    "mot": "ce",
+    "freq": 2104,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġce"
+    ]
+   },
+   {
+    "mot": "sa",
+    "freq": 2033,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsa"
+    ]
+   },
+   {
+    "mot": "elle",
+    "freq": 1890,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġel",
+     "le"
+    ]
+   },
+   {
+    "mot": "aux",
+    "freq": 1884,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġaux"
+    ]
+   },
+   {
+    "mot": "qu",
+    "freq": 1876,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqu"
+    ]
+   },
+   {
+    "mot": "comme",
+    "freq": 1836,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcomm",
+     "e"
+    ]
+   },
+   {
+    "mot": "cette",
+    "freq": 1658,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġc",
+     "ette"
+    ]
+   },
+   {
+    "mot": "pas",
+    "freq": 1572,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpas"
+    ]
+   },
+   {
+    "mot": "deux",
+    "freq": 1563,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġde",
+     "ux"
+    ]
+   },
+   {
+    "mot": "été",
+    "freq": 1482,
+    "n_tokens": 3,
+    "pieces": [
+     "Ġ",
+     "ét",
+     "é"
+    ]
+   },
+   {
+    "mot": "mais",
+    "freq": 1463,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġm",
+     "ais"
+    ]
+   },
+   {
+    "mot": "ses",
+    "freq": 1451,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġs",
+     "es"
+    ]
+   },
+   {
+    "mot": "ne",
+    "freq": 1357,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġne"
+    ]
+   },
+   {
+    "mot": "entre",
+    "freq": 1291,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġent",
+     "re"
+    ]
+   },
+   {
+    "mot": "on",
+    "freq": 1276,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġon"
+    ]
+   },
+   {
+    "mot": "après",
+    "freq": 1205,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġapr",
+     "ès"
+    ]
+   },
+   {
+    "mot": "commune",
+    "freq": 1177,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcommun",
+     "e"
+    ]
+   },
+   {
+    "mot": "fait",
+    "freq": 1159,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġf",
+     "ait"
+    ]
+   },
+   {
+    "mot": "france",
+    "freq": 1144,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġf",
+     "rance"
+    ]
+   },
+   {
+    "mot": "être",
+    "freq": 1143,
+    "n_tokens": 3,
+    "pieces": [
+     "ĠÃ",
+     "ª",
+     "tre"
+    ]
+   },
+   {
+    "mot": "ont",
+    "freq": 1138,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġont"
+    ]
+   },
+   {
+    "mot": "saint",
+    "freq": 1095,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsaint"
+    ]
+   },
+   {
+    "mot": "même",
+    "freq": 1088,
+    "n_tokens": 3,
+    "pieces": [
+     "Ġm",
+     "ê",
+     "me"
+    ]
+   },
+   {
+    "mot": "sous",
+    "freq": 1073,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġs",
+     "ous"
+    ]
+   },
+   {
+    "mot": "où",
+    "freq": 1011,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġo",
+     "ù"
+    ]
+   }
+  ],
+  "taux_tokens_unk": 0.009621581933155847,
+  "taux_mots_unk_pondere": 0.034725629353658055
+ },
+ "bpe16k": {
+  "vocab_size": 16000,
+  "tokens_par_mot": 1.6287578899717805,
+  "mots_evalues": 821771,
+  "types_evalues": 58604,
+  "taux_mots_fragmentes_pondere": 0.23871623660286767,
+  "tokens_par_mot_types": 1.362615277650238,
+  "cible": {
+   "capitale": {
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcapitale"
+    ]
+   },
+   "capitaine": {
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcapitaine"
+    ]
+   },
+   "capitole": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "ole"
+    ]
+   },
+   "capitalle": {
+    "n_tokens": null,
+    "pieces": [
+     "Ġcapital",
+     "le"
+    ]
+   }
+  },
+  "exemples_50": [
+   {
+    "mot": "de",
+    "freq": 49756,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġde"
+    ]
+   },
+   {
+    "mot": "la",
+    "freq": 28003,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġla"
+    ]
+   },
+   {
+    "mot": "le",
+    "freq": 20605,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġle"
+    ]
+   },
+   {
+    "mot": "et",
+    "freq": 19565,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġet"
+    ]
+   },
+   {
+    "mot": "en",
+    "freq": 15649,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġen"
+    ]
+   },
+   {
+    "mot": "les",
+    "freq": 13986,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġles"
+    ]
+   },
+   {
+    "mot": "des",
+    "freq": 13392,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdes"
+    ]
+   },
+   {
+    "mot": "du",
+    "freq": 12179,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdu"
+    ]
+   },
+   {
+    "mot": "est",
+    "freq": 10098,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġest"
+    ]
+   },
+   {
+    "mot": "un",
+    "freq": 8417,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġun"
+    ]
+   },
+   {
+    "mot": "une",
+    "freq": 8024,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġune"
+    ]
+   },
+   {
+    "mot": "par",
+    "freq": 7304,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpar"
+    ]
+   },
+   {
+    "mot": "dans",
+    "freq": 7078,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdans"
+    ]
+   },
+   {
+    "mot": "il",
+    "freq": 5897,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġil"
+    ]
+   },
+   {
+    "mot": "au",
+    "freq": 5733,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġau"
+    ]
+   },
+   {
+    "mot": "pour",
+    "freq": 5546,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpour"
+    ]
+   },
+   {
+    "mot": "qui",
+    "freq": 4728,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqui"
+    ]
+   },
+   {
+    "mot": "sur",
+    "freq": 4022,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsur"
+    ]
+   },
+   {
+    "mot": "que",
+    "freq": 3710,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġque"
+    ]
+   },
+   {
+    "mot": "avec",
+    "freq": 3247,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġavec"
+    ]
+   },
+   {
+    "mot": "plus",
+    "freq": 3141,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġplus"
+    ]
+   },
+   {
+    "mot": "son",
+    "freq": 3019,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġson"
+    ]
+   },
+   {
+    "mot": "se",
+    "freq": 2762,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġse"
+    ]
+   },
+   {
+    "mot": "sont",
+    "freq": 2741,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsont"
+    ]
+   },
+   {
+    "mot": "ou",
+    "freq": 2570,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġou"
+    ]
+   },
+   {
+    "mot": "ce",
+    "freq": 2104,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġce"
+    ]
+   },
+   {
+    "mot": "sa",
+    "freq": 2033,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsa"
+    ]
+   },
+   {
+    "mot": "elle",
+    "freq": 1890,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġelle"
+    ]
+   },
+   {
+    "mot": "aux",
+    "freq": 1884,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġaux"
+    ]
+   },
+   {
+    "mot": "qu",
+    "freq": 1876,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqu"
+    ]
+   },
+   {
+    "mot": "comme",
+    "freq": 1836,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcomme"
+    ]
+   },
+   {
+    "mot": "cette",
+    "freq": 1658,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcette"
+    ]
+   },
+   {
+    "mot": "pas",
+    "freq": 1572,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpas"
+    ]
+   },
+   {
+    "mot": "deux",
+    "freq": 1563,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdeux"
+    ]
+   },
+   {
+    "mot": "été",
+    "freq": 1482,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠÃ©tÃ©"
+    ]
+   },
+   {
+    "mot": "mais",
+    "freq": 1463,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġmais"
+    ]
+   },
+   {
+    "mot": "ses",
+    "freq": 1451,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġses"
+    ]
+   },
+   {
+    "mot": "ne",
+    "freq": 1357,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġne"
+    ]
+   },
+   {
+    "mot": "entre",
+    "freq": 1291,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġentre"
+    ]
+   },
+   {
+    "mot": "on",
+    "freq": 1276,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġon"
+    ]
+   },
+   {
+    "mot": "après",
+    "freq": 1205,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠaprÃ¨s"
+    ]
+   },
+   {
+    "mot": "commune",
+    "freq": 1177,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcommune"
+    ]
+   },
+   {
+    "mot": "fait",
+    "freq": 1159,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġfait"
+    ]
+   },
+   {
+    "mot": "france",
+    "freq": 1144,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġfran",
+     "ce"
+    ]
+   },
+   {
+    "mot": "être",
+    "freq": 1143,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠÃªtre"
+    ]
+   },
+   {
+    "mot": "ont",
+    "freq": 1138,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġont"
+    ]
+   },
+   {
+    "mot": "saint",
+    "freq": 1095,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsaint"
+    ]
+   },
+   {
+    "mot": "même",
+    "freq": 1088,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠmÃªme"
+    ]
+   },
+   {
+    "mot": "sous",
+    "freq": 1073,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsous"
+    ]
+   },
+   {
+    "mot": "où",
+    "freq": 1011,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠoÃ¹"
+    ]
+   }
+  ]
+ },
+ "bpe12k": {
+  "vocab_size": 12000,
+  "tokens_par_mot": 1.692946088387154,
+  "mots_evalues": 821771,
+  "types_evalues": 58604,
+  "taux_mots_fragmentes_pondere": 0.2681184326175078,
+  "tokens_par_mot_types": 1.4169528657072767,
+  "cible": {
+   "capitale": {
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcapitale"
+    ]
+   },
+   "capitaine": {
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcapitaine"
+    ]
+   },
+   "capitole": {
+    "n_tokens": 2,
+    "pieces": [
+     "Ġcapit",
+     "ole"
+    ]
+   },
+   "capitalle": {
+    "n_tokens": null,
+    "pieces": [
+     "Ġcapital",
+     "le"
+    ]
+   }
+  },
+  "exemples_50": [
+   {
+    "mot": "de",
+    "freq": 49756,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġde"
+    ]
+   },
+   {
+    "mot": "la",
+    "freq": 28003,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġla"
+    ]
+   },
+   {
+    "mot": "le",
+    "freq": 20605,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġle"
+    ]
+   },
+   {
+    "mot": "et",
+    "freq": 19565,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġet"
+    ]
+   },
+   {
+    "mot": "en",
+    "freq": 15649,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġen"
+    ]
+   },
+   {
+    "mot": "les",
+    "freq": 13986,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġles"
+    ]
+   },
+   {
+    "mot": "des",
+    "freq": 13392,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdes"
+    ]
+   },
+   {
+    "mot": "du",
+    "freq": 12179,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdu"
+    ]
+   },
+   {
+    "mot": "est",
+    "freq": 10098,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġest"
+    ]
+   },
+   {
+    "mot": "un",
+    "freq": 8417,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġun"
+    ]
+   },
+   {
+    "mot": "une",
+    "freq": 8024,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġune"
+    ]
+   },
+   {
+    "mot": "par",
+    "freq": 7304,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpar"
+    ]
+   },
+   {
+    "mot": "dans",
+    "freq": 7078,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdans"
+    ]
+   },
+   {
+    "mot": "il",
+    "freq": 5897,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġil"
+    ]
+   },
+   {
+    "mot": "au",
+    "freq": 5733,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġau"
+    ]
+   },
+   {
+    "mot": "pour",
+    "freq": 5546,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpour"
+    ]
+   },
+   {
+    "mot": "qui",
+    "freq": 4728,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqui"
+    ]
+   },
+   {
+    "mot": "sur",
+    "freq": 4022,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsur"
+    ]
+   },
+   {
+    "mot": "que",
+    "freq": 3710,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġque"
+    ]
+   },
+   {
+    "mot": "avec",
+    "freq": 3247,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġavec"
+    ]
+   },
+   {
+    "mot": "plus",
+    "freq": 3141,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġplus"
+    ]
+   },
+   {
+    "mot": "son",
+    "freq": 3019,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġson"
+    ]
+   },
+   {
+    "mot": "se",
+    "freq": 2762,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġse"
+    ]
+   },
+   {
+    "mot": "sont",
+    "freq": 2741,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsont"
+    ]
+   },
+   {
+    "mot": "ou",
+    "freq": 2570,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġou"
+    ]
+   },
+   {
+    "mot": "ce",
+    "freq": 2104,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġce"
+    ]
+   },
+   {
+    "mot": "sa",
+    "freq": 2033,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsa"
+    ]
+   },
+   {
+    "mot": "elle",
+    "freq": 1890,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġelle"
+    ]
+   },
+   {
+    "mot": "aux",
+    "freq": 1884,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġaux"
+    ]
+   },
+   {
+    "mot": "qu",
+    "freq": 1876,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġqu"
+    ]
+   },
+   {
+    "mot": "comme",
+    "freq": 1836,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcomme"
+    ]
+   },
+   {
+    "mot": "cette",
+    "freq": 1658,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcette"
+    ]
+   },
+   {
+    "mot": "pas",
+    "freq": 1572,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġpas"
+    ]
+   },
+   {
+    "mot": "deux",
+    "freq": 1563,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġdeux"
+    ]
+   },
+   {
+    "mot": "été",
+    "freq": 1482,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠÃ©tÃ©"
+    ]
+   },
+   {
+    "mot": "mais",
+    "freq": 1463,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġmais"
+    ]
+   },
+   {
+    "mot": "ses",
+    "freq": 1451,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġses"
+    ]
+   },
+   {
+    "mot": "ne",
+    "freq": 1357,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġne"
+    ]
+   },
+   {
+    "mot": "entre",
+    "freq": 1291,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġentre"
+    ]
+   },
+   {
+    "mot": "on",
+    "freq": 1276,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġon"
+    ]
+   },
+   {
+    "mot": "après",
+    "freq": 1205,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠaprÃ¨s"
+    ]
+   },
+   {
+    "mot": "commune",
+    "freq": 1177,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġcommune"
+    ]
+   },
+   {
+    "mot": "fait",
+    "freq": 1159,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġfait"
+    ]
+   },
+   {
+    "mot": "france",
+    "freq": 1144,
+    "n_tokens": 2,
+    "pieces": [
+     "Ġfran",
+     "ce"
+    ]
+   },
+   {
+    "mot": "être",
+    "freq": 1143,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠÃªtre"
+    ]
+   },
+   {
+    "mot": "ont",
+    "freq": 1138,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġont"
+    ]
+   },
+   {
+    "mot": "saint",
+    "freq": 1095,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsaint"
+    ]
+   },
+   {
+    "mot": "même",
+    "freq": 1088,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠmÃªme"
+    ]
+   },
+   {
+    "mot": "sous",
+    "freq": 1073,
+    "n_tokens": 1,
+    "pieces": [
+     "Ġsous"
+    ]
+   },
+   {
+    "mot": "où",
+    "freq": 1011,
+    "n_tokens": 1,
+    "pieces": [
+     "ĠoÃ¹"
+    ]
+   }
+  ]
+ },
+ "hypothese": "Un BPE FR de 12-16k réduit le nombre de tokens par mot et la fragmentation ; l'écart chiffré indique le gain maximal attendu d'un tokenizer natif, à comparer au coût d'un changement de vocabulaire (embeddings + tête liée à réinit.)"
+}

@@ -1,0 +1,135 @@
+{
+ "ref_ppl": 19.8,
+ "ref_dc": {
+  "valbig": -0.1949,
+  "ood": -0.1708
+ },
+ "rows": [
+  {
+   "modele": "t08",
+   "tag": "Et08",
+   "val_ppl": 19.8,
+   "duree_s": 16780,
+   "valbig": {
+    "a": -0.18994089547227944,
+    "b": -0.18931115542841992,
+    "c": -0.19506105685317543
+   },
+   "ood": {
+    "a": -0.1657116212258889,
+    "b": -0.16388324532655796,
+    "c": -0.17080618644074752
+   },
+   "sonde": 0.02,
+   "repetition_4g": 0.0,
+   "oov_combine": 0.0044062106588334034,
+   "capitain": 0,
+   "logproba_top1": 0.325,
+   "logproba_mrr": 0.5649999999999996,
+   "gate_dc_valbig": null,
+   "gate_dc_ood": null
+  },
+  {
+   "modele": "t09",
+   "tag": "Et09",
+   "val_ppl": 19.8,
+   "duree_s": 7555,
+   "valbig": {
+    "a": -0.19118513393578285,
+    "b": -0.1889285011208064,
+    "c": -0.19467240027068433
+   },
+   "ood": {
+    "a": -0.16706129395248315,
+    "b": -0.16262148025495948,
+    "c": -0.16948973962932268
+   },
+   "gate_dc_valbig": null,
+   "gate_dc_ood": null
+  },
+  {
+   "modele": "F-A",
+   "tag": "F-A",
+   "val_ppl": 19.8,
+   "duree_s": 8315,
+   "flips_pct": 1.873,
+   "valbig": {
+    "a": -0.19103820287951745,
+    "b": -0.1888194786679629,
+    "c": -0.1945676903455391
+   },
+   "ood": {
+    "a": -0.16893072799724873,
+    "b": -0.16447504883564745,
+    "c": -0.17141199808187269
+   },
+   "gate_valbig": "PASS",
+   "gate_ood": "PASS",
+   "sonde": 0.035,
+   "repetition_4g": 0.0,
+   "oov_combine": 0.006654428636989445,
+   "capitain": 0,
+   "logproba_top1": 0.315,
+   "logproba_mrr": 0.565833333333333,
+   "gate_dc_valbig": -0.1944,
+   "gate_dc_ood": -0.1714,
+   "critere_ok": false
+  },
+  {
+   "modele": "F-B",
+   "tag": "F-B",
+   "val_ppl": 15.8,
+   "duree_s": 4754,
+   "flips_pct": 6.31,
+   "valbig": {
+    "a": -0.28033477384523176,
+    "b": -0.2747197411768927,
+    "c": -0.2830519761890442
+   },
+   "ood": {
+    "a": -0.15194441329059316,
+    "b": -0.14122663056956775,
+    "c": -0.14720073362525277
+   },
+   "gate_valbig": "PASS",
+   "gate_ood": "PASS",
+   "sonde": 0.04,
+   "repetition_4g": 0.0,
+   "oov_combine": 0.007387988560533841,
+   "capitain": 0,
+   "logproba_top1": 0.3,
+   "logproba_mrr": 0.5583333333333331,
+   "gate_dc_valbig": -0.283,
+   "gate_dc_ood": -0.1471,
+   "critere_ok": false
+  },
+  {
+   "modele": "F-C",
+   "tag": "F-C",
+   "val_ppl": 20.4,
+   "duree_s": 6901,
+   "flips_pct": 6.515,
+   "valbig": {
+    "a": -0.17570057024917674,
+    "b": -0.17366072380630304,
+    "c": -0.1789472748170977
+   },
+   "ood": {
+    "a": -0.15362879470350999,
+    "b": -0.14924503505188325,
+    "c": -0.15554235942967276
+   },
+   "gate_valbig": "PASS",
+   "gate_ood": "PASS",
+   "sonde": 0.025,
+   "repetition_4g": 0.0,
+   "oov_combine": 0.007243195785776997,
+   "capitain": 0,
+   "logproba_top1": 0.305,
+   "logproba_mrr": 0.5524999999999997,
+   "gate_dc_valbig": -0.1788,
+   "gate_dc_ood": -0.1555,
+   "critere_ok": false
+  }
+ ]
+}

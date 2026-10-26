@@ -1,0 +1,7 @@
+{
+  "last_status_ts": 1792866883.1574342,
+  "last_checkpoint": "models/llm_25m_fr/checkpoint_0100000.safetensors",
+  "done": true,
+  "error_sent": false,
+  "last_notified_step": 99500
+}

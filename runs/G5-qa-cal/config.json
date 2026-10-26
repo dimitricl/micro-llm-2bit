@@ -1,0 +1,13 @@
+{
+ "init": "models/llm_25m_fr/model.safetensors",
+ "data": "runs/G5-qa-data/qa_prompt_packed.npz",
+ "steps": 6,
+ "batch_size": 16,
+ "accum": 8,
+ "seq_len": 256,
+ "lr": 0.0003,
+ "warmup_ratio": 0.05,
+ "weight_decay": 0.01,
+ "seed": 0,
+ "duration_s": 41.2
+}
