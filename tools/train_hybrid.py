@@ -41,11 +41,11 @@ import sys
 from pathlib import Path
 
 
-def prepare_pretrain_data(data_dir: Path, output_dir: Path) -> Path:
-    """Prépare les données de pré-entraînement mixte."""
-    print("[pretrain] Préparation données mixtes code + conversation")
+def prepare_pretrain_data(data_dir: Path, wiki_dir: Path, output_dir: Path) -> Path:
+    """Prépare les données de pré-entraînement mixte (wiki + hybrid)."""
+    print("[pretrain] Préparation données mixtes Wikipédia + code + conversation")
 
-    # Charger tous les datasets
+    # Charger les datasets hybrides
     datasets = []
     for file in data_dir.glob("*.jsonl"):
         if file.name.startswith("synthetic"):
@@ -56,6 +56,23 @@ def prepare_pretrain_data(data_dir: Path, output_dir: Path) -> Path:
                 line = line.strip()
                 if line:
                     datasets.append(json.loads(line))
+
+    print(f"[pretrain]   Datasets hybrides: {len(datasets)} documents")
+
+    # Charger les tranches Wikipédia existantes
+    wiki_count = 0
+    if wiki_dir.exists():
+        for wiki_file in sorted(wiki_dir.glob("tranche_*.jsonl")):
+            print(f"[pretrain]   Chargement {wiki_file.name}")
+            with open(wiki_file, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        datasets.append(json.loads(line))
+                        wiki_count += 1
+                        if wiki_count % 10000 == 0:
+                            print(f"[pretrain]     {wiki_count} documents wiki...")
+        print(f"[pretrain]   Total Wikipédia: {wiki_count} documents")
 
     print(f"[pretrain]   Total documents: {len(datasets)}")
 
@@ -72,7 +89,8 @@ def prepare_pretrain_data(data_dir: Path, output_dir: Path) -> Path:
             if text:
                 f.write(json.dumps({"text": text}, ensure_ascii=False) + "\n")
 
-    print(f"[pretrain]   Sauvegardé: {output_file}")
+    size_mb = output_file.stat().st_size / 1024 / 1024
+    print(f"[pretrain]   Sauvegardé: {output_file} ({size_mb:.2f} Mo)")
     return output_file
 
 
@@ -118,7 +136,7 @@ def run_pretrain(data_file: Path, output: Path, config: str) -> None:
         "--save-batch", "8",
         "--batch-size", "8",
         "--accum", "16",
-        "--epochs", "2",
+        "--epochs", "1",  # 1 époque avec autant de données
         "--lr", "1e-3",
         "--alpha", "0",  # CE-only pour from-scratch
         "--temperature", "1.0",
@@ -128,7 +146,7 @@ def run_pretrain(data_file: Path, output: Path, config: str) -> None:
         "--wsd-decay-frac", "0.2",
         "--wsd-min-ratio", "0.1",
         "--wd-zero-frac", "0.5",
-        "--ckpt-every", "500",
+        "--ckpt-every", "1000",
     ]
 
     print(f"[pretrain] Commande: {' '.join(cmd)}")
@@ -220,7 +238,13 @@ def main() -> None:
         "--data-dir",
         type=Path,
         default=Path("data/hybrid"),
-        help="Dossier des données"
+        help="Dossier des données hybrides"
+    )
+    parser.add_argument(
+        "--wiki-dir",
+        type=Path,
+        default=Path("/Volumes/Lexar/clean-corpus/dedup"),
+        help="Dossier des tranches Wikipédia"
     )
     parser.add_argument(
         "--qa-data",
@@ -248,7 +272,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.stage == "pretrain":
-        data_file = prepare_pretrain_data(args.data_dir, args.output)
+        data_file = prepare_pretrain_data(args.data_dir, args.wiki_dir, args.output)
         run_pretrain(data_file, args.output, args.config)
 
     elif args.stage == "instruct":
