@@ -123,8 +123,11 @@ def run_pretrain(data_file: Path, output: Path, config: str) -> None:
     """Lance le pré-entraînement avec main.py train."""
     print(f"[pretrain] Lancement entraînement sur {data_file}")
 
+    # Utiliser le Python du venv
+    venv_python = ".venv/bin/python"
+
     cmd = [
-        "python",
+        venv_python,
         "main.py",
         "train",
         "--data", str(data_file),
@@ -157,8 +160,10 @@ def run_instruct(data_file: Path, checkpoint: Path, output: Path, config: str) -
     """Lance le fine-tuning instruction-following."""
     print(f"[instruct] Lancement fine-tuning sur {data_file}")
 
+    venv_python = ".venv/bin/python"
+
     cmd = [
-        "python",
+        venv_python,
         "main.py",
         "train",
         "--data", str(data_file),
@@ -192,8 +197,10 @@ def run_qa(qa_data: Path, checkpoint: Path, output: Path, config: str) -> None:
     """Lance le fine-tuning QA-passage (technique G1 validée)."""
     print(f"[qa] Lancement fine-tuning QA sur {qa_data}")
 
+    venv_python = ".venv/bin/python"
+
     cmd = [
-        "python",
+        venv_python,
         "main.py",
         "train",
         "--qa-data", str(qa_data),
