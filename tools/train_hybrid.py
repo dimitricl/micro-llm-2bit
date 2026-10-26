@@ -131,6 +131,7 @@ def run_pretrain(data_file: Path, output: Path, config: str) -> None:
         "main.py",
         "train",
         "--data", str(data_file),
+        "--parent", "HuggingFaceTB/SmolLM-135M",  # Requis même pour from-scratch
         "--from-scratch",
         "--config", config,
         "--out", str(output / "model.pt"),
