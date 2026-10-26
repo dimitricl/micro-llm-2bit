@@ -36,8 +36,10 @@ def call_ollama(
     model: str = "qwen2.5-coder:1.5b",
     temperature: float = 0.7,
     max_tokens: int = 512,
+    timeout: int = 60,
+    max_retries: int = 2,
 ) -> str:
-    """Appelle Ollama pour générer une réponse."""
+    """Appelle Ollama pour générer une réponse avec retries."""
     cmd = [
         "ollama",
         "run",
@@ -45,23 +47,35 @@ def call_ollama(
         prompt,
     ]
 
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-        if result.returncode != 0:
-            print(f"[ollama] Erreur: {result.stderr}")
+    for attempt in range(max_retries + 1):
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+            if result.returncode != 0:
+                print(f"[ollama] Erreur: {result.stderr}")
+                if attempt < max_retries:
+                    print(f"[ollama] Retry {attempt + 1}/{max_retries}")
+                    continue
+                return ""
+            return result.stdout.strip()
+        except subprocess.TimeoutExpired:
+            print(f"[ollama] Timeout (attempt {attempt + 1}/{max_retries + 1})")
+            if attempt < max_retries:
+                print(f"[ollama] Retry {attempt + 1}/{max_retries}")
+                continue
             return ""
-        return result.stdout.strip()
-    except subprocess.TimeoutExpired:
-        print("[ollama] Timeout")
-        return ""
-    except Exception as e:
-        print(f"[ollama] Exception: {e}")
-        return ""
+        except Exception as e:
+            print(f"[ollama] Exception: {e}")
+            if attempt < max_retries:
+                print(f"[ollama] Retry {attempt + 1}/{max_retries}")
+                continue
+            return ""
+
+    return ""
 
 
 def generate_code_sample(model: str) -> dict | None:
@@ -249,7 +263,7 @@ def main() -> None:
             samples.clear()
 
         # Petite pause pour éviter de surcharger Ollama
-        time.sleep(0.1)
+        time.sleep(0.5)
 
     # Écrire les derniers
     if samples:
