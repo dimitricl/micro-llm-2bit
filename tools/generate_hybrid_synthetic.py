@@ -17,10 +17,18 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import re
 import subprocess
 import time
 from pathlib import Path
 from typing import Literal
+
+
+def clean_ansi(text: str) -> str:
+    """Nettoie les séquences ANSI d'une chaîne."""
+    # Pattern pour les séquences ANSI (comme \u001b[6D\u001b[K)
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
 
 
 def call_ollama(
@@ -96,6 +104,8 @@ def generate_code_sample(model: str) -> dict | None:
     if not response:
         return None
 
+    response = clean_ansi(response)
+
     return {
         "mode": "code",
         "instruction": prompt,
@@ -154,6 +164,8 @@ def generate_chat_sample(model: str) -> dict | None:
 
     if not response:
         return None
+
+    response = clean_ansi(response)
 
     return {
         "mode": "chat",

@@ -60,11 +60,14 @@ def download_no_robots(output_dir: Path, max_samples: int = 30000) -> Path:
         return output_path
 
     ds = load_dataset("HuggingFaceH4/no_robots", split="train")
-    # Filtrer les instructions en français
-    fr_instructions = [
-        item for item in ds
-        if item.get("language") == "french" and item.get("instruction")
-    ][:max_samples]
+    # Filtrer les instructions en français (lang peut être null ou "french")
+    fr_instructions = []
+    for item in ds:
+        lang = item.get("language")
+        if lang and "french" in str(lang).lower() and item.get("instruction"):
+            fr_instructions.append(item)
+            if len(fr_instructions) >= max_samples:
+                break
 
     with open(output_path, "w", encoding="utf-8") as f:
         for item in fr_instructions:
@@ -78,68 +81,96 @@ def download_no_robots(output_dir: Path, max_samples: int = 30000) -> Path:
 def download_the_stack(output_dir: Path, max_samples: int = 50000) -> Path:
     """Télécharge The Stack (code Python, JS, TS)."""
     print("[download] The Stack - code (Python, JS, TS)")
+    print("[download] The Stack est gated, utilisation de datasets alternatifs")
     output_path = output_dir / "the_stack_code.jsonl"
 
     if output_path.exists():
         print(f"[download] {output_path} existe déjà, skip")
         return output_path
 
-    # Télécharger un subset pour Python, JS, TS
-    languages = ["Python", "JavaScript", "TypeScript"]
-    all_code = []
-
-    for lang in languages:
-        print(f"[download]   {lang}...")
-        try:
-            ds = load_dataset(
-                "bigcode/the-stack",
-                data_dir=f"data/{lang}",
-                split="train",
-                streaming=True
-            )
-            lang_code = []
-            for item in ds:
-                if item.get("content"):
-                    lang_code.append({"text": item["content"]})
-                    if len(lang_code) >= max_samples // len(languages):
-                        break
-            all_code.extend(lang_code)
-            print(f"[download]   {lang}: {len(lang_code)} exemples")
-        except Exception as e:
-            print(f"[download]   Erreur {lang}: {e}")
-            continue
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        for item in all_code:
-            f.write(json.dumps(item, ensure_ascii=False) + "\n")
-
-    print(f"[download] The Stack total: {len(all_code)} exemples -> {output_path}")
+    # Utiliser datasets alternatifs non-gated
+    print("[download]   Utilisation de datasets alternatifs...")
     return output_path
 
 
 def download_codeparrot(output_dir: Path, max_samples: int = 30000) -> Path:
     """Télécharge CodeParrot (code Python)."""
     print("[download] CodeParrot - Python")
+    print("[download] CodeParrot n'est plus disponible, utilisation de datasets alternatifs")
     output_path = output_dir / "codeparrot_python.jsonl"
 
     if output_path.exists():
         print(f"[download] {output_path} existe déjà, skip")
         return output_path
 
-    ds = load_dataset("HuggingFaceH4/codeparrot", split="train", streaming=True)
-    python_code = []
+    # Utiliser un dataset alternatif
+    print("[download]   Utilisation de datasets alternatifs...")
+    return output_path
 
-    for item in ds:
-        if item.get("content"):
-            python_code.append({"text": item["content"]})
-            if len(python_code) >= max_samples:
-                break
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        for item in python_code:
-            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+def download_octopack(output_dir: Path, max_samples: int = 30000) -> Path:
+    """Télécharge OctoPack (code avec instructions)."""
+    print("[download] OctoPack - code avec instructions")
+    output_path = output_dir / "octopack_code.jsonl"
 
-    print(f"[download] CodeParrot: {len(python_code)} exemples -> {output_path}")
+    if output_path.exists():
+        print(f"[download] {output_path} existe déjà, skip")
+        return output_path
+
+    try:
+        ds = load_dataset("bigcode/octopack", split="train", streaming=True)
+        code_samples = []
+
+        for item in ds:
+            if item.get("content"):
+                code_samples.append({"text": item["content"]})
+                if len(code_samples) >= max_samples:
+                    break
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            for item in code_samples:
+                f.write(json.dumps(item, ensure_ascii=False) + "\n")
+
+        print(f"[download] OctoPack: {len(code_samples)} exemples -> {output_path}")
+    except Exception as e:
+        print(f"[download]   Erreur OctoPack: {e}")
+        # Créer fichier vide
+        open(output_path, "w").close()
+
+    return output_path
+
+
+def download_javascript(output_dir: Path, max_samples: int = 20000) -> Path:
+    """Télécharge un dataset JavaScript simple."""
+    print("[download] Dataset JavaScript")
+    output_path = output_dir / "javascript_code.jsonl"
+
+    if output_path.exists():
+        print(f"[download] {output_path} existe déjà, skip")
+        return output_path
+
+    try:
+        # Utiliser un dataset plus simple
+        ds = load_dataset("codeparrot/codeparrot-clean", split="train", streaming=True)
+        js_code = []
+
+        for item in ds:
+            content = item.get("content", "")
+            # Filtrer pour avoir du JavaScript approximatif
+            if "function" in content or "const " in content or "let " in content:
+                js_code.append({"text": content})
+                if len(js_code) >= max_samples:
+                    break
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            for item in js_code:
+                f.write(json.dumps(item, ensure_ascii=False) + "\n")
+
+        print(f"[download] JavaScript: {len(js_code)} exemples -> {output_path}")
+    except Exception as e:
+        print(f"[download]   Erreur JavaScript: {e}")
+        open(output_path, "w").close()
+
     return output_path
 
 
@@ -216,8 +247,8 @@ def main() -> None:
 
     # Datasets code
     if not args.skip_code:
-        datasets.append(download_the_stack(output_dir, args.max_samples))
-        datasets.append(download_codeparrot(output_dir, args.max_samples // 2))
+        datasets.append(download_octopack(output_dir, args.max_samples))
+        datasets.append(download_javascript(output_dir, args.max_samples // 2))
 
     print(f"\n[download] Téléchargement terminé: {len(datasets)} datasets")
     for ds in datasets:
