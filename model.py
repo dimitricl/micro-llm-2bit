@@ -55,8 +55,17 @@ BASE = ModelConfig(
     ffn_dim=1536,
     seq_max=2048,
 )
+HYBRID = ModelConfig(
+    vocab_size=16000,
+    d_model=640,
+    n_layers=10,
+    n_heads_q=8,
+    n_heads_kv=4,
+    ffn_dim=1280,
+    seq_max=512,
+)
 
-CONFIGS = {"tiny": TINY, "base": BASE}
+CONFIGS = {"tiny": TINY, "base": BASE, "hybrid": HYBRID}
 
 
 # ---------------------------------------------------------------------------
