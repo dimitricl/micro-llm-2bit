@@ -226,16 +226,26 @@ class DataLoader:
         self.rng = np.random.default_rng(seed)
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         manifest_path = cache_path.with_suffix(cache_path.suffix + ".json")
-        cache_key = token_cache_key(data_paths, tokenizer_path)
         tokenizer_sha256 = hashlib.sha256(tokenizer_path.read_bytes()).hexdigest()
         manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
-        if manifest.get("cache_key") == "external" and cache_path.exists():
+
+        # An explicit --token-cache means the caller intentionally reuses this
+        # token stream, even if its original JSONL sources have since moved.
+        if reuse_only:
+            if not cache_path.exists():
+                raise FileNotFoundError(f"Cache tokens absent: {cache_path}")
             if manifest.get("tokenizer_sha256") != tokenizer_sha256:
                 raise ValueError("Le cache tokens et le tokenizer ne correspondent pas")
+            if cache_path.stat().st_size % 2:
+                raise ValueError("Taille invalide pour le cache uint16")
+            if manifest.get("tokens") is not None and cache_path.stat().st_size // 2 != manifest["tokens"]:
+                raise ValueError("La taille du cache tokens ne correspond pas au manifeste")
             self.tokens = np.memmap(cache_path, dtype=np.uint16, mode="r")
             self.total_tokens = len(self.tokens)
             print(f"[dataloader] Cache réutilisé: {self.total_tokens:,} tokens", flush=True)
             return
+
+        cache_key = token_cache_key(data_paths, tokenizer_path)
         sep = tokenizer.encode("\n\n").ids
         if not sep:
             sep = [0]
@@ -490,10 +500,11 @@ def main():
         print(f"[main] Reprise des poids {args.resume} au step {args.resume_step}; "
               "état AdamW réinitialisé", flush=True)
 
-    config = vars(args).copy()
-    config["data"] = [str(p) for p in args.data]
-    config["output"] = str(args.output)
-    config["tokenizer"] = str(args.tokenizer)
+    config = {
+        key: ([str(item) for item in value] if isinstance(value, list)
+              else str(value) if isinstance(value, Path) else value)
+        for key, value in vars(args).items()
+    }
     (args.output / "config.json").write_text(json.dumps(config, indent=2))
     print(f"[main] {dataloader.total_tokens:,} tokens | "
           f"étape={args.stage} | {steps_per_epoch} steps/epoch | "

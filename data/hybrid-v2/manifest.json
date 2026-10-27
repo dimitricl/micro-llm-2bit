@@ -1,0 +1,12 @@
+{
+  "chat_source": "angeluriot/french_instruct (author=human, style=human, code=false)",
+  "chat_license": "MIT",
+  "chat_eligible": 56177,
+  "chat_written": 5000,
+  "javascript_source": "REXX-NEW/github-top-code (file_language=JavaScript)",
+  "javascript_license": "MIT (dataset card; permissive source licenses)",
+  "javascript_inspected": 594,
+  "javascript_rejected": 94,
+  "javascript_written": 500,
+  "seed": 42
+}

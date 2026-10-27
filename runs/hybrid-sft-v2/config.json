@@ -1,0 +1,24 @@
+{
+  "stage": "sft",
+  "data": [
+    "/Volumes/Lexar/clean-corpus/dedup"
+  ],
+  "sft_data": "runs/hybrid-sft-v2/sft_packed.npz",
+  "token_cache": "runs/hybrid-mlx/tokens.uint16.bin",
+  "tokenizer": "models/tokenizer_fr_16k",
+  "output": "runs/hybrid-sft-v2",
+  "batch_size": 16,
+  "seq_len": 512,
+  "epochs": 3.0,
+  "max_iters": 0,
+  "lr": 5e-05,
+  "weight_decay": 0.01,
+  "replay_ratio": 0.1,
+  "warmup_frac": 0.05,
+  "min_lr_ratio": 0.1,
+  "ckpt_every": 100,
+  "log_every": 20,
+  "resume": "runs/hybrid-mlx/final.safetensors",
+  "resume_step": 0,
+  "seed": 42
+}

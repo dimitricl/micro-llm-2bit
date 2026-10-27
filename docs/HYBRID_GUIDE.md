@@ -29,8 +29,10 @@ nohup caffeinate -dims bash tools/run_hybrid_mlx_full.sh \
 echo $! > logs/hybrid-full.pid
 ```
 
-Elle refuse d'écraser des sorties finales existantes. Les journaux de chaque
-étape apparaissent dans `logs/hybrid-full.nohup`.
+Elle reprend automatiquement le dernier checkpoint du pré-entraînement s'il
+existe, puis poursuit avec le SFT, l'export et le benchmark. Elle refuse
+d'écraser des sorties finales existantes. Les journaux de chaque étape
+apparaissent dans `logs/hybrid-full.nohup`.
 
 Pré-entraînement sur les dix tranches dédupliquées (≈1 Go) et les données
 hybrides locales :

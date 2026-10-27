@@ -36,6 +36,12 @@ def chat_pairs(path: Path):
                 content = str(message.get("content", "")).strip()
                 if not content:
                     continue
+                if role == "user":
+                    content = re.sub(r"^\s*(?:utilisateur|user|human)\s*:\s*", "",
+                                     content, flags=re.I)
+                elif role == "assistant":
+                    content = re.sub(r"^\s*(?:assistant|bot)\s*:\s*", "",
+                                     content, flags=re.I)
                 if role == "assistant" and history:
                     prompt = "\n".join(
                         f"{'Utilisateur' if r == 'user' else 'Assistant'} : {c}"
@@ -69,7 +75,20 @@ def code_pairs(path: Path, tokenizer: Tokenizer, max_samples: int):
             if not line.strip() or made >= max_samples:
                 continue
             row = json.loads(line)
+            language = str(row.get("language", row.get("file_language", ""))).lower()
+            file_path = str(row.get("file_path", ""))
+            if language not in {"javascript", "js"}:
+                continue
+            if Path(file_path).suffix.lower() not in {".js", ".mjs", ".cjs"}:
+                continue
             source = str(row.get("text", "")).replace("\r\n", "\n").strip()
+            # Guard against the previous failure mode: Python files carrying a
+            # JavaScript label because their text happened to contain keywords.
+            if re.search(r"(?m)^\s*(?:async\s+)?def\s+\w+\s*\(|"
+                         r"^\s*from\s+[\w.]+\s+import\s+|"
+                         r"^\s*import\s+[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*$",
+                         source):
+                continue
             lines = [s for s in source.splitlines() if s.strip()]
             if len(lines) < 4:
                 continue
@@ -112,7 +131,11 @@ def encode_pair(tokenizer: Tokenizer, prompt: str, answer: str,
         return None
     if repeated_word_pairs(answer) >= 2:
         return None
-    prefix = tokenizer.encode(f"Utilisateur : {prompt}\nAssistant :\n").ids
+    if re.match(r"^\s*Utilisateur\s*:", prompt, flags=re.I):
+        prefix_text = prompt + "\nAssistant :\n"
+    else:
+        prefix_text = f"Utilisateur : {prompt}\nAssistant :\n"
+    prefix = tokenizer.encode(prefix_text).ids
     target = tokenizer.encode(answer + "\n\n").ids
     limit = seq_len + 1
     if len(prefix) + len(target) > limit or not target:
@@ -133,6 +156,11 @@ def main() -> int:
     ap.add_argument("--seq-len", type=int, default=512)
     ap.add_argument("--out", type=Path, default=Path("runs/hybrid-sft/sft_packed.npz"))
     args = ap.parse_args()
+
+    for label, path in (("--chat", args.chat), ("--synthetic", args.synthetic),
+                        ("--code", args.code)):
+        if not path.is_file():
+            ap.error(f"{label} est absent : {path}; construis d'abord les données SFT v2")
 
     tokenizer = Tokenizer.from_file(str(args.tokenizer / "tokenizer.json"))
     tokenizer.no_truncation()

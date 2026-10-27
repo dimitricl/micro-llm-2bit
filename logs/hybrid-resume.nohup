@@ -1,0 +1,104 @@
+[hybrid] Préparation du jeu SFT chat + complétion code
+Aucun exemple SFT valide après filtrage.
+[hybrid] Réutilisation du jeu SFT déjà préparé
+[hybrid] Reprise du pré-entraînement au step 36000 depuis runs/hybrid-mlx/checkpoint_0036000.safetensors
+[hybrid] Reprise du pré-entraînement MLX depuis le cache complet du corpus
+[main] Vocab size: 16000
+[main] Modèle créé: 47,789,184 params
+[dataloader] Cache réutilisé: 302,937,807 tokens
+[main] Reprise des poids runs/hybrid-mlx/checkpoint_0036000.safetensors au step 36000; état AdamW réinitialisé
+Traceback (most recent call last):
+  File "/Volumes/Lexar/micro-llm-2bit/tools/train_hybrid_mlx.py", line 521, in <module>
+    main()
+  File "/Volumes/Lexar/micro-llm-2bit/tools/train_hybrid_mlx.py", line 507, in main
+    (args.output / "config.json").write_text(json.dumps(config, indent=2))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dimitriclaverie/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/Users/dimitriclaverie/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/json/encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "/Users/dimitriclaverie/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/json/encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/Users/dimitriclaverie/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/Users/dimitriclaverie/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/json/encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "/Users/dimitriclaverie/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type PosixPath is not JSON serializable
+[hybrid] Réutilisation du jeu SFT déjà préparé
+[hybrid] Reprise du pré-entraînement au step 36000 depuis runs/hybrid-mlx/checkpoint_0036000.safetensors
+[hybrid] Reprise du pré-entraînement MLX depuis le cache complet du corpus
+[main] Vocab size: 16000
+[main] Modèle créé: 47,789,184 params
+[dataloader] Cache réutilisé: 302,937,807 tokens
+[main] Reprise des poids runs/hybrid-mlx/checkpoint_0036000.safetensors au step 36000; état AdamW réinitialisé
+[main] 302,937,807 tokens | étape=pretrain | 36980 steps/epoch | 36980 steps prévus
+[train] step 36001/36980 | loss 2.9398 | ppl 18.91 | lr 3.05e-05 | 3513 tok/s
+[train] step 36050/36980 | loss 2.9909 | ppl 19.90 | lr 3.05e-05 | 4185 tok/s
+[train] step 36100/36980 | loss 2.8291 | ppl 16.93 | lr 3.04e-05 | 4217 tok/s
+[train] step 36150/36980 | loss 2.9751 | ppl 19.59 | lr 3.04e-05 | 4186 tok/s
+[train] step 36200/36980 | loss 2.7517 | ppl 15.67 | lr 3.03e-05 | 4175 tok/s
+[train] step 36250/36980 | loss 2.8860 | ppl 17.92 | lr 3.03e-05 | 4168 tok/s
+[train] step 36300/36980 | loss 2.5853 | ppl 13.27 | lr 3.02e-05 | 4162 tok/s
+[train] step 36350/36980 | loss 2.6750 | ppl 14.51 | lr 3.02e-05 | 4156 tok/s
+[train] step 36400/36980 | loss 2.9454 | ppl 19.02 | lr 3.02e-05 | 4153 tok/s
+[train] step 36450/36980 | loss 2.6752 | ppl 14.52 | lr 3.02e-05 | 4150 tok/s
+[train] step 36500/36980 | loss 2.8301 | ppl 16.95 | lr 3.01e-05 | 4148 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0036500.safetensors
+[train] step 36550/36980 | loss 2.6750 | ppl 14.51 | lr 3.01e-05 | 4145 tok/s
+[train] step 36600/36980 | loss 2.3647 | ppl 10.64 | lr 3.01e-05 | 4144 tok/s
+[train] step 36650/36980 | loss 2.7453 | ppl 15.57 | lr 3.01e-05 | 4142 tok/s
+[train] step 36700/36980 | loss 2.8565 | ppl 17.40 | lr 3.00e-05 | 4140 tok/s
+[train] step 36750/36980 | loss 2.8244 | ppl 16.85 | lr 3.00e-05 | 4138 tok/s
+[train] step 36800/36980 | loss 2.8574 | ppl 17.42 | lr 3.00e-05 | 4137 tok/s
+[train] step 36850/36980 | loss 2.8422 | ppl 17.15 | lr 3.00e-05 | 4135 tok/s
+[train] step 36900/36980 | loss 2.7561 | ppl 15.74 | lr 3.00e-05 | 4134 tok/s
+[train] step 36950/36980 | loss 2.9363 | ppl 18.85 | lr 3.00e-05 | 4132 tok/s
+[train] Modèle final sauvegardé: runs/hybrid-mlx/final.safetensors
+[main] Entraînement terminé en 0.54h
+[hybrid] Fine-tuning masqué chat/code avec 10% de replay langue
+[main] Vocab size: 16000
+[main] Modèle créé: 47,789,184 params
+[dataloader] Cache réutilisé: 302,937,807 tokens
+[sft] 1583 exemples | 14 exemples SFT/step + 2 replay LM
+[main] Reprise des poids runs/hybrid-mlx/final.safetensors au step 0; état AdamW réinitialisé
+[main] 302,937,807 tokens | étape=sft | 114 steps/epoch | 342 steps prévus
+[train] step 1/342 | loss 1.9767 | ppl 7.22 | lr 2.94e-06 | 3683 tok/s
+[train] step 20/342 | loss 1.6850 | ppl 5.39 | lr 5.00e-05 | 4143 tok/s
+[train] step 40/342 | loss 1.9887 | ppl 7.31 | lr 4.95e-05 | 4159 tok/s
+[train] step 60/342 | loss 2.1046 | ppl 8.20 | lr 4.82e-05 | 4165 tok/s
+[train] step 80/342 | loss 1.8511 | ppl 6.37 | lr 4.61e-05 | 4161 tok/s
+[train] step 100/342 | loss 1.6046 | ppl 4.98 | lr 4.33e-05 | 4162 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft/checkpoint_0000100.safetensors
+[train] step 120/342 | loss 1.6818 | ppl 5.38 | lr 3.99e-05 | 4161 tok/s
+[train] step 140/342 | loss 1.9663 | ppl 7.14 | lr 3.60e-05 | 4157 tok/s
+[train] step 160/342 | loss 1.4439 | ppl 4.24 | lr 3.18e-05 | 4150 tok/s
+[train] step 180/342 | loss 1.5002 | ppl 4.48 | lr 2.75e-05 | 4147 tok/s
+[train] step 200/342 | loss 1.5558 | ppl 4.74 | lr 2.32e-05 | 4147 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft/checkpoint_0000200.safetensors
+[train] step 220/342 | loss 1.8453 | ppl 6.33 | lr 1.90e-05 | 4146 tok/s
+[train] step 240/342 | loss 1.8110 | ppl 6.12 | lr 1.51e-05 | 4146 tok/s
+[train] step 260/342 | loss 1.5698 | ppl 4.81 | lr 1.17e-05 | 4143 tok/s
+[train] step 280/342 | loss 1.3118 | ppl 3.71 | lr 8.94e-06 | 4131 tok/s
+[train] step 300/342 | loss 1.6536 | ppl 5.23 | lr 6.84e-06 | 4127 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft/checkpoint_0000300.safetensors
+[train] step 320/342 | loss 1.6809 | ppl 5.37 | lr 5.51e-06 | 4122 tok/s
+[train] step 340/342 | loss 1.4265 | ppl 4.16 | lr 5.00e-06 | 4122 tok/s
+[train] Modèle final sauvegardé: runs/hybrid-sft/final.safetensors
+[main] Entraînement terminé en 0.19h
+[hybrid] Export int4 MLX
+[export] exports/hybrid_mlx_int4.safetensors: 32.20 Mo (4-bit)
+[hybrid] Benchmark export
+[bench] 32.20 Mo | Δ RSS chargement 52.1 Mo | après génération 66.0 Mo | 41.7 tok/s
+Bonjour, que peux-tu faire ?
+
+1. Repétition du premier mot : Le mot est une forme de pluriel qui se prononce « u » (en latin) et s'écrit u.
+
+2. L'adjectif qualificatif : Le terme est un adjectif qualificatif.
+3. L’adjectif démonstratif : Le nom est le genre d'adjectifs qualificatifs.
+4. L'« adjectif démonstrative » : Le pronom démonstratif est
+[hybrid] Pipeline terminé

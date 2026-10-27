@@ -1,1 +1,17 @@
-[watch-hybrid] 18:25:06 👀 Surveillance Telegram activée pour le pipeline MLX hybride.
+[watch-hybrid] 12:05:05 👀 Surveillance Telegram activée pour le pipeline MLX hybride.
+[watch-hybrid] 12:08:06 🔄 Pipeline MLX hybride — Réutilisation du jeu SFT déjà préparé
+[watch-hybrid] 12:08:06 🔄 Pipeline MLX hybride — Reprise du pré-entraînement au step 36000 depuis runs/hybrid-mlx/checkpoint_0036000.safetensors
+[watch-hybrid] 12:08:06 🔄 Pipeline MLX hybride — Reprise du pré-entraînement MLX depuis le cache complet du corpus
+[watch-hybrid] 12:08:06 ⚠️ Erreur dans le pipeline MLX hybride
+[watch-hybrid] 12:08:59 🔄 Pipeline MLX hybride — Réutilisation du jeu SFT déjà préparé
+[watch-hybrid] 12:08:59 🔄 Pipeline MLX hybride — Reprise du pré-entraînement au step 36000 depuis runs/hybrid-mlx/checkpoint_0036000.safetensors
+[watch-hybrid] 12:08:59 🔄 Pipeline MLX hybride — Reprise du pré-entraînement MLX depuis le cache complet du corpus
+[watch-hybrid] 12:25:30 📊 MLX hybride — Reprise du pré-entraînement MLX depuis le cache complet du corpus
+[watch-hybrid] 12:25:30 📦 Checkpoint MLX sauvegardé — step 36,500/36,980
+[watch-hybrid] 12:41:30 🔄 Pipeline MLX hybride — Fine-tuning masqué chat/code avec 10% de replay langue
+[watch-hybrid] 12:44:39 📦 Checkpoint MLX sauvegardé — step 100/342
+[watch-hybrid] 12:47:54 📦 Checkpoint MLX sauvegardé — step 200/342
+[watch-hybrid] 12:51:24 📦 Checkpoint MLX sauvegardé — step 300/342
+[watch-hybrid] 12:52:39 🔄 Pipeline MLX hybride — Export int4 MLX
+[watch-hybrid] 12:52:40 🔄 Pipeline MLX hybride — Benchmark export
+[watch-hybrid] 12:52:55 ✅ Pipeline MLX hybride terminé : pré-entraînement, SFT, export et benchmark.

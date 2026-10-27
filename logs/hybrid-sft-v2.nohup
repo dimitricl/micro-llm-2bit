@@ -1,0 +1,120 @@
+[hybrid] SFT v2 vérifié depuis le checkpoint de pré-entraînement
+[main] Vocab size: 16000
+[main] Modèle créé: 47,789,184 params
+[dataloader] Cache réutilisé: 302,937,807 tokens
+[sft] 5965 exemples | 14 exemples SFT/step + 2 replay LM
+[main] Reprise des poids runs/hybrid-mlx/final.safetensors au step 0; état AdamW réinitialisé
+[main] 302,937,807 tokens | étape=sft | 427 steps/epoch | 1281 steps prévus
+[train] step 1/1281 | loss 3.0911 | ppl 22.00 | lr 7.81e-07 | 3490 tok/s
+[train] step 20/1281 | loss 2.6936 | ppl 14.78 | lr 1.56e-05 | 4140 tok/s
+[train] step 40/1281 | loss 2.4819 | ppl 11.96 | lr 3.12e-05 | 4242 tok/s
+[train] step 60/1281 | loss 2.7217 | ppl 15.21 | lr 4.69e-05 | 4281 tok/s
+[train] step 80/1281 | loss 2.7154 | ppl 15.11 | lr 5.00e-05 | 4308 tok/s
+[train] step 100/1281 | loss 2.6444 | ppl 14.07 | lr 4.99e-05 | 4322 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000100.safetensors
+[train] step 120/1281 | loss 2.6790 | ppl 14.57 | lr 4.98e-05 | 4323 tok/s
+[train] step 140/1281 | loss 2.5665 | ppl 13.02 | lr 4.96e-05 | 4327 tok/s
+[train] step 160/1281 | loss 2.3224 | ppl 10.20 | lr 4.93e-05 | 4330 tok/s
+[train] step 180/1281 | loss 2.4925 | ppl 12.09 | lr 4.90e-05 | 4330 tok/s
+[train] step 200/1281 | loss 2.6543 | ppl 14.22 | lr 4.86e-05 | 4332 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000200.safetensors
+[train] step 220/1281 | loss 3.0704 | ppl 21.55 | lr 4.82e-05 | 4331 tok/s
+[train] step 240/1281 | loss 2.6534 | ppl 14.20 | lr 4.77e-05 | 4333 tok/s
+[train] step 260/1281 | loss 2.8290 | ppl 16.93 | lr 4.72e-05 | 4336 tok/s
+[train] step 280/1281 | loss 2.0157 | ppl 7.51 | lr 4.66e-05 | 4332 tok/s
+[train] step 300/1281 | loss 2.9318 | ppl 18.76 | lr 4.60e-05 | 4330 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000300.safetensors
+[train] step 320/1281 | loss 2.5456 | ppl 12.75 | lr 4.53e-05 | 4327 tok/s
+[train] step 340/1281 | loss 2.1170 | ppl 8.31 | lr 4.46e-05 | 4325 tok/s
+[train] step 360/1281 | loss 2.2555 | ppl 9.54 | lr 4.38e-05 | 4323 tok/s
+[train] step 380/1281 | loss 2.6495 | ppl 14.15 | lr 4.30e-05 | 4321 tok/s
+[train] step 400/1281 | loss 2.5965 | ppl 13.42 | lr 4.21e-05 | 4319 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000400.safetensors
+[train] step 420/1281 | loss 2.4704 | ppl 11.83 | lr 4.12e-05 | 4317 tok/s
+[train] step 440/1281 | loss 2.8571 | ppl 17.41 | lr 4.02e-05 | 4316 tok/s
+[train] step 460/1281 | loss 2.3060 | ppl 10.03 | lr 3.93e-05 | 4315 tok/s
+[train] step 480/1281 | loss 2.5150 | ppl 12.37 | lr 3.83e-05 | 4316 tok/s
+[train] step 500/1281 | loss 2.6651 | ppl 14.37 | lr 3.72e-05 | 4314 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000500.safetensors
+[train] step 520/1281 | loss 2.6393 | ppl 14.00 | lr 3.62e-05 | 4311 tok/s
+[train] step 540/1281 | loss 2.3579 | ppl 10.57 | lr 3.51e-05 | 4309 tok/s
+[train] step 560/1281 | loss 2.0635 | ppl 7.87 | lr 3.40e-05 | 4307 tok/s
+[train] step 580/1281 | loss 2.1925 | ppl 8.96 | lr 3.29e-05 | 4306 tok/s
+[train] step 600/1281 | loss 2.3698 | ppl 10.69 | lr 3.17e-05 | 4304 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000600.safetensors
+[train] step 620/1281 | loss 2.3629 | ppl 10.62 | lr 3.06e-05 | 4302 tok/s
+[train] step 640/1281 | loss 2.1160 | ppl 8.30 | lr 2.94e-05 | 4301 tok/s
+[train] step 660/1281 | loss 2.7992 | ppl 16.43 | lr 2.83e-05 | 4299 tok/s
+[train] step 680/1281 | loss 2.2088 | ppl 9.11 | lr 2.71e-05 | 4298 tok/s
+[train] step 700/1281 | loss 2.5184 | ppl 12.41 | lr 2.59e-05 | 4297 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000700.safetensors
+[train] step 720/1281 | loss 2.3156 | ppl 10.13 | lr 2.48e-05 | 4295 tok/s
+[train] step 740/1281 | loss 2.2989 | ppl 9.96 | lr 2.36e-05 | 4294 tok/s
+[train] step 760/1281 | loss 2.5947 | ppl 13.39 | lr 2.25e-05 | 4294 tok/s
+[train] step 780/1281 | loss 2.6560 | ppl 14.24 | lr 2.14e-05 | 4294 tok/s
+[train] step 800/1281 | loss 2.5164 | ppl 12.38 | lr 2.02e-05 | 4293 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000800.safetensors
+[train] step 820/1281 | loss 2.3733 | ppl 10.73 | lr 1.92e-05 | 4291 tok/s
+[train] step 840/1281 | loss 2.4971 | ppl 12.15 | lr 1.81e-05 | 4289 tok/s
+[train] step 860/1281 | loss 1.9668 | ppl 7.15 | lr 1.70e-05 | 4288 tok/s
+[train] step 880/1281 | loss 2.3062 | ppl 10.04 | lr 1.60e-05 | 4287 tok/s
+[train] step 900/1281 | loss 2.1033 | ppl 8.19 | lr 1.50e-05 | 4286 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0000900.safetensors
+[train] step 920/1281 | loss 2.4412 | ppl 11.49 | lr 1.41e-05 | 4285 tok/s
+[train] step 940/1281 | loss 2.3510 | ppl 10.50 | lr 1.32e-05 | 4284 tok/s
+[train] step 960/1281 | loss 2.0141 | ppl 7.49 | lr 1.23e-05 | 4283 tok/s
+[train] step 980/1281 | loss 2.4321 | ppl 11.38 | lr 1.15e-05 | 4283 tok/s
+[train] step 1000/1281 | loss 2.5649 | ppl 13.00 | lr 1.07e-05 | 4281 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0001000.safetensors
+[train] step 1020/1281 | loss 2.6596 | ppl 14.29 | lr 9.92e-06 | 4280 tok/s
+[train] step 1040/1281 | loss 2.3871 | ppl 10.88 | lr 9.22e-06 | 4279 tok/s
+[train] step 1060/1281 | loss 2.4495 | ppl 11.58 | lr 8.57e-06 | 4279 tok/s
+[train] step 1080/1281 | loss 2.4404 | ppl 11.48 | lr 7.97e-06 | 4278 tok/s
+[train] step 1100/1281 | loss 2.7851 | ppl 16.20 | lr 7.42e-06 | 4277 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0001100.safetensors
+[train] step 1120/1281 | loss 2.6807 | ppl 14.60 | lr 6.92e-06 | 4275 tok/s
+[train] step 1140/1281 | loss 2.3338 | ppl 10.32 | lr 6.48e-06 | 4274 tok/s
+[train] step 1160/1281 | loss 2.3947 | ppl 10.97 | lr 6.09e-06 | 4274 tok/s
+[train] step 1180/1281 | loss 2.3071 | ppl 10.05 | lr 5.76e-06 | 4272 tok/s
+[train] step 1200/1281 | loss 2.5120 | ppl 12.33 | lr 5.49e-06 | 4271 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-sft-v2/checkpoint_0001200.safetensors
+[train] step 1220/1281 | loss 2.1721 | ppl 8.78 | lr 5.28e-06 | 4270 tok/s
+[train] step 1240/1281 | loss 2.5329 | ppl 12.59 | lr 5.13e-06 | 4270 tok/s
+[train] step 1260/1281 | loss 2.3670 | ppl 10.66 | lr 5.03e-06 | 4269 tok/s
+[train] step 1280/1281 | loss 2.4087 | ppl 11.12 | lr 5.00e-06 | 4268 tok/s
+[train] Modèle final sauvegardé: runs/hybrid-sft-v2/final.safetensors
+[main] Entraînement terminé en 0.68h
+[hybrid] Export int4 SFT v2
+[export] exports/hybrid_mlx_int4_v2.safetensors: 32.20 Mo (4-bit)
+[hybrid] Benchmark export SFT v2
+[bench] 32.20 Mo | Δ RSS chargement 52.0 Mo | après génération 69.4 Mo | 34.8 tok/s
+Bonjour, que peux-tu faire ?
+Steve Bates, « The California Pacific Ocean », dans Annie Girardot, , .
+.
+. (traduction de l'ouvrage de Jean-Pierre Jeunet)
+. [] (traduit du grec ancien par Pauline Loiseau)
+Conquête des États-Unis
+Histoire de la Californie
+Histoire des États américains
+Histoire d'Ottawa
+Histoire du Mexique
+Histoire économique de Cuba
+Histoire coloniale américaine
+Histoire contemporaine de l’Amérique latine
+Histoire post-apartheid
+Histoire politique de l', sur le site de la Bibliothèque nationale de France
+Culture dans les États pontificaux
+Constitution de la République romaine
+Documentaire sur la guerre des Six Jours de L'Humanité
+Société d'histoire du Mexique (France)
+Projet de loi sur la liberté religieuse
+Histoire militaire de l'.
+. .
+Loi sur les droits civils et militaires
+Commission de la Défense nationale
+Droit de la guerre
+Relations entre le Mexique et Cuba
+Traité de paix de la Société des Nations
+Seconde Guerre mondiale
+Succès de la Seconde Guerre mondiale
+[hybrid] Pipeline terminé

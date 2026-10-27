@@ -1,11 +1,10 @@
 {
   "stage": "pretrain",
   "data": [
-    "/Volumes/Lexar/clean-corpus/dedup",
-    "data/hybrid"
+    "/Volumes/Lexar/clean-corpus/dedup"
   ],
   "sft_data": null,
-  "token_cache": null,
+  "token_cache": "runs/hybrid-mlx/tokens.uint16.bin",
   "tokenizer": "models/tokenizer_fr_16k",
   "output": "runs/hybrid-mlx",
   "batch_size": 16,
@@ -19,7 +18,7 @@
   "min_lr_ratio": 0.1,
   "ckpt_every": 500,
   "log_every": 50,
-  "resume": null,
-  "resume_step": 0,
+  "resume": "runs/hybrid-mlx/checkpoint_0036000.safetensors",
+  "resume_step": 36000,
   "seed": 42
 }
