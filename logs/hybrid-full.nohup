@@ -1,0 +1,818 @@
+[hybrid] Préparation du jeu SFT chat + complétion code
+{
+  "tokenizer": "models/tokenizer_fr_16k",
+  "seq_len": 512,
+  "examples": 1583,
+  "supervised_tokens": 259593,
+  "counts": {
+    "chat": 56,
+    "code": 1527,
+    "rejected": 28,
+    "duplicates": 0
+  }
+}
+[hybrid] Pré-entraînement MLX sur les tranches Wikipédia + data/hybrid
+[main] Vocab size: 16000
+[main] Modèle créé: 47,789,184 params
+[dataloader] Tokenisation en deux passes vers runs/hybrid-mlx/tokens.uint16.bin
+[dataloader] 153036 documents, 302,937,807 tokens
+[dataloader] 302,937,807 tokens
+[main] 302,937,807 tokens | étape=pretrain | 36980 steps/epoch | 36980 steps prévus
+[train] step 1/36980 | loss 10.1456 | ppl 25479.41 | lr 1.62e-07 | 3129 tok/s
+[train] step 50/36980 | loss 8.3503 | ppl 4231.54 | lr 8.11e-06 | 4221 tok/s
+[train] step 100/36980 | loss 7.6758 | ppl 2155.47 | lr 1.62e-05 | 4218 tok/s
+[train] step 150/36980 | loss 7.2544 | ppl 1414.25 | lr 2.43e-05 | 4188 tok/s
+[train] step 200/36980 | loss 7.0588 | ppl 1163.10 | lr 3.24e-05 | 4166 tok/s
+[train] step 250/36980 | loss 6.8319 | ppl 926.99 | lr 4.06e-05 | 4156 tok/s
+[train] step 300/36980 | loss 6.4083 | ppl 606.84 | lr 4.87e-05 | 4144 tok/s
+[train] step 350/36980 | loss 6.3624 | ppl 579.66 | lr 5.68e-05 | 4132 tok/s
+[train] step 400/36980 | loss 6.3109 | ppl 550.54 | lr 6.49e-05 | 4122 tok/s
+[train] step 450/36980 | loss 6.0606 | ppl 428.62 | lr 7.30e-05 | 4181 tok/s
+[train] step 500/36980 | loss 6.0672 | ppl 431.46 | lr 8.11e-05 | 4234 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0000500.safetensors
+[train] step 550/36980 | loss 5.8493 | ppl 346.98 | lr 8.92e-05 | 4263 tok/s
+[train] step 600/36980 | loss 5.7428 | ppl 311.93 | lr 9.73e-05 | 4292 tok/s
+[train] step 650/36980 | loss 5.6064 | ppl 272.18 | lr 1.05e-04 | 4328 tok/s
+[train] step 700/36980 | loss 5.6924 | ppl 296.61 | lr 1.14e-04 | 4359 tok/s
+[train] step 750/36980 | loss 5.5635 | ppl 260.73 | lr 1.22e-04 | 4388 tok/s
+[train] step 800/36980 | loss 5.6102 | ppl 273.21 | lr 1.30e-04 | 4412 tok/s
+[train] step 850/36980 | loss 5.4694 | ppl 237.31 | lr 1.38e-04 | 4425 tok/s
+[train] step 900/36980 | loss 5.2817 | ppl 196.70 | lr 1.46e-04 | 4404 tok/s
+[train] step 950/36980 | loss 5.3840 | ppl 217.89 | lr 1.54e-04 | 4404 tok/s
+[train] step 1000/36980 | loss 5.1182 | ppl 167.03 | lr 1.62e-04 | 4425 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0001000.safetensors
+[train] step 1050/36980 | loss 5.3347 | ppl 207.41 | lr 1.70e-04 | 4442 tok/s
+[train] step 1100/36980 | loss 5.2407 | ppl 188.80 | lr 1.78e-04 | 4460 tok/s
+[train] step 1150/36980 | loss 5.0636 | ppl 158.16 | lr 1.87e-04 | 4476 tok/s
+[train] step 1200/36980 | loss 4.9071 | ppl 135.24 | lr 1.95e-04 | 4491 tok/s
+[train] step 1250/36980 | loss 5.1668 | ppl 175.36 | lr 2.03e-04 | 4505 tok/s
+[train] step 1300/36980 | loss 4.9501 | ppl 141.19 | lr 2.11e-04 | 4518 tok/s
+[train] step 1350/36980 | loss 4.8602 | ppl 129.04 | lr 2.19e-04 | 4530 tok/s
+[train] step 1400/36980 | loss 4.8665 | ppl 129.87 | lr 2.27e-04 | 4541 tok/s
+[train] step 1450/36980 | loss 4.8822 | ppl 131.92 | lr 2.35e-04 | 4551 tok/s
+[train] step 1500/36980 | loss 4.9132 | ppl 136.07 | lr 2.43e-04 | 4560 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0001500.safetensors
+[train] step 1550/36980 | loss 4.6231 | ppl 101.81 | lr 2.51e-04 | 4569 tok/s
+[train] step 1600/36980 | loss 4.6981 | ppl 109.74 | lr 2.60e-04 | 4577 tok/s
+[train] step 1650/36980 | loss 4.1849 | ppl 65.69 | lr 2.68e-04 | 4584 tok/s
+[train] step 1700/36980 | loss 4.6257 | ppl 102.07 | lr 2.76e-04 | 4591 tok/s
+[train] step 1750/36980 | loss 4.6335 | ppl 102.87 | lr 2.84e-04 | 4598 tok/s
+[train] step 1800/36980 | loss 4.8926 | ppl 133.30 | lr 2.92e-04 | 4604 tok/s
+[train] step 1850/36980 | loss 4.5885 | ppl 98.34 | lr 3.00e-04 | 4609 tok/s
+[train] step 1900/36980 | loss 4.5316 | ppl 92.91 | lr 3.00e-04 | 4613 tok/s
+[train] step 1950/36980 | loss 4.4837 | ppl 88.56 | lr 3.00e-04 | 4618 tok/s
+[train] step 2000/36980 | loss 4.4613 | ppl 86.60 | lr 3.00e-04 | 4622 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0002000.safetensors
+[train] step 2050/36980 | loss 4.4720 | ppl 87.54 | lr 3.00e-04 | 4626 tok/s
+[train] step 2100/36980 | loss 4.5878 | ppl 98.28 | lr 3.00e-04 | 4629 tok/s
+[train] step 2150/36980 | loss 4.3157 | ppl 74.87 | lr 3.00e-04 | 4633 tok/s
+[train] step 2200/36980 | loss 4.6143 | ppl 100.91 | lr 3.00e-04 | 4636 tok/s
+[train] step 2250/36980 | loss 4.3733 | ppl 79.30 | lr 3.00e-04 | 4638 tok/s
+[train] step 2300/36980 | loss 4.0265 | ppl 56.06 | lr 3.00e-04 | 4641 tok/s
+[train] step 2350/36980 | loss 4.2944 | ppl 73.29 | lr 3.00e-04 | 4644 tok/s
+[train] step 2400/36980 | loss 4.2990 | ppl 73.62 | lr 3.00e-04 | 4647 tok/s
+[train] step 2450/36980 | loss 4.3235 | ppl 75.45 | lr 3.00e-04 | 4650 tok/s
+[train] step 2500/36980 | loss 4.3666 | ppl 78.78 | lr 3.00e-04 | 4653 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0002500.safetensors
+[train] step 2550/36980 | loss 4.1146 | ppl 61.23 | lr 3.00e-04 | 4655 tok/s
+[train] step 2600/36980 | loss 4.3651 | ppl 78.66 | lr 3.00e-04 | 4657 tok/s
+[train] step 2650/36980 | loss 4.3390 | ppl 76.63 | lr 3.00e-04 | 4660 tok/s
+[train] step 2700/36980 | loss 4.1230 | ppl 61.75 | lr 3.00e-04 | 4662 tok/s
+[train] step 2750/36980 | loss 4.2661 | ppl 71.25 | lr 3.00e-04 | 4664 tok/s
+[train] step 2800/36980 | loss 4.2393 | ppl 69.36 | lr 3.00e-04 | 4666 tok/s
+[train] step 2850/36980 | loss 4.2953 | ppl 73.35 | lr 2.99e-04 | 4667 tok/s
+[train] step 2900/36980 | loss 4.0178 | ppl 55.58 | lr 2.99e-04 | 4669 tok/s
+[train] step 2950/36980 | loss 4.1372 | ppl 62.63 | lr 2.99e-04 | 4671 tok/s
+[train] step 3000/36980 | loss 4.0287 | ppl 56.19 | lr 2.99e-04 | 4673 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0003000.safetensors
+[train] step 3050/36980 | loss 4.1166 | ppl 61.35 | lr 2.99e-04 | 4675 tok/s
+[train] step 3100/36980 | loss 3.7278 | ppl 41.59 | lr 2.99e-04 | 4677 tok/s
+[train] step 3150/36980 | loss 4.0487 | ppl 57.32 | lr 2.99e-04 | 4679 tok/s
+[train] step 3200/36980 | loss 4.0200 | ppl 55.70 | lr 2.99e-04 | 4680 tok/s
+[train] step 3250/36980 | loss 4.0693 | ppl 58.51 | lr 2.99e-04 | 4682 tok/s
+[train] step 3300/36980 | loss 4.0384 | ppl 56.74 | lr 2.99e-04 | 4683 tok/s
+[train] step 3350/36980 | loss 4.1336 | ppl 62.40 | lr 2.99e-04 | 4685 tok/s
+[train] step 3400/36980 | loss 3.9276 | ppl 50.78 | lr 2.99e-04 | 4686 tok/s
+[train] step 3450/36980 | loss 3.9038 | ppl 49.59 | lr 2.99e-04 | 4688 tok/s
+[train] step 3500/36980 | loss 3.8459 | ppl 46.80 | lr 2.99e-04 | 4689 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0003500.safetensors
+[train] step 3550/36980 | loss 3.6680 | ppl 39.17 | lr 2.98e-04 | 4691 tok/s
+[train] step 3600/36980 | loss 3.8959 | ppl 49.20 | lr 2.98e-04 | 4692 tok/s
+[train] step 3650/36980 | loss 3.8078 | ppl 45.05 | lr 2.98e-04 | 4693 tok/s
+[train] step 3700/36980 | loss 3.6489 | ppl 38.43 | lr 2.98e-04 | 4695 tok/s
+[train] step 3750/36980 | loss 3.9393 | ppl 51.38 | lr 2.98e-04 | 4696 tok/s
+[train] step 3800/36980 | loss 3.8352 | ppl 46.30 | lr 2.98e-04 | 4697 tok/s
+[train] step 3850/36980 | loss 3.6540 | ppl 38.63 | lr 2.98e-04 | 4698 tok/s
+[train] step 3900/36980 | loss 3.5478 | ppl 34.74 | lr 2.98e-04 | 4700 tok/s
+[train] step 3950/36980 | loss 3.7037 | ppl 40.60 | lr 2.98e-04 | 4701 tok/s
+[train] step 4000/36980 | loss 3.7816 | ppl 43.88 | lr 2.98e-04 | 4701 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0004000.safetensors
+[train] step 4050/36980 | loss 3.7468 | ppl 42.39 | lr 2.97e-04 | 4702 tok/s
+[train] step 4100/36980 | loss 3.5142 | ppl 33.59 | lr 2.97e-04 | 4703 tok/s
+[train] step 4150/36980 | loss 3.6238 | ppl 37.48 | lr 2.97e-04 | 4704 tok/s
+[train] step 4200/36980 | loss 3.6569 | ppl 38.74 | lr 2.97e-04 | 4705 tok/s
+[train] step 4250/36980 | loss 3.5327 | ppl 34.22 | lr 2.97e-04 | 4706 tok/s
+[train] step 4300/36980 | loss 3.6913 | ppl 40.10 | lr 2.97e-04 | 4707 tok/s
+[train] step 4350/36980 | loss 3.5787 | ppl 35.83 | lr 2.97e-04 | 4708 tok/s
+[train] step 4400/36980 | loss 3.3613 | ppl 28.83 | lr 2.97e-04 | 4709 tok/s
+[train] step 4450/36980 | loss 3.3444 | ppl 28.34 | lr 2.96e-04 | 4709 tok/s
+[train] step 4500/36980 | loss 3.6505 | ppl 38.49 | lr 2.96e-04 | 4710 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0004500.safetensors
+[train] step 4550/36980 | loss 3.7104 | ppl 40.87 | lr 2.96e-04 | 4711 tok/s
+[train] step 4600/36980 | loss 3.5985 | ppl 36.54 | lr 2.96e-04 | 4712 tok/s
+[train] step 4650/36980 | loss 3.7260 | ppl 41.51 | lr 2.96e-04 | 4712 tok/s
+[train] step 4700/36980 | loss 3.6352 | ppl 37.91 | lr 2.96e-04 | 4713 tok/s
+[train] step 4750/36980 | loss 3.5606 | ppl 35.19 | lr 2.95e-04 | 4714 tok/s
+[train] step 4800/36980 | loss 3.5305 | ppl 34.14 | lr 2.95e-04 | 4715 tok/s
+[train] step 4850/36980 | loss 3.5856 | ppl 36.08 | lr 2.95e-04 | 4716 tok/s
+[train] step 4900/36980 | loss 3.6740 | ppl 39.41 | lr 2.95e-04 | 4716 tok/s
+[train] step 4950/36980 | loss 3.6466 | ppl 38.34 | lr 2.95e-04 | 4717 tok/s
+[train] step 5000/36980 | loss 3.4095 | ppl 30.25 | lr 2.95e-04 | 4718 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0005000.safetensors
+[train] step 5050/36980 | loss 3.4536 | ppl 31.61 | lr 2.95e-04 | 4718 tok/s
+[train] step 5100/36980 | loss 3.8193 | ppl 45.57 | lr 2.94e-04 | 4719 tok/s
+[train] step 5150/36980 | loss 3.4653 | ppl 31.99 | lr 2.94e-04 | 4720 tok/s
+[train] step 5200/36980 | loss 3.5593 | ppl 35.14 | lr 2.94e-04 | 4721 tok/s
+[train] step 5250/36980 | loss 3.6733 | ppl 39.38 | lr 2.94e-04 | 4721 tok/s
+[train] step 5300/36980 | loss 3.6720 | ppl 39.33 | lr 2.94e-04 | 4722 tok/s
+[train] step 5350/36980 | loss 3.6238 | ppl 37.48 | lr 2.93e-04 | 4722 tok/s
+[train] step 5400/36980 | loss 3.6618 | ppl 38.93 | lr 2.93e-04 | 4723 tok/s
+[train] step 5450/36980 | loss 3.5704 | ppl 35.53 | lr 2.93e-04 | 4724 tok/s
+[train] step 5500/36980 | loss 3.7078 | ppl 40.76 | lr 2.93e-04 | 4724 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0005500.safetensors
+[train] step 5550/36980 | loss 3.3987 | ppl 29.93 | lr 2.93e-04 | 4725 tok/s
+[train] step 5600/36980 | loss 3.6540 | ppl 38.63 | lr 2.92e-04 | 4725 tok/s
+[train] step 5650/36980 | loss 3.4524 | ppl 31.58 | lr 2.92e-04 | 4726 tok/s
+[train] step 5700/36980 | loss 3.6748 | ppl 39.44 | lr 2.92e-04 | 4727 tok/s
+[train] step 5750/36980 | loss 3.2957 | ppl 27.00 | lr 2.92e-04 | 4727 tok/s
+[train] step 5800/36980 | loss 3.3677 | ppl 29.01 | lr 2.92e-04 | 4728 tok/s
+[train] step 5850/36980 | loss 3.5234 | ppl 33.90 | lr 2.91e-04 | 4728 tok/s
+[train] step 5900/36980 | loss 3.4582 | ppl 31.76 | lr 2.91e-04 | 4729 tok/s
+[train] step 5950/36980 | loss 3.5000 | ppl 33.12 | lr 2.91e-04 | 4729 tok/s
+[train] step 6000/36980 | loss 3.6686 | ppl 39.20 | lr 2.91e-04 | 4730 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0006000.safetensors
+[train] step 6050/36980 | loss 3.4677 | ppl 32.06 | lr 2.91e-04 | 4730 tok/s
+[train] step 6100/36980 | loss 3.5623 | ppl 35.24 | lr 2.90e-04 | 4731 tok/s
+[train] step 6150/36980 | loss 3.4304 | ppl 30.89 | lr 2.90e-04 | 4731 tok/s
+[train] step 6200/36980 | loss 3.4167 | ppl 30.47 | lr 2.90e-04 | 4732 tok/s
+[train] step 6250/36980 | loss 3.5689 | ppl 35.48 | lr 2.90e-04 | 4732 tok/s
+[train] step 6300/36980 | loss 3.5600 | ppl 35.16 | lr 2.89e-04 | 4733 tok/s
+[train] step 6350/36980 | loss 3.2564 | ppl 25.96 | lr 2.89e-04 | 4733 tok/s
+[train] step 6400/36980 | loss 3.4563 | ppl 31.70 | lr 2.89e-04 | 4733 tok/s
+[train] step 6450/36980 | loss 3.6000 | ppl 36.60 | lr 2.89e-04 | 4734 tok/s
+[train] step 6500/36980 | loss 3.3102 | ppl 27.39 | lr 2.88e-04 | 4734 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0006500.safetensors
+[train] step 6550/36980 | loss 3.6388 | ppl 38.05 | lr 2.88e-04 | 4735 tok/s
+[train] step 6600/36980 | loss 3.4802 | ppl 32.47 | lr 2.88e-04 | 4735 tok/s
+[train] step 6650/36980 | loss 3.3722 | ppl 29.14 | lr 2.88e-04 | 4736 tok/s
+[train] step 6700/36980 | loss 3.2146 | ppl 24.89 | lr 2.87e-04 | 4736 tok/s
+[train] step 6750/36980 | loss 3.4626 | ppl 31.90 | lr 2.87e-04 | 4737 tok/s
+[train] step 6800/36980 | loss 3.3122 | ppl 27.45 | lr 2.87e-04 | 4737 tok/s
+[train] step 6850/36980 | loss 3.6221 | ppl 37.42 | lr 2.87e-04 | 4737 tok/s
+[train] step 6900/36980 | loss 3.2730 | ppl 26.39 | lr 2.86e-04 | 4738 tok/s
+[train] step 6950/36980 | loss 3.3473 | ppl 28.42 | lr 2.86e-04 | 4738 tok/s
+[train] step 7000/36980 | loss 3.1929 | ppl 24.36 | lr 2.86e-04 | 4739 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0007000.safetensors
+[train] step 7050/36980 | loss 3.4226 | ppl 30.65 | lr 2.86e-04 | 4739 tok/s
+[train] step 7100/36980 | loss 3.2402 | ppl 25.54 | lr 2.85e-04 | 4740 tok/s
+[train] step 7150/36980 | loss 3.2571 | ppl 25.97 | lr 2.85e-04 | 4740 tok/s
+[train] step 7200/36980 | loss 3.2492 | ppl 25.77 | lr 2.85e-04 | 4740 tok/s
+[train] step 7250/36980 | loss 3.2326 | ppl 25.35 | lr 2.85e-04 | 4741 tok/s
+[train] step 7300/36980 | loss 3.4548 | ppl 31.65 | lr 2.84e-04 | 4741 tok/s
+[train] step 7350/36980 | loss 3.1504 | ppl 23.35 | lr 2.84e-04 | 4735 tok/s
+[train] step 7400/36980 | loss 3.4918 | ppl 32.85 | lr 2.84e-04 | 4730 tok/s
+[train] step 7450/36980 | loss 3.1150 | ppl 22.53 | lr 2.83e-04 | 4727 tok/s
+[train] step 7500/36980 | loss 3.3347 | ppl 28.07 | lr 2.83e-04 | 4724 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0007500.safetensors
+[train] step 7550/36980 | loss 3.4021 | ppl 30.03 | lr 2.83e-04 | 4721 tok/s
+[train] step 7600/36980 | loss 3.1565 | ppl 23.49 | lr 2.83e-04 | 4717 tok/s
+[train] step 7650/36980 | loss 3.2746 | ppl 26.43 | lr 2.82e-04 | 4714 tok/s
+[train] step 7700/36980 | loss 3.2641 | ppl 26.16 | lr 2.82e-04 | 4709 tok/s
+[train] step 7750/36980 | loss 3.4232 | ppl 30.67 | lr 2.82e-04 | 4706 tok/s
+[train] step 7800/36980 | loss 3.3795 | ppl 29.36 | lr 2.81e-04 | 4703 tok/s
+[train] step 7850/36980 | loss 3.5530 | ppl 34.92 | lr 2.81e-04 | 4699 tok/s
+[train] step 7900/36980 | loss 3.1051 | ppl 22.31 | lr 2.81e-04 | 4700 tok/s
+[train] step 7950/36980 | loss 3.4450 | ppl 31.34 | lr 2.80e-04 | 4700 tok/s
+[train] step 8000/36980 | loss 3.3586 | ppl 28.75 | lr 2.80e-04 | 4701 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0008000.safetensors
+[train] step 8050/36980 | loss 3.2100 | ppl 24.78 | lr 2.80e-04 | 4701 tok/s
+[train] step 8100/36980 | loss 3.2568 | ppl 25.97 | lr 2.79e-04 | 4702 tok/s
+[train] step 8150/36980 | loss 3.0196 | ppl 20.48 | lr 2.79e-04 | 4702 tok/s
+[train] step 8200/36980 | loss 3.4885 | ppl 32.74 | lr 2.79e-04 | 4703 tok/s
+[train] step 8250/36980 | loss 3.3678 | ppl 29.01 | lr 2.78e-04 | 4703 tok/s
+[train] step 8300/36980 | loss 3.3899 | ppl 29.66 | lr 2.78e-04 | 4704 tok/s
+[train] step 8350/36980 | loss 3.2387 | ppl 25.50 | lr 2.78e-04 | 4705 tok/s
+[train] step 8400/36980 | loss 3.3624 | ppl 28.86 | lr 2.77e-04 | 4705 tok/s
+[train] step 8450/36980 | loss 3.5016 | ppl 33.17 | lr 2.77e-04 | 4706 tok/s
+[train] step 8500/36980 | loss 3.0566 | ppl 21.25 | lr 2.77e-04 | 4706 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0008500.safetensors
+[train] step 8550/36980 | loss 2.9692 | ppl 19.48 | lr 2.76e-04 | 4706 tok/s
+[train] step 8600/36980 | loss 3.2088 | ppl 24.75 | lr 2.76e-04 | 4707 tok/s
+[train] step 8650/36980 | loss 3.3209 | ppl 27.69 | lr 2.76e-04 | 4708 tok/s
+[train] step 8700/36980 | loss 3.2791 | ppl 26.55 | lr 2.75e-04 | 4708 tok/s
+[train] step 8750/36980 | loss 3.3916 | ppl 29.71 | lr 2.75e-04 | 4709 tok/s
+[train] step 8800/36980 | loss 3.4639 | ppl 31.94 | lr 2.75e-04 | 4709 tok/s
+[train] step 8850/36980 | loss 3.2577 | ppl 25.99 | lr 2.74e-04 | 4710 tok/s
+[train] step 8900/36980 | loss 3.3328 | ppl 28.02 | lr 2.74e-04 | 4710 tok/s
+[train] step 8950/36980 | loss 3.1751 | ppl 23.93 | lr 2.74e-04 | 4711 tok/s
+[train] step 9000/36980 | loss 3.5657 | ppl 35.37 | lr 2.73e-04 | 4711 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0009000.safetensors
+[train] step 9050/36980 | loss 2.9661 | ppl 19.42 | lr 2.73e-04 | 4712 tok/s
+[train] step 9100/36980 | loss 3.2538 | ppl 25.89 | lr 2.73e-04 | 4712 tok/s
+[train] step 9150/36980 | loss 3.2359 | ppl 25.43 | lr 2.72e-04 | 4713 tok/s
+[train] step 9200/36980 | loss 3.1165 | ppl 22.57 | lr 2.72e-04 | 4713 tok/s
+[train] step 9250/36980 | loss 3.3971 | ppl 29.88 | lr 2.72e-04 | 4713 tok/s
+[train] step 9300/36980 | loss 3.3485 | ppl 28.46 | lr 2.71e-04 | 4714 tok/s
+[train] step 9350/36980 | loss 3.1323 | ppl 22.93 | lr 2.71e-04 | 4714 tok/s
+[train] step 9400/36980 | loss 3.2626 | ppl 26.12 | lr 2.70e-04 | 4715 tok/s
+[train] step 9450/36980 | loss 3.0117 | ppl 20.32 | lr 2.70e-04 | 4715 tok/s
+[train] step 9500/36980 | loss 3.2026 | ppl 24.60 | lr 2.70e-04 | 4716 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0009500.safetensors
+[train] step 9550/36980 | loss 3.1801 | ppl 24.05 | lr 2.69e-04 | 4716 tok/s
+[train] step 9600/36980 | loss 3.4231 | ppl 30.66 | lr 2.69e-04 | 4717 tok/s
+[train] step 9650/36980 | loss 3.1052 | ppl 22.31 | lr 2.68e-04 | 4717 tok/s
+[train] step 9700/36980 | loss 3.1425 | ppl 23.16 | lr 2.68e-04 | 4717 tok/s
+[train] step 9750/36980 | loss 3.1752 | ppl 23.93 | lr 2.68e-04 | 4718 tok/s
+[train] step 9800/36980 | loss 3.2604 | ppl 26.06 | lr 2.67e-04 | 4718 tok/s
+[train] step 9850/36980 | loss 3.1806 | ppl 24.06 | lr 2.67e-04 | 4719 tok/s
+[train] step 9900/36980 | loss 3.3506 | ppl 28.52 | lr 2.67e-04 | 4719 tok/s
+[train] step 9950/36980 | loss 3.4480 | ppl 31.44 | lr 2.66e-04 | 4719 tok/s
+[train] step 10000/36980 | loss 3.3560 | ppl 28.67 | lr 2.66e-04 | 4720 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0010000.safetensors
+[train] step 10050/36980 | loss 3.3792 | ppl 29.35 | lr 2.65e-04 | 4720 tok/s
+[train] step 10100/36980 | loss 3.0294 | ppl 20.68 | lr 2.65e-04 | 4721 tok/s
+[train] step 10150/36980 | loss 3.4229 | ppl 30.66 | lr 2.64e-04 | 4721 tok/s
+[train] step 10200/36980 | loss 2.9109 | ppl 18.37 | lr 2.64e-04 | 4721 tok/s
+[train] step 10250/36980 | loss 3.1072 | ppl 22.36 | lr 2.64e-04 | 4721 tok/s
+[train] step 10300/36980 | loss 3.2198 | ppl 25.02 | lr 2.63e-04 | 4722 tok/s
+[train] step 10350/36980 | loss 3.2763 | ppl 26.48 | lr 2.63e-04 | 4722 tok/s
+[train] step 10400/36980 | loss 3.0689 | ppl 21.52 | lr 2.62e-04 | 4722 tok/s
+[train] step 10450/36980 | loss 2.9008 | ppl 18.19 | lr 2.62e-04 | 4723 tok/s
+[train] step 10500/36980 | loss 3.2071 | ppl 24.71 | lr 2.62e-04 | 4723 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0010500.safetensors
+[train] step 10550/36980 | loss 3.3366 | ppl 28.12 | lr 2.61e-04 | 4723 tok/s
+[train] step 10600/36980 | loss 3.0568 | ppl 21.26 | lr 2.61e-04 | 4724 tok/s
+[train] step 10650/36980 | loss 2.9736 | ppl 19.56 | lr 2.60e-04 | 4724 tok/s
+[train] step 10700/36980 | loss 3.3883 | ppl 29.61 | lr 2.60e-04 | 4724 tok/s
+[train] step 10750/36980 | loss 3.2559 | ppl 25.94 | lr 2.59e-04 | 4725 tok/s
+[train] step 10800/36980 | loss 3.3913 | ppl 29.70 | lr 2.59e-04 | 4725 tok/s
+[train] step 10850/36980 | loss 3.2248 | ppl 25.15 | lr 2.59e-04 | 4725 tok/s
+[train] step 10900/36980 | loss 3.0661 | ppl 21.46 | lr 2.58e-04 | 4726 tok/s
+[train] step 10950/36980 | loss 3.1018 | ppl 22.24 | lr 2.58e-04 | 4726 tok/s
+[train] step 11000/36980 | loss 3.3857 | ppl 29.54 | lr 2.57e-04 | 4726 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0011000.safetensors
+[train] step 11050/36980 | loss 3.3748 | ppl 29.22 | lr 2.57e-04 | 4727 tok/s
+[train] step 11100/36980 | loss 3.3935 | ppl 29.77 | lr 2.56e-04 | 4727 tok/s
+[train] step 11150/36980 | loss 3.1090 | ppl 22.40 | lr 2.56e-04 | 4727 tok/s
+[train] step 11200/36980 | loss 3.1288 | ppl 22.85 | lr 2.55e-04 | 4728 tok/s
+[train] step 11250/36980 | loss 2.9067 | ppl 18.30 | lr 2.55e-04 | 4728 tok/s
+[train] step 11300/36980 | loss 3.1251 | ppl 22.76 | lr 2.55e-04 | 4728 tok/s
+[train] step 11350/36980 | loss 3.3115 | ppl 27.43 | lr 2.54e-04 | 4729 tok/s
+[train] step 11400/36980 | loss 3.2341 | ppl 25.38 | lr 2.54e-04 | 4729 tok/s
+[train] step 11450/36980 | loss 3.2341 | ppl 25.38 | lr 2.53e-04 | 4729 tok/s
+[train] step 11500/36980 | loss 3.2337 | ppl 25.37 | lr 2.53e-04 | 4729 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0011500.safetensors
+[train] step 11550/36980 | loss 3.0238 | ppl 20.57 | lr 2.52e-04 | 4730 tok/s
+[train] step 11600/36980 | loss 3.1902 | ppl 24.29 | lr 2.52e-04 | 4730 tok/s
+[train] step 11650/36980 | loss 3.3414 | ppl 28.26 | lr 2.51e-04 | 4730 tok/s
+[train] step 11700/36980 | loss 3.2181 | ppl 24.98 | lr 2.51e-04 | 4731 tok/s
+[train] step 11750/36980 | loss 3.3633 | ppl 28.89 | lr 2.50e-04 | 4731 tok/s
+[train] step 11800/36980 | loss 3.0346 | ppl 20.79 | lr 2.50e-04 | 4731 tok/s
+[train] step 11850/36980 | loss 3.1409 | ppl 23.12 | lr 2.50e-04 | 4731 tok/s
+[train] step 11900/36980 | loss 3.0308 | ppl 20.71 | lr 2.49e-04 | 4732 tok/s
+[train] step 11950/36980 | loss 3.0988 | ppl 22.17 | lr 2.49e-04 | 4732 tok/s
+[train] step 12000/36980 | loss 3.0182 | ppl 20.45 | lr 2.48e-04 | 4732 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0012000.safetensors
+[train] step 12050/36980 | loss 3.2193 | ppl 25.01 | lr 2.48e-04 | 4733 tok/s
+[train] step 12100/36980 | loss 3.2703 | ppl 26.32 | lr 2.47e-04 | 4733 tok/s
+[train] step 12150/36980 | loss 2.9708 | ppl 19.51 | lr 2.47e-04 | 4733 tok/s
+[train] step 12200/36980 | loss 3.0414 | ppl 20.93 | lr 2.46e-04 | 4733 tok/s
+[train] step 12250/36980 | loss 3.0220 | ppl 20.53 | lr 2.46e-04 | 4734 tok/s
+[train] step 12300/36980 | loss 3.2937 | ppl 26.94 | lr 2.45e-04 | 4734 tok/s
+[train] step 12350/36980 | loss 2.9205 | ppl 18.55 | lr 2.45e-04 | 4734 tok/s
+[train] step 12400/36980 | loss 3.1587 | ppl 23.54 | lr 2.44e-04 | 4734 tok/s
+[train] step 12450/36980 | loss 2.9942 | ppl 19.97 | lr 2.44e-04 | 4735 tok/s
+[train] step 12500/36980 | loss 2.9248 | ppl 18.63 | lr 2.43e-04 | 4735 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0012500.safetensors
+[train] step 12550/36980 | loss 3.1749 | ppl 23.92 | lr 2.43e-04 | 4735 tok/s
+[train] step 12600/36980 | loss 3.2874 | ppl 26.77 | lr 2.42e-04 | 4735 tok/s
+[train] step 12650/36980 | loss 3.1577 | ppl 23.52 | lr 2.42e-04 | 4736 tok/s
+[train] step 12700/36980 | loss 3.0750 | ppl 21.65 | lr 2.41e-04 | 4736 tok/s
+[train] step 12750/36980 | loss 2.9739 | ppl 19.57 | lr 2.41e-04 | 4736 tok/s
+[train] step 12800/36980 | loss 3.2051 | ppl 24.66 | lr 2.40e-04 | 4736 tok/s
+[train] step 12850/36980 | loss 3.0948 | ppl 22.08 | lr 2.40e-04 | 4736 tok/s
+[train] step 12900/36980 | loss 3.1274 | ppl 22.82 | lr 2.39e-04 | 4737 tok/s
+[train] step 12950/36980 | loss 3.0563 | ppl 21.25 | lr 2.39e-04 | 4737 tok/s
+[train] step 13000/36980 | loss 3.3471 | ppl 28.42 | lr 2.38e-04 | 4737 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0013000.safetensors
+[train] step 13050/36980 | loss 3.3711 | ppl 29.11 | lr 2.38e-04 | 4737 tok/s
+[train] step 13100/36980 | loss 3.1304 | ppl 22.88 | lr 2.37e-04 | 4738 tok/s
+[train] step 13150/36980 | loss 2.9950 | ppl 19.98 | lr 2.37e-04 | 4738 tok/s
+[train] step 13200/36980 | loss 3.1321 | ppl 22.92 | lr 2.36e-04 | 4738 tok/s
+[train] step 13250/36980 | loss 3.1150 | ppl 22.53 | lr 2.36e-04 | 4738 tok/s
+[train] step 13300/36980 | loss 3.1588 | ppl 23.54 | lr 2.35e-04 | 4739 tok/s
+[train] step 13350/36980 | loss 2.9532 | ppl 19.17 | lr 2.35e-04 | 4739 tok/s
+[train] step 13400/36980 | loss 3.0937 | ppl 22.06 | lr 2.34e-04 | 4739 tok/s
+[train] step 13450/36980 | loss 3.0816 | ppl 21.79 | lr 2.34e-04 | 4739 tok/s
+[train] step 13500/36980 | loss 3.1071 | ppl 22.36 | lr 2.33e-04 | 4739 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0013500.safetensors
+[train] step 13550/36980 | loss 2.6112 | ppl 13.62 | lr 2.33e-04 | 4740 tok/s
+[train] step 13600/36980 | loss 3.1048 | ppl 22.30 | lr 2.32e-04 | 4740 tok/s
+[train] step 13650/36980 | loss 3.1339 | ppl 22.96 | lr 2.32e-04 | 4740 tok/s
+[train] step 13700/36980 | loss 3.0106 | ppl 20.30 | lr 2.31e-04 | 4740 tok/s
+[train] step 13750/36980 | loss 3.1945 | ppl 24.40 | lr 2.31e-04 | 4741 tok/s
+[train] step 13800/36980 | loss 3.2741 | ppl 26.42 | lr 2.30e-04 | 4741 tok/s
+[train] step 13850/36980 | loss 3.0319 | ppl 20.74 | lr 2.29e-04 | 4741 tok/s
+[train] step 13900/36980 | loss 3.2175 | ppl 24.97 | lr 2.29e-04 | 4741 tok/s
+[train] step 13950/36980 | loss 3.1034 | ppl 22.27 | lr 2.28e-04 | 4742 tok/s
+[train] step 14000/36980 | loss 3.1372 | ppl 23.04 | lr 2.28e-04 | 4742 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0014000.safetensors
+[train] step 14050/36980 | loss 2.8532 | ppl 17.34 | lr 2.27e-04 | 4742 tok/s
+[train] step 14100/36980 | loss 3.2361 | ppl 25.43 | lr 2.27e-04 | 4742 tok/s
+[train] step 14150/36980 | loss 3.0614 | ppl 21.36 | lr 2.26e-04 | 4742 tok/s
+[train] step 14200/36980 | loss 3.0759 | ppl 21.67 | lr 2.26e-04 | 4743 tok/s
+[train] step 14250/36980 | loss 3.2404 | ppl 25.54 | lr 2.25e-04 | 4743 tok/s
+[train] step 14300/36980 | loss 3.0901 | ppl 21.98 | lr 2.25e-04 | 4743 tok/s
+[train] step 14350/36980 | loss 3.0632 | ppl 21.40 | lr 2.24e-04 | 4743 tok/s
+[train] step 14400/36980 | loss 3.1360 | ppl 23.01 | lr 2.24e-04 | 4743 tok/s
+[train] step 14450/36980 | loss 3.2394 | ppl 25.52 | lr 2.23e-04 | 4744 tok/s
+[train] step 14500/36980 | loss 2.7327 | ppl 15.37 | lr 2.22e-04 | 4744 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0014500.safetensors
+[train] step 14550/36980 | loss 3.2224 | ppl 25.09 | lr 2.22e-04 | 4744 tok/s
+[train] step 14600/36980 | loss 2.9903 | ppl 19.89 | lr 2.21e-04 | 4744 tok/s
+[train] step 14650/36980 | loss 2.9861 | ppl 19.81 | lr 2.21e-04 | 4744 tok/s
+[train] step 14700/36980 | loss 3.1337 | ppl 22.96 | lr 2.20e-04 | 4744 tok/s
+[train] step 14750/36980 | loss 3.2213 | ppl 25.06 | lr 2.20e-04 | 4744 tok/s
+[train] step 14800/36980 | loss 3.0404 | ppl 20.91 | lr 2.19e-04 | 4745 tok/s
+[train] step 14850/36980 | loss 3.3190 | ppl 27.63 | lr 2.19e-04 | 4745 tok/s
+[train] step 14900/36980 | loss 2.8144 | ppl 16.68 | lr 2.18e-04 | 4745 tok/s
+[train] step 14950/36980 | loss 3.0671 | ppl 21.48 | lr 2.17e-04 | 4745 tok/s
+[train] step 15000/36980 | loss 3.0828 | ppl 21.82 | lr 2.17e-04 | 4745 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0015000.safetensors
+[train] step 15050/36980 | loss 3.1766 | ppl 23.96 | lr 2.16e-04 | 4745 tok/s
+[train] step 15100/36980 | loss 2.9975 | ppl 20.03 | lr 2.16e-04 | 4746 tok/s
+[train] step 15150/36980 | loss 2.8302 | ppl 16.95 | lr 2.15e-04 | 4746 tok/s
+[train] step 15200/36980 | loss 2.8940 | ppl 18.07 | lr 2.15e-04 | 4746 tok/s
+[train] step 15250/36980 | loss 2.8208 | ppl 16.79 | lr 2.14e-04 | 4746 tok/s
+[train] step 15300/36980 | loss 2.8754 | ppl 17.73 | lr 2.14e-04 | 4746 tok/s
+[train] step 15350/36980 | loss 3.1602 | ppl 23.57 | lr 2.13e-04 | 4746 tok/s
+[train] step 15400/36980 | loss 2.9348 | ppl 18.82 | lr 2.12e-04 | 4747 tok/s
+[train] step 15450/36980 | loss 2.6556 | ppl 14.23 | lr 2.12e-04 | 4747 tok/s
+[train] step 15500/36980 | loss 2.9688 | ppl 19.47 | lr 2.11e-04 | 4747 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0015500.safetensors
+[train] step 15550/36980 | loss 2.7610 | ppl 15.81 | lr 2.11e-04 | 4747 tok/s
+[train] step 15600/36980 | loss 3.2062 | ppl 24.69 | lr 2.10e-04 | 4747 tok/s
+[train] step 15650/36980 | loss 3.0454 | ppl 21.02 | lr 2.10e-04 | 4748 tok/s
+[train] step 15700/36980 | loss 3.0776 | ppl 21.71 | lr 2.09e-04 | 4748 tok/s
+[train] step 15750/36980 | loss 3.0178 | ppl 20.45 | lr 2.08e-04 | 4748 tok/s
+[train] step 15800/36980 | loss 3.1103 | ppl 22.43 | lr 2.08e-04 | 4748 tok/s
+[train] step 15850/36980 | loss 2.9258 | ppl 18.65 | lr 2.07e-04 | 4748 tok/s
+[train] step 15900/36980 | loss 2.7952 | ppl 16.37 | lr 2.07e-04 | 4748 tok/s
+[train] step 15950/36980 | loss 3.1981 | ppl 24.49 | lr 2.06e-04 | 4749 tok/s
+[train] step 16000/36980 | loss 3.1512 | ppl 23.36 | lr 2.06e-04 | 4749 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0016000.safetensors
+[train] step 16050/36980 | loss 2.5797 | ppl 13.19 | lr 2.05e-04 | 4749 tok/s
+[train] step 16100/36980 | loss 2.4601 | ppl 11.71 | lr 2.04e-04 | 4749 tok/s
+[train] step 16150/36980 | loss 3.1889 | ppl 24.26 | lr 2.04e-04 | 4749 tok/s
+[train] step 16200/36980 | loss 3.2359 | ppl 25.43 | lr 2.03e-04 | 4749 tok/s
+[train] step 16250/36980 | loss 3.0834 | ppl 21.83 | lr 2.03e-04 | 4749 tok/s
+[train] step 16300/36980 | loss 2.9516 | ppl 19.14 | lr 2.02e-04 | 4749 tok/s
+[train] step 16350/36980 | loss 2.7001 | ppl 14.88 | lr 2.02e-04 | 4749 tok/s
+[train] step 16400/36980 | loss 3.0865 | ppl 21.90 | lr 2.01e-04 | 4749 tok/s
+[train] step 16450/36980 | loss 2.9803 | ppl 19.69 | lr 2.00e-04 | 4749 tok/s
+[train] step 16500/36980 | loss 2.9937 | ppl 19.96 | lr 2.00e-04 | 4750 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0016500.safetensors
+[train] step 16550/36980 | loss 3.1492 | ppl 23.32 | lr 1.99e-04 | 4750 tok/s
+[train] step 16600/36980 | loss 3.1906 | ppl 24.30 | lr 1.99e-04 | 4750 tok/s
+[train] step 16650/36980 | loss 2.6219 | ppl 13.76 | lr 1.98e-04 | 4750 tok/s
+[train] step 16700/36980 | loss 3.2552 | ppl 25.92 | lr 1.97e-04 | 4750 tok/s
+[train] step 16750/36980 | loss 3.0707 | ppl 21.56 | lr 1.97e-04 | 4750 tok/s
+[train] step 16800/36980 | loss 3.0089 | ppl 20.26 | lr 1.96e-04 | 4750 tok/s
+[train] step 16850/36980 | loss 2.8352 | ppl 17.03 | lr 1.96e-04 | 4751 tok/s
+[train] step 16900/36980 | loss 3.0519 | ppl 21.16 | lr 1.95e-04 | 4751 tok/s
+[train] step 16950/36980 | loss 3.1688 | ppl 23.78 | lr 1.95e-04 | 4751 tok/s
+[train] step 17000/36980 | loss 3.0082 | ppl 20.25 | lr 1.94e-04 | 4751 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0017000.safetensors
+[train] step 17050/36980 | loss 3.2009 | ppl 24.55 | lr 1.93e-04 | 4751 tok/s
+[train] step 17100/36980 | loss 2.7260 | ppl 15.27 | lr 1.93e-04 | 4751 tok/s
+[train] step 17150/36980 | loss 2.9810 | ppl 19.71 | lr 1.92e-04 | 4751 tok/s
+[train] step 17200/36980 | loss 2.8405 | ppl 17.12 | lr 1.92e-04 | 4752 tok/s
+[train] step 17250/36980 | loss 2.8397 | ppl 17.11 | lr 1.91e-04 | 4752 tok/s
+[train] step 17300/36980 | loss 3.1507 | ppl 23.35 | lr 1.90e-04 | 4752 tok/s
+[train] step 17350/36980 | loss 3.1619 | ppl 23.62 | lr 1.90e-04 | 4752 tok/s
+[train] step 17400/36980 | loss 3.1053 | ppl 22.32 | lr 1.89e-04 | 4752 tok/s
+[train] step 17450/36980 | loss 2.9610 | ppl 19.32 | lr 1.89e-04 | 4752 tok/s
+[train] step 17500/36980 | loss 3.1575 | ppl 23.51 | lr 1.88e-04 | 4753 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0017500.safetensors
+[train] step 17550/36980 | loss 2.8479 | ppl 17.25 | lr 1.87e-04 | 4753 tok/s
+[train] step 17600/36980 | loss 3.1628 | ppl 23.64 | lr 1.87e-04 | 4753 tok/s
+[train] step 17650/36980 | loss 3.1402 | ppl 23.11 | lr 1.86e-04 | 4753 tok/s
+[train] step 17700/36980 | loss 2.9343 | ppl 18.81 | lr 1.86e-04 | 4753 tok/s
+[train] step 17750/36980 | loss 2.7519 | ppl 15.67 | lr 1.85e-04 | 4753 tok/s
+[train] step 17800/36980 | loss 2.7501 | ppl 15.64 | lr 1.84e-04 | 4753 tok/s
+[train] step 17850/36980 | loss 2.9446 | ppl 19.00 | lr 1.84e-04 | 4754 tok/s
+[train] step 17900/36980 | loss 2.9819 | ppl 19.73 | lr 1.83e-04 | 4754 tok/s
+[train] step 17950/36980 | loss 2.2497 | ppl 9.48 | lr 1.83e-04 | 4754 tok/s
+[train] step 18000/36980 | loss 2.9289 | ppl 18.71 | lr 1.82e-04 | 4754 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0018000.safetensors
+[train] step 18050/36980 | loss 3.0357 | ppl 20.82 | lr 1.81e-04 | 4754 tok/s
+[train] step 18100/36980 | loss 2.8038 | ppl 16.51 | lr 1.81e-04 | 4754 tok/s
+[train] step 18150/36980 | loss 3.0231 | ppl 20.56 | lr 1.80e-04 | 4754 tok/s
+[train] step 18200/36980 | loss 2.9513 | ppl 19.13 | lr 1.80e-04 | 4755 tok/s
+[train] step 18250/36980 | loss 2.7431 | ppl 15.54 | lr 1.79e-04 | 4755 tok/s
+[train] step 18300/36980 | loss 2.7210 | ppl 15.20 | lr 1.78e-04 | 4755 tok/s
+[train] step 18350/36980 | loss 3.0456 | ppl 21.02 | lr 1.78e-04 | 4755 tok/s
+[train] step 18400/36980 | loss 3.0055 | ppl 20.20 | lr 1.77e-04 | 4755 tok/s
+[train] step 18450/36980 | loss 3.3518 | ppl 28.55 | lr 1.77e-04 | 4755 tok/s
+[train] step 18500/36980 | loss 2.9666 | ppl 19.43 | lr 1.76e-04 | 4755 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0018500.safetensors
+[train] step 18550/36980 | loss 2.8967 | ppl 18.11 | lr 1.75e-04 | 4756 tok/s
+[train] step 18600/36980 | loss 3.1571 | ppl 23.50 | lr 1.75e-04 | 4756 tok/s
+[train] step 18650/36980 | loss 2.9855 | ppl 19.80 | lr 1.74e-04 | 4756 tok/s
+[train] step 18700/36980 | loss 2.6192 | ppl 13.73 | lr 1.74e-04 | 4756 tok/s
+[train] step 18750/36980 | loss 3.0720 | ppl 21.59 | lr 1.73e-04 | 4756 tok/s
+[train] step 18800/36980 | loss 2.8168 | ppl 16.72 | lr 1.72e-04 | 4756 tok/s
+[train] step 18850/36980 | loss 3.0672 | ppl 21.48 | lr 1.72e-04 | 4756 tok/s
+[train] step 18900/36980 | loss 2.9007 | ppl 18.19 | lr 1.71e-04 | 4756 tok/s
+[train] step 18950/36980 | loss 2.8429 | ppl 17.17 | lr 1.71e-04 | 4757 tok/s
+[train] step 19000/36980 | loss 2.8801 | ppl 17.82 | lr 1.70e-04 | 4757 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0019000.safetensors
+[train] step 19050/36980 | loss 2.9089 | ppl 18.34 | lr 1.69e-04 | 4757 tok/s
+[train] step 19100/36980 | loss 2.8869 | ppl 17.94 | lr 1.69e-04 | 4757 tok/s
+[train] step 19150/36980 | loss 2.9867 | ppl 19.82 | lr 1.68e-04 | 4757 tok/s
+[train] step 19200/36980 | loss 2.9300 | ppl 18.73 | lr 1.68e-04 | 4757 tok/s
+[train] step 19250/36980 | loss 2.9039 | ppl 18.24 | lr 1.67e-04 | 4757 tok/s
+[train] step 19300/36980 | loss 2.8984 | ppl 18.14 | lr 1.66e-04 | 4757 tok/s
+[train] step 19350/36980 | loss 3.1378 | ppl 23.05 | lr 1.66e-04 | 4758 tok/s
+[train] step 19400/36980 | loss 3.0322 | ppl 20.74 | lr 1.65e-04 | 4758 tok/s
+[train] step 19450/36980 | loss 2.9437 | ppl 18.99 | lr 1.65e-04 | 4758 tok/s
+[train] step 19500/36980 | loss 2.7100 | ppl 15.03 | lr 1.64e-04 | 4758 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0019500.safetensors
+[train] step 19550/36980 | loss 2.8698 | ppl 17.63 | lr 1.63e-04 | 4758 tok/s
+[train] step 19600/36980 | loss 3.0226 | ppl 20.54 | lr 1.63e-04 | 4758 tok/s
+[train] step 19650/36980 | loss 3.0173 | ppl 20.44 | lr 1.62e-04 | 4758 tok/s
+[train] step 19700/36980 | loss 3.0101 | ppl 20.29 | lr 1.62e-04 | 4758 tok/s
+[train] step 19750/36980 | loss 3.1789 | ppl 24.02 | lr 1.61e-04 | 4758 tok/s
+[train] step 19800/36980 | loss 2.7390 | ppl 15.47 | lr 1.60e-04 | 4759 tok/s
+[train] step 19850/36980 | loss 2.9948 | ppl 19.98 | lr 1.60e-04 | 4759 tok/s
+[train] step 19900/36980 | loss 2.8505 | ppl 17.30 | lr 1.59e-04 | 4759 tok/s
+[train] step 19950/36980 | loss 2.6954 | ppl 14.81 | lr 1.59e-04 | 4759 tok/s
+[train] step 20000/36980 | loss 2.7721 | ppl 15.99 | lr 1.58e-04 | 4759 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0020000.safetensors
+[train] step 20050/36980 | loss 3.1285 | ppl 22.84 | lr 1.57e-04 | 4759 tok/s
+[train] step 20100/36980 | loss 2.6889 | ppl 14.72 | lr 1.57e-04 | 4759 tok/s
+[train] step 20150/36980 | loss 3.0013 | ppl 20.11 | lr 1.56e-04 | 4759 tok/s
+[train] step 20200/36980 | loss 3.1276 | ppl 22.82 | lr 1.56e-04 | 4760 tok/s
+[train] step 20250/36980 | loss 2.8293 | ppl 16.93 | lr 1.55e-04 | 4760 tok/s
+[train] step 20300/36980 | loss 2.8557 | ppl 17.39 | lr 1.54e-04 | 4760 tok/s
+[train] step 20350/36980 | loss 2.6937 | ppl 14.79 | lr 1.54e-04 | 4760 tok/s
+[train] step 20400/36980 | loss 2.9918 | ppl 19.92 | lr 1.53e-04 | 4760 tok/s
+[train] step 20450/36980 | loss 2.8535 | ppl 17.35 | lr 1.53e-04 | 4760 tok/s
+[train] step 20500/36980 | loss 2.4499 | ppl 11.59 | lr 1.52e-04 | 4760 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0020500.safetensors
+[train] step 20550/36980 | loss 2.7748 | ppl 16.04 | lr 1.51e-04 | 4760 tok/s
+[train] step 20600/36980 | loss 2.9477 | ppl 19.06 | lr 1.51e-04 | 4760 tok/s
+[train] step 20650/36980 | loss 2.9044 | ppl 18.25 | lr 1.50e-04 | 4761 tok/s
+[train] step 20700/36980 | loss 2.7204 | ppl 15.19 | lr 1.50e-04 | 4761 tok/s
+[train] step 20750/36980 | loss 3.0972 | ppl 22.14 | lr 1.49e-04 | 4761 tok/s
+[train] step 20800/36980 | loss 3.0252 | ppl 20.60 | lr 1.48e-04 | 4761 tok/s
+[train] step 20850/36980 | loss 2.9526 | ppl 19.16 | lr 1.48e-04 | 4761 tok/s
+[train] step 20900/36980 | loss 2.6893 | ppl 14.72 | lr 1.47e-04 | 4761 tok/s
+[train] step 20950/36980 | loss 2.9851 | ppl 19.79 | lr 1.47e-04 | 4761 tok/s
+[train] step 21000/36980 | loss 2.8418 | ppl 17.15 | lr 1.46e-04 | 4761 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0021000.safetensors
+[train] step 21050/36980 | loss 2.9887 | ppl 19.86 | lr 1.45e-04 | 4761 tok/s
+[train] step 21100/36980 | loss 2.8940 | ppl 18.07 | lr 1.45e-04 | 4762 tok/s
+[train] step 21150/36980 | loss 3.1529 | ppl 23.40 | lr 1.44e-04 | 4762 tok/s
+[train] step 21200/36980 | loss 3.0206 | ppl 20.50 | lr 1.44e-04 | 4762 tok/s
+[train] step 21250/36980 | loss 2.9399 | ppl 18.91 | lr 1.43e-04 | 4762 tok/s
+[train] step 21300/36980 | loss 2.8228 | ppl 16.82 | lr 1.42e-04 | 4762 tok/s
+[train] step 21350/36980 | loss 3.0674 | ppl 21.49 | lr 1.42e-04 | 4762 tok/s
+[train] step 21400/36980 | loss 2.9789 | ppl 19.67 | lr 1.41e-04 | 4762 tok/s
+[train] step 21450/36980 | loss 2.9699 | ppl 19.49 | lr 1.41e-04 | 4762 tok/s
+[train] step 21500/36980 | loss 2.8029 | ppl 16.49 | lr 1.40e-04 | 4762 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0021500.safetensors
+[train] step 21550/36980 | loss 2.8882 | ppl 17.96 | lr 1.39e-04 | 4763 tok/s
+[train] step 21600/36980 | loss 2.9929 | ppl 19.94 | lr 1.39e-04 | 4763 tok/s
+[train] step 21650/36980 | loss 2.6113 | ppl 13.62 | lr 1.38e-04 | 4763 tok/s
+[train] step 21700/36980 | loss 2.7293 | ppl 15.32 | lr 1.38e-04 | 4763 tok/s
+[train] step 21750/36980 | loss 2.7401 | ppl 15.49 | lr 1.37e-04 | 4763 tok/s
+[train] step 21800/36980 | loss 2.9366 | ppl 18.85 | lr 1.36e-04 | 4763 tok/s
+[train] step 21850/36980 | loss 2.9652 | ppl 19.40 | lr 1.36e-04 | 4763 tok/s
+[train] step 21900/36980 | loss 2.9436 | ppl 18.98 | lr 1.35e-04 | 4763 tok/s
+[train] step 21950/36980 | loss 2.8536 | ppl 17.35 | lr 1.35e-04 | 4763 tok/s
+[train] step 22000/36980 | loss 2.9922 | ppl 19.93 | lr 1.34e-04 | 4764 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0022000.safetensors
+[train] step 22050/36980 | loss 2.8834 | ppl 17.87 | lr 1.33e-04 | 4764 tok/s
+[train] step 22100/36980 | loss 2.9345 | ppl 18.81 | lr 1.33e-04 | 4764 tok/s
+[train] step 22150/36980 | loss 2.8041 | ppl 16.51 | lr 1.32e-04 | 4764 tok/s
+[train] step 22200/36980 | loss 2.9974 | ppl 20.03 | lr 1.32e-04 | 4764 tok/s
+[train] step 22250/36980 | loss 2.9340 | ppl 18.80 | lr 1.31e-04 | 4764 tok/s
+[train] step 22300/36980 | loss 2.4922 | ppl 12.09 | lr 1.31e-04 | 4764 tok/s
+[train] step 22350/36980 | loss 2.8935 | ppl 18.06 | lr 1.30e-04 | 4764 tok/s
+[train] step 22400/36980 | loss 2.9564 | ppl 19.23 | lr 1.29e-04 | 4764 tok/s
+[train] step 22450/36980 | loss 2.8740 | ppl 17.71 | lr 1.29e-04 | 4764 tok/s
+[train] step 22500/36980 | loss 3.0118 | ppl 20.32 | lr 1.28e-04 | 4765 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0022500.safetensors
+[train] step 22550/36980 | loss 2.5502 | ppl 12.81 | lr 1.28e-04 | 4765 tok/s
+[train] step 22600/36980 | loss 2.7614 | ppl 15.82 | lr 1.27e-04 | 4765 tok/s
+[train] step 22650/36980 | loss 3.0378 | ppl 20.86 | lr 1.26e-04 | 4765 tok/s
+[train] step 22700/36980 | loss 3.0717 | ppl 21.58 | lr 1.26e-04 | 4765 tok/s
+[train] step 22750/36980 | loss 3.1379 | ppl 23.05 | lr 1.25e-04 | 4765 tok/s
+[train] step 22800/36980 | loss 2.8679 | ppl 17.60 | lr 1.25e-04 | 4765 tok/s
+[train] step 22850/36980 | loss 2.9498 | ppl 19.10 | lr 1.24e-04 | 4765 tok/s
+[train] step 22900/36980 | loss 2.8398 | ppl 17.11 | lr 1.24e-04 | 4765 tok/s
+[train] step 22950/36980 | loss 3.0088 | ppl 20.26 | lr 1.23e-04 | 4765 tok/s
+[train] step 23000/36980 | loss 2.9769 | ppl 19.63 | lr 1.22e-04 | 4765 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0023000.safetensors
+[train] step 23050/36980 | loss 2.9134 | ppl 18.42 | lr 1.22e-04 | 4765 tok/s
+[train] step 23100/36980 | loss 2.7895 | ppl 16.27 | lr 1.21e-04 | 4765 tok/s
+[train] step 23150/36980 | loss 2.8281 | ppl 16.91 | lr 1.21e-04 | 4765 tok/s
+[train] step 23200/36980 | loss 2.8129 | ppl 16.66 | lr 1.20e-04 | 4765 tok/s
+[train] step 23250/36980 | loss 2.9351 | ppl 18.82 | lr 1.20e-04 | 4765 tok/s
+[train] step 23300/36980 | loss 2.8684 | ppl 17.61 | lr 1.19e-04 | 4765 tok/s
+[train] step 23350/36980 | loss 3.0575 | ppl 21.27 | lr 1.18e-04 | 4765 tok/s
+[train] step 23400/36980 | loss 3.0160 | ppl 20.41 | lr 1.18e-04 | 4765 tok/s
+[train] step 23450/36980 | loss 2.8717 | ppl 17.67 | lr 1.17e-04 | 4765 tok/s
+[train] step 23500/36980 | loss 2.7383 | ppl 15.46 | lr 1.17e-04 | 4765 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0023500.safetensors
+[train] step 23550/36980 | loss 2.8469 | ppl 17.24 | lr 1.16e-04 | 4765 tok/s
+[train] step 23600/36980 | loss 2.8704 | ppl 17.64 | lr 1.16e-04 | 4765 tok/s
+[train] step 23650/36980 | loss 2.5986 | ppl 13.44 | lr 1.15e-04 | 4766 tok/s
+[train] step 23700/36980 | loss 3.0554 | ppl 21.23 | lr 1.15e-04 | 4766 tok/s
+[train] step 23750/36980 | loss 2.8837 | ppl 17.88 | lr 1.14e-04 | 4766 tok/s
+[train] step 23800/36980 | loss 2.7510 | ppl 15.66 | lr 1.13e-04 | 4766 tok/s
+[train] step 23850/36980 | loss 2.9844 | ppl 19.77 | lr 1.13e-04 | 4766 tok/s
+[train] step 23900/36980 | loss 3.1633 | ppl 23.65 | lr 1.12e-04 | 4766 tok/s
+[train] step 23950/36980 | loss 3.0709 | ppl 21.56 | lr 1.12e-04 | 4766 tok/s
+[train] step 24000/36980 | loss 2.9150 | ppl 18.45 | lr 1.11e-04 | 4766 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0024000.safetensors
+[train] step 24050/36980 | loss 2.8208 | ppl 16.79 | lr 1.11e-04 | 4766 tok/s
+[train] step 24100/36980 | loss 3.0909 | ppl 22.00 | lr 1.10e-04 | 4766 tok/s
+[train] step 24150/36980 | loss 2.9637 | ppl 19.37 | lr 1.10e-04 | 4766 tok/s
+[train] step 24200/36980 | loss 2.8639 | ppl 17.53 | lr 1.09e-04 | 4766 tok/s
+[train] step 24250/36980 | loss 2.7014 | ppl 14.90 | lr 1.08e-04 | 4767 tok/s
+[train] step 24300/36980 | loss 2.8277 | ppl 16.91 | lr 1.08e-04 | 4767 tok/s
+[train] step 24350/36980 | loss 2.7607 | ppl 15.81 | lr 1.07e-04 | 4767 tok/s
+[train] step 24400/36980 | loss 2.7739 | ppl 16.02 | lr 1.07e-04 | 4767 tok/s
+[train] step 24450/36980 | loss 3.0742 | ppl 21.63 | lr 1.06e-04 | 4767 tok/s
+[train] step 24500/36980 | loss 3.0199 | ppl 20.49 | lr 1.06e-04 | 4767 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0024500.safetensors
+[train] step 24550/36980 | loss 2.7516 | ppl 15.67 | lr 1.05e-04 | 4767 tok/s
+[train] step 24600/36980 | loss 2.8222 | ppl 16.81 | lr 1.05e-04 | 4767 tok/s
+[train] step 24650/36980 | loss 2.7822 | ppl 16.15 | lr 1.04e-04 | 4767 tok/s
+[train] step 24700/36980 | loss 2.7194 | ppl 15.17 | lr 1.04e-04 | 4767 tok/s
+[train] step 24750/36980 | loss 2.8464 | ppl 17.22 | lr 1.03e-04 | 4767 tok/s
+[train] step 24800/36980 | loss 3.1703 | ppl 23.81 | lr 1.02e-04 | 4767 tok/s
+[train] step 24850/36980 | loss 2.8992 | ppl 18.16 | lr 1.02e-04 | 4767 tok/s
+[train] step 24900/36980 | loss 2.7185 | ppl 15.16 | lr 1.01e-04 | 4768 tok/s
+[train] step 24950/36980 | loss 3.0369 | ppl 20.84 | lr 1.01e-04 | 4768 tok/s
+[train] step 25000/36980 | loss 2.9744 | ppl 19.58 | lr 1.00e-04 | 4768 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0025000.safetensors
+[train] step 25050/36980 | loss 3.0299 | ppl 20.69 | lr 9.98e-05 | 4768 tok/s
+[train] step 25100/36980 | loss 3.0073 | ppl 20.23 | lr 9.93e-05 | 4768 tok/s
+[train] step 25150/36980 | loss 2.7528 | ppl 15.69 | lr 9.88e-05 | 4768 tok/s
+[train] step 25200/36980 | loss 2.8973 | ppl 18.12 | lr 9.82e-05 | 4768 tok/s
+[train] step 25250/36980 | loss 3.0515 | ppl 21.15 | lr 9.77e-05 | 4768 tok/s
+[train] step 25300/36980 | loss 2.6841 | ppl 14.65 | lr 9.72e-05 | 4768 tok/s
+[train] step 25350/36980 | loss 2.9272 | ppl 18.68 | lr 9.67e-05 | 4768 tok/s
+[train] step 25400/36980 | loss 2.9874 | ppl 19.83 | lr 9.61e-05 | 4768 tok/s
+[train] step 25450/36980 | loss 3.0049 | ppl 20.18 | lr 9.56e-05 | 4768 tok/s
+[train] step 25500/36980 | loss 2.8394 | ppl 17.11 | lr 9.51e-05 | 4768 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0025500.safetensors
+[train] step 25550/36980 | loss 2.8363 | ppl 17.05 | lr 9.46e-05 | 4768 tok/s
+[train] step 25600/36980 | loss 2.7252 | ppl 15.26 | lr 9.41e-05 | 4769 tok/s
+[train] step 25650/36980 | loss 3.0638 | ppl 21.41 | lr 9.36e-05 | 4769 tok/s
+[train] step 25700/36980 | loss 2.7597 | ppl 15.80 | lr 9.31e-05 | 4769 tok/s
+[train] step 25750/36980 | loss 3.1265 | ppl 22.79 | lr 9.25e-05 | 4769 tok/s
+[train] step 25800/36980 | loss 3.0821 | ppl 21.80 | lr 9.20e-05 | 4769 tok/s
+[train] step 25850/36980 | loss 2.9415 | ppl 18.94 | lr 9.15e-05 | 4769 tok/s
+[train] step 25900/36980 | loss 3.1628 | ppl 23.64 | lr 9.10e-05 | 4769 tok/s
+[train] step 25950/36980 | loss 2.7576 | ppl 15.76 | lr 9.05e-05 | 4769 tok/s
+[train] step 26000/36980 | loss 2.9036 | ppl 18.24 | lr 9.00e-05 | 4769 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0026000.safetensors
+[train] step 26050/36980 | loss 2.7729 | ppl 16.01 | lr 8.95e-05 | 4769 tok/s
+[train] step 26100/36980 | loss 2.6366 | ppl 13.97 | lr 8.90e-05 | 4769 tok/s
+[train] step 26150/36980 | loss 3.0625 | ppl 21.38 | lr 8.85e-05 | 4769 tok/s
+[train] step 26200/36980 | loss 2.9540 | ppl 19.18 | lr 8.80e-05 | 4769 tok/s
+[train] step 26250/36980 | loss 2.8626 | ppl 17.51 | lr 8.75e-05 | 4770 tok/s
+[train] step 26300/36980 | loss 2.9482 | ppl 19.07 | lr 8.70e-05 | 4770 tok/s
+[train] step 26350/36980 | loss 2.8533 | ppl 17.34 | lr 8.65e-05 | 4770 tok/s
+[train] step 26400/36980 | loss 2.9122 | ppl 18.40 | lr 8.60e-05 | 4770 tok/s
+[train] step 26450/36980 | loss 2.8454 | ppl 17.21 | lr 8.56e-05 | 4770 tok/s
+[train] step 26500/36980 | loss 2.8175 | ppl 16.74 | lr 8.51e-05 | 4770 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0026500.safetensors
+[train] step 26550/36980 | loss 2.6825 | ppl 14.62 | lr 8.46e-05 | 4770 tok/s
+[train] step 26600/36980 | loss 2.6937 | ppl 14.79 | lr 8.41e-05 | 4770 tok/s
+[train] step 26650/36980 | loss 2.7729 | ppl 16.01 | lr 8.36e-05 | 4770 tok/s
+[train] step 26700/36980 | loss 2.9097 | ppl 18.35 | lr 8.31e-05 | 4770 tok/s
+[train] step 26750/36980 | loss 3.0248 | ppl 20.59 | lr 8.27e-05 | 4770 tok/s
+[train] step 26800/36980 | loss 2.6574 | ppl 14.26 | lr 8.22e-05 | 4770 tok/s
+[train] step 26850/36980 | loss 2.9768 | ppl 19.62 | lr 8.17e-05 | 4770 tok/s
+[train] step 26900/36980 | loss 3.1559 | ppl 23.47 | lr 8.12e-05 | 4770 tok/s
+[train] step 26950/36980 | loss 3.0403 | ppl 20.91 | lr 8.08e-05 | 4770 tok/s
+[train] step 27000/36980 | loss 3.0001 | ppl 20.09 | lr 8.03e-05 | 4770 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0027000.safetensors
+[train] step 27050/36980 | loss 2.3996 | ppl 11.02 | lr 7.98e-05 | 4770 tok/s
+[train] step 27100/36980 | loss 2.8093 | ppl 16.60 | lr 7.94e-05 | 4771 tok/s
+[train] step 27150/36980 | loss 2.8639 | ppl 17.53 | lr 7.89e-05 | 4771 tok/s
+[train] step 27200/36980 | loss 2.8574 | ppl 17.42 | lr 7.84e-05 | 4771 tok/s
+[train] step 27250/36980 | loss 2.5974 | ppl 13.43 | lr 7.80e-05 | 4771 tok/s
+[train] step 27300/36980 | loss 2.7892 | ppl 16.27 | lr 7.75e-05 | 4771 tok/s
+[train] step 27350/36980 | loss 3.0343 | ppl 20.79 | lr 7.70e-05 | 4771 tok/s
+[train] step 27400/36980 | loss 2.7382 | ppl 15.46 | lr 7.66e-05 | 4771 tok/s
+[train] step 27450/36980 | loss 2.7048 | ppl 14.95 | lr 7.61e-05 | 4771 tok/s
+[train] step 27500/36980 | loss 2.4676 | ppl 11.79 | lr 7.57e-05 | 4771 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0027500.safetensors
+[train] step 27550/36980 | loss 2.6173 | ppl 13.70 | lr 7.52e-05 | 4771 tok/s
+[train] step 27600/36980 | loss 2.6855 | ppl 14.67 | lr 7.48e-05 | 4771 tok/s
+[train] step 27650/36980 | loss 2.9592 | ppl 19.28 | lr 7.43e-05 | 4771 tok/s
+[train] step 27700/36980 | loss 2.8553 | ppl 17.38 | lr 7.39e-05 | 4771 tok/s
+[train] step 27750/36980 | loss 2.9780 | ppl 19.65 | lr 7.34e-05 | 4771 tok/s
+[train] step 27800/36980 | loss 2.7958 | ppl 16.38 | lr 7.30e-05 | 4771 tok/s
+[train] step 27850/36980 | loss 2.9381 | ppl 18.88 | lr 7.26e-05 | 4772 tok/s
+[train] step 27900/36980 | loss 2.8050 | ppl 16.53 | lr 7.21e-05 | 4772 tok/s
+[train] step 27950/36980 | loss 2.6596 | ppl 14.29 | lr 7.17e-05 | 4772 tok/s
+[train] step 28000/36980 | loss 3.0790 | ppl 21.74 | lr 7.12e-05 | 4772 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0028000.safetensors
+[train] step 28050/36980 | loss 2.9086 | ppl 18.33 | lr 7.08e-05 | 4772 tok/s
+[train] step 28100/36980 | loss 3.0499 | ppl 21.11 | lr 7.04e-05 | 4772 tok/s
+[train] step 28150/36980 | loss 2.8188 | ppl 16.76 | lr 6.99e-05 | 4772 tok/s
+[train] step 28200/36980 | loss 3.0158 | ppl 20.41 | lr 6.95e-05 | 4772 tok/s
+[train] step 28250/36980 | loss 2.5677 | ppl 13.04 | lr 6.91e-05 | 4772 tok/s
+[train] step 28300/36980 | loss 2.7676 | ppl 15.92 | lr 6.87e-05 | 4772 tok/s
+[train] step 28350/36980 | loss 2.7701 | ppl 15.96 | lr 6.82e-05 | 4772 tok/s
+[train] step 28400/36980 | loss 2.7810 | ppl 16.14 | lr 6.78e-05 | 4772 tok/s
+[train] step 28450/36980 | loss 2.9451 | ppl 19.01 | lr 6.74e-05 | 4772 tok/s
+[train] step 28500/36980 | loss 2.9237 | ppl 18.61 | lr 6.70e-05 | 4772 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0028500.safetensors
+[train] step 28550/36980 | loss 2.5969 | ppl 13.42 | lr 6.66e-05 | 4772 tok/s
+[train] step 28600/36980 | loss 2.8215 | ppl 16.80 | lr 6.62e-05 | 4772 tok/s
+[train] step 28650/36980 | loss 2.8185 | ppl 16.75 | lr 6.58e-05 | 4773 tok/s
+[train] step 28700/36980 | loss 2.4807 | ppl 11.95 | lr 6.53e-05 | 4773 tok/s
+[train] step 28750/36980 | loss 2.9068 | ppl 18.30 | lr 6.49e-05 | 4773 tok/s
+[train] step 28800/36980 | loss 2.9558 | ppl 19.22 | lr 6.45e-05 | 4773 tok/s
+[train] step 28850/36980 | loss 2.7567 | ppl 15.75 | lr 6.41e-05 | 4773 tok/s
+[train] step 28900/36980 | loss 2.9562 | ppl 19.23 | lr 6.37e-05 | 4773 tok/s
+[train] step 28950/36980 | loss 2.6631 | ppl 14.34 | lr 6.33e-05 | 4773 tok/s
+[train] step 29000/36980 | loss 3.0017 | ppl 20.12 | lr 6.29e-05 | 4773 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0029000.safetensors
+[train] step 29050/36980 | loss 2.8394 | ppl 17.11 | lr 6.25e-05 | 4773 tok/s
+[train] step 29100/36980 | loss 2.8332 | ppl 17.00 | lr 6.22e-05 | 4773 tok/s
+[train] step 29150/36980 | loss 2.8872 | ppl 17.94 | lr 6.18e-05 | 4773 tok/s
+[train] step 29200/36980 | loss 2.8751 | ppl 17.73 | lr 6.14e-05 | 4773 tok/s
+[train] step 29250/36980 | loss 2.7170 | ppl 15.13 | lr 6.10e-05 | 4773 tok/s
+[train] step 29300/36980 | loss 2.7948 | ppl 16.36 | lr 6.06e-05 | 4773 tok/s
+[train] step 29350/36980 | loss 2.8573 | ppl 17.41 | lr 6.02e-05 | 4773 tok/s
+[train] step 29400/36980 | loss 2.8766 | ppl 17.75 | lr 5.98e-05 | 4773 tok/s
+[train] step 29450/36980 | loss 2.9263 | ppl 18.66 | lr 5.95e-05 | 4773 tok/s
+[train] step 29500/36980 | loss 3.0152 | ppl 20.39 | lr 5.91e-05 | 4773 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0029500.safetensors
+[train] step 29550/36980 | loss 2.6958 | ppl 14.82 | lr 5.87e-05 | 4773 tok/s
+[train] step 29600/36980 | loss 2.6958 | ppl 14.82 | lr 5.83e-05 | 4773 tok/s
+[train] step 29650/36980 | loss 2.6656 | ppl 14.38 | lr 5.80e-05 | 4773 tok/s
+[train] step 29700/36980 | loss 2.8624 | ppl 17.50 | lr 5.76e-05 | 4773 tok/s
+[train] step 29750/36980 | loss 2.6744 | ppl 14.50 | lr 5.72e-05 | 4773 tok/s
+[train] step 29800/36980 | loss 2.9304 | ppl 18.74 | lr 5.69e-05 | 4773 tok/s
+[train] step 29850/36980 | loss 2.8581 | ppl 17.43 | lr 5.65e-05 | 4774 tok/s
+[train] step 29900/36980 | loss 2.7530 | ppl 15.69 | lr 5.62e-05 | 4774 tok/s
+[train] step 29950/36980 | loss 2.5330 | ppl 12.59 | lr 5.58e-05 | 4774 tok/s
+[train] step 30000/36980 | loss 2.9891 | ppl 19.87 | lr 5.55e-05 | 4774 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0030000.safetensors
+[train] step 30050/36980 | loss 2.6179 | ppl 13.71 | lr 5.51e-05 | 4774 tok/s
+[train] step 30100/36980 | loss 2.4990 | ppl 12.17 | lr 5.48e-05 | 4774 tok/s
+[train] step 30150/36980 | loss 2.7953 | ppl 16.37 | lr 5.44e-05 | 4774 tok/s
+[train] step 30200/36980 | loss 2.8367 | ppl 17.06 | lr 5.41e-05 | 4774 tok/s
+[train] step 30250/36980 | loss 2.8314 | ppl 16.97 | lr 5.37e-05 | 4774 tok/s
+[train] step 30300/36980 | loss 2.7229 | ppl 15.22 | lr 5.34e-05 | 4774 tok/s
+[train] step 30350/36980 | loss 2.9029 | ppl 18.23 | lr 5.30e-05 | 4774 tok/s
+[train] step 30400/36980 | loss 2.8829 | ppl 17.87 | lr 5.27e-05 | 4774 tok/s
+[train] step 30450/36980 | loss 3.0053 | ppl 20.19 | lr 5.24e-05 | 4774 tok/s
+[train] step 30500/36980 | loss 2.7917 | ppl 16.31 | lr 5.20e-05 | 4774 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0030500.safetensors
+[train] step 30550/36980 | loss 2.6738 | ppl 14.50 | lr 5.17e-05 | 4774 tok/s
+[train] step 30600/36980 | loss 2.7498 | ppl 15.64 | lr 5.14e-05 | 4774 tok/s
+[train] step 30650/36980 | loss 2.6399 | ppl 14.01 | lr 5.11e-05 | 4773 tok/s
+[train] step 30700/36980 | loss 2.8150 | ppl 16.69 | lr 5.07e-05 | 4773 tok/s
+[train] step 30750/36980 | loss 2.6687 | ppl 14.42 | lr 5.04e-05 | 4773 tok/s
+[train] step 30800/36980 | loss 2.6230 | ppl 13.78 | lr 5.01e-05 | 4773 tok/s
+[train] step 30850/36980 | loss 2.6445 | ppl 14.08 | lr 4.98e-05 | 4773 tok/s
+[train] step 30900/36980 | loss 2.8891 | ppl 17.98 | lr 4.95e-05 | 4773 tok/s
+[train] step 30950/36980 | loss 2.6886 | ppl 14.71 | lr 4.92e-05 | 4772 tok/s
+[train] step 31000/36980 | loss 2.6451 | ppl 14.08 | lr 4.88e-05 | 4772 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0031000.safetensors
+[train] step 31050/36980 | loss 2.8151 | ppl 16.69 | lr 4.85e-05 | 4772 tok/s
+[train] step 31100/36980 | loss 2.7532 | ppl 15.69 | lr 4.82e-05 | 4772 tok/s
+[train] step 31150/36980 | loss 2.5963 | ppl 13.41 | lr 4.79e-05 | 4772 tok/s
+[train] step 31200/36980 | loss 2.7726 | ppl 16.00 | lr 4.76e-05 | 4772 tok/s
+[train] step 31250/36980 | loss 2.8548 | ppl 17.37 | lr 4.73e-05 | 4771 tok/s
+[train] step 31300/36980 | loss 2.7517 | ppl 15.67 | lr 4.70e-05 | 4771 tok/s
+[train] step 31350/36980 | loss 2.5403 | ppl 12.68 | lr 4.68e-05 | 4771 tok/s
+[train] step 31400/36980 | loss 2.7994 | ppl 16.44 | lr 4.65e-05 | 4770 tok/s
+[train] step 31450/36980 | loss 2.5293 | ppl 12.54 | lr 4.62e-05 | 4770 tok/s
+[train] step 31500/36980 | loss 2.4462 | ppl 11.54 | lr 4.59e-05 | 4770 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0031500.safetensors
+[train] step 31550/36980 | loss 2.8651 | ppl 17.55 | lr 4.56e-05 | 4769 tok/s
+[train] step 31600/36980 | loss 2.8827 | ppl 17.86 | lr 4.53e-05 | 4769 tok/s
+[train] step 31650/36980 | loss 2.5356 | ppl 12.62 | lr 4.50e-05 | 4769 tok/s
+[train] step 31700/36980 | loss 2.8910 | ppl 18.01 | lr 4.48e-05 | 4768 tok/s
+[train] step 31750/36980 | loss 2.6668 | ppl 14.39 | lr 4.45e-05 | 4768 tok/s
+[train] step 31800/36980 | loss 2.7704 | ppl 15.96 | lr 4.42e-05 | 4768 tok/s
+[train] step 31850/36980 | loss 2.2297 | ppl 9.30 | lr 4.40e-05 | 4767 tok/s
+[train] step 31900/36980 | loss 2.7057 | ppl 14.96 | lr 4.37e-05 | 4767 tok/s
+[train] step 31950/36980 | loss 2.3656 | ppl 10.65 | lr 4.34e-05 | 4766 tok/s
+[train] step 32000/36980 | loss 2.7366 | ppl 15.43 | lr 4.32e-05 | 4765 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0032000.safetensors
+[train] step 32050/36980 | loss 2.7281 | ppl 15.30 | lr 4.29e-05 | 4764 tok/s
+[train] step 32100/36980 | loss 3.0448 | ppl 21.01 | lr 4.27e-05 | 4764 tok/s
+[train] step 32150/36980 | loss 2.7449 | ppl 15.56 | lr 4.24e-05 | 4764 tok/s
+[train] step 32200/36980 | loss 2.5715 | ppl 13.09 | lr 4.21e-05 | 4763 tok/s
+[train] step 32250/36980 | loss 2.6674 | ppl 14.40 | lr 4.19e-05 | 4763 tok/s
+[train] step 32300/36980 | loss 2.9804 | ppl 19.70 | lr 4.17e-05 | 4762 tok/s
+[train] step 32350/36980 | loss 2.7988 | ppl 16.43 | lr 4.14e-05 | 4762 tok/s
+[train] step 32400/36980 | loss 2.6842 | ppl 14.65 | lr 4.12e-05 | 4762 tok/s
+[train] step 32450/36980 | loss 2.6286 | ppl 13.85 | lr 4.09e-05 | 4761 tok/s
+[train] step 32500/36980 | loss 2.8153 | ppl 16.70 | lr 4.07e-05 | 4761 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0032500.safetensors
+[train] step 32550/36980 | loss 2.9565 | ppl 19.23 | lr 4.05e-05 | 4761 tok/s
+[train] step 32600/36980 | loss 2.7470 | ppl 15.60 | lr 4.02e-05 | 4760 tok/s
+[train] step 32650/36980 | loss 2.4836 | ppl 11.98 | lr 4.00e-05 | 4760 tok/s
+[train] step 32700/36980 | loss 2.6616 | ppl 14.32 | lr 3.98e-05 | 4760 tok/s
+[train] step 32750/36980 | loss 2.7942 | ppl 16.35 | lr 3.95e-05 | 4759 tok/s
+[train] step 32800/36980 | loss 2.8536 | ppl 17.35 | lr 3.93e-05 | 4759 tok/s
+[train] step 32850/36980 | loss 2.8210 | ppl 16.79 | lr 3.91e-05 | 4759 tok/s
+[train] step 32900/36980 | loss 3.0041 | ppl 20.17 | lr 3.89e-05 | 4758 tok/s
+[train] step 32950/36980 | loss 2.8864 | ppl 17.93 | lr 3.87e-05 | 4758 tok/s
+[train] step 33000/36980 | loss 2.8853 | ppl 17.91 | lr 3.85e-05 | 4757 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0033000.safetensors
+[train] step 33050/36980 | loss 2.8910 | ppl 18.01 | lr 3.83e-05 | 4757 tok/s
+[train] step 33100/36980 | loss 2.6994 | ppl 14.87 | lr 3.80e-05 | 4756 tok/s
+[train] step 33150/36980 | loss 2.8311 | ppl 16.96 | lr 3.78e-05 | 4756 tok/s
+[train] step 33200/36980 | loss 2.8833 | ppl 17.87 | lr 3.76e-05 | 4756 tok/s
+[train] step 33250/36980 | loss 2.8238 | ppl 16.84 | lr 3.74e-05 | 4755 tok/s
+[train] step 33300/36980 | loss 2.6510 | ppl 14.17 | lr 3.72e-05 | 4755 tok/s
+[train] step 33350/36980 | loss 2.8798 | ppl 17.81 | lr 3.71e-05 | 4754 tok/s
+[train] step 33400/36980 | loss 2.6679 | ppl 14.41 | lr 3.69e-05 | 4754 tok/s
+[train] step 33450/36980 | loss 2.8883 | ppl 17.96 | lr 3.67e-05 | 4753 tok/s
+[train] step 33500/36980 | loss 2.6026 | ppl 13.50 | lr 3.65e-05 | 4753 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0033500.safetensors
+[train] step 33550/36980 | loss 2.3822 | ppl 10.83 | lr 3.63e-05 | 4752 tok/s
+[train] step 33600/36980 | loss 2.8586 | ppl 17.44 | lr 3.61e-05 | 4752 tok/s
+[train] step 33650/36980 | loss 2.7378 | ppl 15.45 | lr 3.59e-05 | 4752 tok/s
+[train] step 33700/36980 | loss 2.8448 | ppl 17.20 | lr 3.58e-05 | 4751 tok/s
+[train] step 33750/36980 | loss 2.7265 | ppl 15.28 | lr 3.56e-05 | 4751 tok/s
+[train] step 33800/36980 | loss 2.8417 | ppl 17.15 | lr 3.54e-05 | 4750 tok/s
+[train] step 33850/36980 | loss 2.9009 | ppl 18.19 | lr 3.53e-05 | 4750 tok/s
+[train] step 33900/36980 | loss 2.7875 | ppl 16.24 | lr 3.51e-05 | 4750 tok/s
+[train] step 33950/36980 | loss 2.9567 | ppl 19.23 | lr 3.49e-05 | 4749 tok/s
+[train] step 34000/36980 | loss 2.8839 | ppl 17.88 | lr 3.48e-05 | 4748 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0034000.safetensors
+[train] step 34050/36980 | loss 2.8967 | ppl 18.11 | lr 3.46e-05 | 4747 tok/s
+[train] step 34100/36980 | loss 2.6725 | ppl 14.48 | lr 3.45e-05 | 4746 tok/s
+[train] step 34150/36980 | loss 2.5945 | ppl 13.39 | lr 3.43e-05 | 4745 tok/s
+[train] step 34200/36980 | loss 2.7445 | ppl 15.56 | lr 3.42e-05 | 4744 tok/s
+[train] step 34250/36980 | loss 2.7467 | ppl 15.59 | lr 3.40e-05 | 4743 tok/s
+[train] step 34300/36980 | loss 2.9419 | ppl 18.95 | lr 3.39e-05 | 4742 tok/s
+[train] step 34350/36980 | loss 2.5573 | ppl 12.90 | lr 3.37e-05 | 4740 tok/s
+[train] step 34400/36980 | loss 2.4625 | ppl 11.73 | lr 3.36e-05 | 4739 tok/s
+[train] step 34450/36980 | loss 2.6015 | ppl 13.48 | lr 3.34e-05 | 4738 tok/s
+[train] step 34500/36980 | loss 2.9173 | ppl 18.49 | lr 3.33e-05 | 4737 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0034500.safetensors
+[train] step 34550/36980 | loss 2.7438 | ppl 15.55 | lr 3.32e-05 | 4736 tok/s
+[train] step 34600/36980 | loss 2.7921 | ppl 16.32 | lr 3.30e-05 | 4736 tok/s
+[train] step 34650/36980 | loss 2.7232 | ppl 15.23 | lr 3.29e-05 | 4735 tok/s
+[train] step 34700/36980 | loss 2.7180 | ppl 15.15 | lr 3.28e-05 | 4735 tok/s
+[train] step 34750/36980 | loss 2.7652 | ppl 15.88 | lr 3.27e-05 | 4734 tok/s
+[train] step 34800/36980 | loss 2.5557 | ppl 12.88 | lr 3.26e-05 | 4734 tok/s
+[train] step 34850/36980 | loss 2.9059 | ppl 18.28 | lr 3.24e-05 | 4733 tok/s
+[train] step 34900/36980 | loss 2.8222 | ppl 16.81 | lr 3.23e-05 | 4732 tok/s
+[train] step 34950/36980 | loss 2.8933 | ppl 18.05 | lr 3.22e-05 | 4731 tok/s
+[train] step 35000/36980 | loss 2.8708 | ppl 17.65 | lr 3.21e-05 | 4729 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0035000.safetensors
+[train] step 35050/36980 | loss 2.9399 | ppl 18.91 | lr 3.20e-05 | 4728 tok/s
+[train] step 35100/36980 | loss 2.8882 | ppl 17.96 | lr 3.19e-05 | 4728 tok/s
+[train] step 35150/36980 | loss 2.7931 | ppl 16.33 | lr 3.18e-05 | 4727 tok/s
+[train] step 35200/36980 | loss 2.7238 | ppl 15.24 | lr 3.17e-05 | 4727 tok/s
+[train] step 35250/36980 | loss 2.6868 | ppl 14.68 | lr 3.16e-05 | 4726 tok/s
+[train] step 35300/36980 | loss 2.7493 | ppl 15.63 | lr 3.15e-05 | 4725 tok/s
+[train] step 35350/36980 | loss 2.8219 | ppl 16.81 | lr 3.14e-05 | 4725 tok/s
+[train] step 35400/36980 | loss 2.8443 | ppl 17.19 | lr 3.13e-05 | 4723 tok/s
+[train] step 35450/36980 | loss 2.6424 | ppl 14.05 | lr 3.13e-05 | 4722 tok/s
+[train] step 35500/36980 | loss 2.7195 | ppl 15.17 | lr 3.12e-05 | 4721 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0035500.safetensors
+[train] step 35550/36980 | loss 2.6523 | ppl 14.19 | lr 3.11e-05 | 4721 tok/s
+[train] step 35600/36980 | loss 2.7768 | ppl 16.07 | lr 3.10e-05 | 4720 tok/s
+[train] step 35650/36980 | loss 2.9143 | ppl 18.44 | lr 3.10e-05 | 4719 tok/s
+[train] step 35700/36980 | loss 2.9883 | ppl 19.85 | lr 3.09e-05 | 4719 tok/s
+[train] step 35750/36980 | loss 2.9940 | ppl 19.97 | lr 3.08e-05 | 4718 tok/s
+[train] step 35800/36980 | loss 2.7688 | ppl 15.94 | lr 3.08e-05 | 4717 tok/s
+[train] step 35850/36980 | loss 2.9093 | ppl 18.34 | lr 3.07e-05 | 4717 tok/s
+[train] step 35900/36980 | loss 2.6347 | ppl 13.94 | lr 3.06e-05 | 4716 tok/s
+[train] step 35950/36980 | loss 2.8827 | ppl 17.86 | lr 3.06e-05 | 4714 tok/s
+[train] step 36000/36980 | loss 3.0081 | ppl 20.25 | lr 3.05e-05 | 4714 tok/s
+[train] Checkpoint sauvegardé: runs/hybrid-mlx/checkpoint_0036000.safetensors
+[train] step 36050/36980 | loss 2.6472 | ppl 14.11 | lr 3.05e-05 | 4713 tok/s
+[train] step 36100/36980 | loss 2.6193 | ppl 13.73 | lr 3.04e-05 | 4713 tok/s
+[train] step 36150/36980 | loss 2.4128 | ppl 11.16 | lr 3.04e-05 | 4712 tok/s
+[train] step 36200/36980 | loss 2.9403 | ppl 18.92 | lr 3.03e-05 | 4711 tok/s
+[train] step 36250/36980 | loss 2.9172 | ppl 18.49 | lr 3.03e-05 | 4710 tok/s

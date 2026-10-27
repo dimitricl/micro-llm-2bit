@@ -1,0 +1,7 @@
+[corpus] 806 documents, 14713231 caractères
+[corpus] split : 766 docs train, 40 docs val
+[train] device=mps parent=HuggingFaceTB/SmolLM-135M
+[train] alpha=0 : CE seule, parent ignoré (pas de chargement).
+[train] enfant: 47.1M params latents, 4870 batchs, 4870 micros/epoch, 305 steps/epoch x 1 epochs = 305 steps, 5.0M tokens/epoch, micro-batch effectif 8
+[train] step 20/305 loss=7.0249 kl=0.0000 ce=7.0249 ppl~1124.3 lr=3.00e-04 wd=0.01 2445 tok/s
+[train] step 40/305 loss=6.8370 kl=0.0000 ce=6.8370 ppl~931.7 lr=2.95e-04 wd=0.01 2476 tok/s

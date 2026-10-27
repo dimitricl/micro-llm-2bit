@@ -1,5 +1,117 @@
 # Guide modèle hybride conversation + code
 
+## Voie MLX révisée (2026-10-26)
+
+Le pilote PyTorch a été arrêté au step 40/305. La voie `train_hybrid_mlx.py`
+entraîne maintenant le modèle hybride 640/10 couches en flux depuis des
+JSONL, construit un cache tokenisé sur disque, sauvegarde des checkpoints et
+peut reprendre leurs poids. Cette voie entraîne en CE depuis zéro : elle
+n'utilise pas SmolLM comme professeur.
+
+L'export MLX ajouté fait une quantification **int4 après entraînement** et
+fournit une inférence/mesure MLX. C'est une voie de déploiement sous 100 Mo à
+mesurer ; elle ne produit pas les poids ternaires 2 bits de la chaîne
+PyTorch. Le choix MLX/int4 favorise le débit, avec une quantification
+différente du but historique du dépôt.
+
+La chaîne séquentielle complète (préparation SFT, pré-entraînement sur les
+corpus disponibles, SFT, export int4 et benchmark) est dans
+`tools/run_hybrid_mlx_full.sh`. Le jeu SFT local vient d'être préparé : 1 583
+exemples conservés, dont 56 exemples conversation/instruction et 1 527
+complétions JavaScript. Après avoir vérifié que l'ancien run est arrêté,
+lance-la ainsi :
+
+```bash
+cd /Volumes/Lexar/micro-llm-2bit
+mkdir -p logs
+nohup caffeinate -dims bash tools/run_hybrid_mlx_full.sh \
+  > logs/hybrid-full.nohup 2>&1 < /dev/null &
+echo $! > logs/hybrid-full.pid
+```
+
+Elle refuse d'écraser des sorties finales existantes. Les journaux de chaque
+étape apparaissent dans `logs/hybrid-full.nohup`.
+
+Pré-entraînement sur les dix tranches dédupliquées (≈1 Go) et les données
+hybrides locales :
+
+```bash
+cd /Volumes/Lexar/micro-llm-2bit
+mkdir -p logs runs/hybrid-mlx
+nohup caffeinate -dims .venv/bin/python -u tools/train_hybrid_mlx.py \
+  --data /Volumes/Lexar/clean-corpus/dedup data/hybrid \
+  --tokenizer models/tokenizer_fr_16k \
+  --output runs/hybrid-mlx \
+  --batch-size 16 --seq-len 512 --epochs 1 --lr 3e-4 \
+  --ckpt-every 500 --log-every 50 \
+  > logs/hybrid-mlx.nohup 2>&1 < /dev/null &
+echo $! > logs/hybrid-mlx.pid
+```
+
+Le premier lancement tokenise en deux passes et crée
+`runs/hybrid-mlx/tokens.uint16.bin`. Les lancements suivants réutilisent ce
+cache si les fichiers sources et le tokenizer n'ont pas changé. Les
+checkpoints contiennent les poids ; une reprise réinitialise AdamW. Exemple :
+
+```bash
+.venv/bin/python tools/train_hybrid_mlx.py \
+  --data /Volumes/Lexar/clean-corpus/dedup data/hybrid \
+  --tokenizer models/tokenizer_fr_16k \
+  --output runs/hybrid-mlx \
+  --batch-size 16 --seq-len 512 --epochs 1 --lr 3e-4 \
+  --resume runs/hybrid-mlx/checkpoint_0000500.safetensors \
+  --resume-step 500
+```
+
+Après un entraînement complet, exporter et mesurer l'int4 :
+
+```bash
+.venv/bin/python tools/export_hybrid_mlx.py export \
+  --checkpoint runs/hybrid-mlx/final.safetensors \
+  --bits 4 --out exports/hybrid_mlx_int4.safetensors
+.venv/bin/python tools/export_hybrid_mlx.py bench \
+  --model exports/hybrid_mlx_int4.safetensors --bits 4
+```
+
+Le fine-tuning chat/code reste à préparer : le dépôt n'a que 100 réponses
+synthétiques et dix dialogues de contrôle. Le préparateur SFT forme désormais
+des cibles réponse uniquement à partir de ces dialogues, des réponses
+synthétiques filtrées et de préfixes de code JavaScript. Il ajoute ensuite
+10 % de replay du corpus de langue durant le SFT pour limiter l'oubli.
+
+Préparer les exemples, puis lancer le SFT après la fin du pré-entraînement :
+
+```bash
+.venv/bin/python tools/prepare_hybrid_sft_mlx.py \
+  --tokenizer models/tokenizer_fr_16k \
+  --chat data/chat/chat_pilot_v1.jsonl \
+  --synthetic data/hybrid/synthetic.jsonl \
+  --code data/hybrid/javascript_code.jsonl \
+  --seq-len 512 --out runs/hybrid-sft/sft_packed.npz
+
+mkdir -p runs/hybrid-sft
+nohup caffeinate -dims .venv/bin/python -u tools/train_hybrid_mlx.py \
+  --stage sft \
+  --data /Volumes/Lexar/clean-corpus/dedup data/hybrid \
+  --sft-data runs/hybrid-sft/sft_packed.npz \
+  --token-cache runs/hybrid-mlx/tokens.uint16.bin \
+  --tokenizer models/tokenizer_fr_16k \
+  --output runs/hybrid-sft \
+  --resume runs/hybrid-mlx/final.safetensors \
+  --batch-size 16 --seq-len 512 --epochs 3 --lr 5e-5 \
+  --weight-decay 0.01 --replay-ratio 0.1 \
+  --ckpt-every 100 --log-every 20 \
+  > logs/hybrid-sft.nohup 2>&1 < /dev/null &
+echo $! > logs/hybrid-sft.pid
+```
+
+Le fichier SFT et son manifeste affichent le nombre d'exemples conservés
+après filtrage. Ce premier jeu reste petit ; il sert à valider la chaîne et
+le comportement de base, pas à établir une compétence générale en chat.
+
+L'export final utilise `runs/hybrid-sft/final.safetensors` à la place du
+checkpoint de pré-entraînement montré ci-dessus.
+
 ## Vue d'ensemble
 
 Ce guide décrit comment créer un LLM ultra-léger (<100 Mo) capable de :
@@ -18,7 +130,7 @@ L'architecture repose sur votre base existante ternaire 2-bit avec une nouvelle 
 | vocab_size | 16000 | Supporte tokens FR + code |
 | seq_max | 512 | Conversations plus longues |
 | ffn_dim | 1280 | Capacité hybride |
-| Params estimés | ~40M | Tient dans <100 Mo |
+| Params estimés | ~47M | L'export int4 doit être mesuré pour confirmer la taille |
 
 ## Workflow complet
 

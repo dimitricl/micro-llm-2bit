@@ -1,0 +1,25 @@
+{
+  "stage": "pretrain",
+  "data": [
+    "/Volumes/Lexar/clean-corpus/dedup",
+    "data/hybrid"
+  ],
+  "sft_data": null,
+  "token_cache": null,
+  "tokenizer": "models/tokenizer_fr_16k",
+  "output": "runs/hybrid-mlx",
+  "batch_size": 16,
+  "seq_len": 512,
+  "epochs": 1.0,
+  "max_iters": 0,
+  "lr": 0.0003,
+  "weight_decay": 0.1,
+  "replay_ratio": 0.1,
+  "warmup_frac": 0.05,
+  "min_lr_ratio": 0.1,
+  "ckpt_every": 500,
+  "log_every": 50,
+  "resume": null,
+  "resume_step": 0,
+  "seed": 42
+}

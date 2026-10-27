@@ -168,8 +168,7 @@ def run_instruct(data_file: Path, checkpoint: Path, output: Path, config: str) -
         "main.py",
         "train",
         "--data", str(data_file),
-        "--parent", "dummy",  # Pas utilisé pour CE-only
-        "--from-scratch",
+        "--parent", "HuggingFaceTB/SmolLM-135M",
         "--resume", str(checkpoint),
         "--config", config,
         "--vocab-from", str(checkpoint) + ".vocab.json",
