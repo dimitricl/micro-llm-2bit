@@ -1,0 +1,24 @@
+[gutenberg] 465 livres français à traiter
+[gutenberg] 25/465 ok=22 skip=3 fail=0
+[gutenberg] 50/465 ok=47 skip=3 fail=0
+[gutenberg] 75/465 ok=72 skip=3 fail=0
+[gutenberg] 100/465 ok=97 skip=3 fail=0
+[gutenberg] 125/465 ok=122 skip=3 fail=0
+[gutenberg] 150/465 ok=147 skip=3 fail=0
+[gutenberg] ÉCHEC 10263 Envoyons d'l'avant nos gens!
+Folklore du Canada : fail: HTTP 404 https://www.gutenberg.org/files/10263/10263.txt
+[gutenberg] 175/465 ok=171 skip=3 fail=1
+[gutenberg] ÉCHEC 11040 Le passage, suivi de Transfiguration (Nouvelle) : fail: HTTP 404 https://www.gutenberg.org/files/11040/11040.txt
+[gutenberg] 200/465 ok=195 skip=3 fail=2
+[gutenberg] 225/465 ok=220 skip=3 fail=2
+[gutenberg] 250/465 ok=245 skip=3 fail=2
+[gutenberg] 275/465 ok=270 skip=3 fail=2
+[gutenberg] 300/465 ok=295 skip=3 fail=2
+[gutenberg] 325/465 ok=320 skip=3 fail=2
+[gutenberg] 350/465 ok=345 skip=3 fail=2
+[gutenberg] 375/465 ok=370 skip=3 fail=2
+[gutenberg] 400/465 ok=395 skip=3 fail=2
+[gutenberg] 425/465 ok=420 skip=3 fail=2
+[gutenberg] 450/465 ok=445 skip=3 fail=2
+[gutenberg] 465/465 ok=460 skip=3 fail=2
+[gutenberg] -> runs/G2-data/gutenberg_manifest.json (ok=460 skip=3 fail=2)

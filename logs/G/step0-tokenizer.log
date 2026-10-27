@@ -1,0 +1,8 @@
+[tok-fr] BPE 16000 entraîné en 2s (3036 docs)
+[tok-fr] BPE 12000 entraîné en 2s (3036 docs)
+[tok-fr] smollm: 2.211 tok/mot, 53.5% types fragmentés
+[tok-fr] smollm+reduit: 2.211 tok/mot, 53.5% types fragmentés, 1.0% unk
+[tok-fr] bpe16k: 1.629 tok/mot, 23.9% types fragmentés
+[tok-fr] bpe12k: 1.693 tok/mot, 26.8% types fragmentés
+[tok-fr] -> docs/results/tokenizer_fr_G.json
+[tok-fr] -> docs/TOKENIZER_FR_G.md

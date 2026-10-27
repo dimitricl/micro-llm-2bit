@@ -1,0 +1,11 @@
+[surface] sonde gelée OK sha256=d9817afb15d8…
+[surface] lexique chargé : 630793 types (runs/F-diag/lexique_fr.tsv.gz)
+[surface] lexique N>=5: 331297 types, N>=20: 145508 types
+[surface] === t08 ===
+[surface] t08 classement : top1=0.325 MRR=0.565 rang=2.37 (32s)
+[surface] === pilot-qa3 ===
+[surface] pilot-qa3 classement : top1=0.400 MRR=0.623 rang=2.14 (32s)
+[surface] === tranche00 ===
+[surface] tranche00 classement : top1=0.275 MRR=0.532 rang=2.48 (33s)
+[surface] -> docs/results/surface_F.json
+[surface] -> docs/SURFACE.md

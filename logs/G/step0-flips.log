@@ -1,0 +1,10 @@
+[flips] B@23250    step 23250  cumulé  17.37%  retournements ±1  0.01%  latent 23.50%
+[flips] B@23500    step 23500  cumulé  19.75%  retournements ±1  0.05%  latent 29.80%
+[flips] B@final    step 23664  cumulé  20.12%  retournements ±1  0.06%  latent 31.16%
+[flips] B@e0       step 23664  cumulé  20.12%  retournements ±1  0.06%  latent 31.16%
+[flips] B@bestval  step 23600  cumulé  20.14%  retournements ±1  0.06%  latent 31.09%
+[flips] A@final    step 23664  cumulé   6.87%  retournements ±1  0.00%  latent  5.78%
+[flips] C@final    step 23664  cumulé  15.75%  retournements ±1  0.01%  latent 25.28%
+[flips] intervalle B@23250 -> B@23500: 11.80%
+[flips] intervalle B@23500 -> B@final: 6.38%
+[flips] -> docs/results/flips_cumul_G.json

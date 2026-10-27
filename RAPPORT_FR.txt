@@ -1,0 +1,39 @@
+=== BENCH (base FR) ===
+[bench] noyau     : neon
+[bench] config      : V=12000 d=768 L=12 Hq=8 Hkv=4 ffn=1536 seq=256
+[bench] poids packés: 29.25 Mo (fichier: 29.25 Mo)
+[bench] KV cache    : 2.36 Mo (int8 pré-alloué)
+[bench] activations : 0.07 Mo
+[bench] TOTAL       : 30.21 Mo / 100 Mo -> OK
+[bench] RSS réel    : avant=195.9 Mo, après chargement=280.6 Mo, après génération=355.5 Mo
+[bench] vitesse     : 53.2 tok/s
+
+=== INFER 1 (pattern pays, greedy) ===
+[infer] noyau=neon vocab=12000
+[infer] 60 tokens en 0.99s = 60.7 tok/s
+ est un pays des Amériques dont la capitale est Port-cag.
+Gou est un pays d’Afrique dont la capitale est Porto-Nau.
+Gibilit est un pays des Amériques dont la capitale est Port-au
+
+=== INFER 2 (pays, greedy) ===
+[infer] noyau=neon vocab=12000
+[infer] 60 tokens en 1.02s = 59.0 tok/s
+ des Amériques dont la capitale est Port-à.
+Gibilité est un pays des Amériques dont la capitale est Port-au-Prince.
+Gibilit est un pays des Amériques dont la capitale est Port-au-P
+
+=== INFER 3 (wiki, sampling 0.7) ===
+[infer] noyau=neon vocab=12000
+[infer] 60 tokens en 0.95s = 63.3 tok/s
+ un équipement principal d’approuna de temps à la suite de référence de données (DDA) et de sécurité. En 2013, il est possible de faire communiquer la méthode à la
+
+=== THINK_WIKI (8 oct, matin) ===
+ source      : /Volumes/Lexar/clean-corpus/q_wiki.jsonl (300 questions)
+ sortie      : /Volumes/Lexar/clean-corpus/think_wiki.jsonl
+ modele      : phi4-mini (Ollama local, 100% GPU)
+ resultat    : 242/300 traces (skipped=58, reponses vides len=0 en fin de run)
+ incidents   : 1 question pathologique (8+ min sans limite de tokens) -> patch
+               data_fetch/gen_think.py : options num_predict=768, reprise append,
+               logs ratee/ignoree + compteur skipped, defaut THINK_MODEL=phi4-mini
+ run         : relance detachee nohup+disown (survit a OpenCode), TERMINE 242 traces
+ reste       : 58 questions manquees a rejouer via q_wiki_retry.jsonl cible

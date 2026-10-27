@@ -1,0 +1,7 @@
+[diag-tok] 54 mots, 27 découpés, 2 avec unk, préfixe partagé cible=True
+[diag-tok] capitale   -> ['cap', 'it', 'ale'] (n=3, unk=False)
+[diag-tok] capitaine  -> ['cap', 'it', 'aine'] (n=3, unk=False)
+[diag-tok] capitole   -> ['cap', 'it', 'ole'] (n=3, unk=False)
+[diag-tok] capitalle  -> ['capital', 'le'] (n=2, unk=True)
+[diag-tok] -> docs/results/tokenizer_diag.json
+[diag-tok] -> docs/TOKENIZER_DIAG.md

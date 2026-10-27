@@ -1,0 +1,57 @@
+[qa-data] 181979 exemples, 127742 fenêtres, 0.9M tokens de réponse utiles, 0 sautés
+[qa-data] calibrage exact : 14784 batchs x 8 lignes, 924 steps.
+[train] device=mps parent=HuggingFaceTB/SmolLM-135M
+[train] QA : CE masquée sur les tokens de réponse uniquement.
+[train] alpha=0 : CE seule, parent ignoré (pas de chargement).
+[train] pas d'état optimiseur dans le checkpoint (best-val) : nouvel optimiseur.
+[train] scheduler reconstruit (défaut, pas d'état).
+[train] reprise depuis runs/G1-init-step0.pt (step 0)
+[train] enfant: 25.0M params latents, 14784 batchs, 14784 micros/epoch, 924 steps/epoch x 1 epochs = 924 steps, 30.3M tokens/epoch, micro-batch effectif 8
+[train] step 20/924 loss=0.9000 kl=0.0000 ce=0.9000 ppl~2.5 lr=1.37e-04 wd=0.01 4799 tok/s
+[train] step 40/924 loss=0.5508 kl=0.0000 ce=0.5508 ppl~1.7 lr=2.67e-04 wd=0.01 4725 tok/s
+[train] step 60/924 loss=0.8829 kl=0.0000 ce=0.8829 ppl~2.4 lr=3.00e-04 wd=0.01 4567 tok/s
+[train] step 80/924 loss=0.4445 kl=0.0000 ce=0.4445 ppl~1.6 lr=2.99e-04 wd=0.01 4501 tok/s
+[train] step 100/924 loss=0.6310 kl=0.0000 ce=0.6310 ppl~1.9 lr=2.97e-04 wd=0.01 4461 tok/s
+[train] step 120/924 loss=0.9007 kl=0.0000 ce=0.9007 ppl~2.5 lr=2.95e-04 wd=0.01 4413 tok/s
+[train] step 140/924 loss=0.7204 kl=0.0000 ce=0.7204 ppl~2.1 lr=2.92e-04 wd=0.01 4397 tok/s
+[train] step 160/924 loss=1.0784 kl=0.0000 ce=1.0784 ppl~2.9 lr=2.89e-04 wd=0.01 4371 tok/s
+[train] step 180/924 loss=1.0398 kl=0.0000 ce=1.0398 ppl~2.8 lr=2.85e-04 wd=0.01 4354 tok/s
+[train] step 200/924 loss=0.8404 kl=0.0000 ce=0.8404 ppl~2.3 lr=2.80e-04 wd=0.01 4343 tok/s
+[train] step 220/924 loss=0.4939 kl=0.0000 ce=0.4939 ppl~1.6 lr=2.75e-04 wd=0.01 4341 tok/s
+[train] step 240/924 loss=0.7985 kl=0.0000 ce=0.7985 ppl~2.2 lr=2.69e-04 wd=0.01 4382 tok/s
+[train] step 260/924 loss=0.4662 kl=0.0000 ce=0.4662 ppl~1.6 lr=2.62e-04 wd=0.01 4416 tok/s
+[train] step 280/924 loss=0.5990 kl=0.0000 ce=0.5990 ppl~1.8 lr=2.55e-04 wd=0.01 4446 tok/s
+[train] step 300/924 loss=0.2874 kl=0.0000 ce=0.2874 ppl~1.3 lr=2.48e-04 wd=0.01 4472 tok/s
+[train] step 320/924 loss=0.9110 kl=0.0000 ce=0.9110 ppl~2.5 lr=2.40e-04 wd=0.01 4483 tok/s
+[train] step 340/924 loss=0.5276 kl=0.0000 ce=0.5276 ppl~1.7 lr=2.32e-04 wd=0.01 4473 tok/s
+[train] step 360/924 loss=0.5795 kl=0.0000 ce=0.5795 ppl~1.8 lr=2.23e-04 wd=0.01 4464 tok/s
+[train] step 380/924 loss=0.2601 kl=0.0000 ce=0.2601 ppl~1.3 lr=2.15e-04 wd=0.01 4470 tok/s
+[train] step 400/924 loss=0.2371 kl=0.0000 ce=0.2371 ppl~1.3 lr=2.05e-04 wd=0.01 4475 tok/s
+[train] step 420/924 loss=0.8286 kl=0.0000 ce=0.8286 ppl~2.3 lr=1.96e-04 wd=0.01 4470 tok/s
+[train] step 440/924 loss=0.9218 kl=0.0000 ce=0.9218 ppl~2.5 lr=1.87e-04 wd=0.01 4467 tok/s
+[train] step 460/924 loss=0.2464 kl=0.0000 ce=0.2464 ppl~1.3 lr=1.77e-04 wd=0.01 4459 tok/s
+[train] step 480/924 loss=0.2280 kl=0.0000 ce=0.2280 ppl~1.3 lr=1.67e-04 wd=0.01 4454 tok/s
+[train] step 500/924 loss=0.3867 kl=0.0000 ce=0.3867 ppl~1.5 lr=1.58e-04 wd=0.01 4451 tok/s
+[train] step 520/924 loss=0.4842 kl=0.0000 ce=0.4842 ppl~1.6 lr=1.48e-04 wd=0.01 4444 tok/s
+[train] step 540/924 loss=0.7166 kl=0.0000 ce=0.7166 ppl~2.0 lr=1.39e-04 wd=0.01 4440 tok/s
+[train] step 560/924 loss=0.3867 kl=0.0000 ce=0.3867 ppl~1.5 lr=1.29e-04 wd=0.01 4435 tok/s
+[train] step 580/924 loss=1.2061 kl=0.0000 ce=1.2061 ppl~3.3 lr=1.20e-04 wd=0.01 4431 tok/s
+[train] step 600/924 loss=0.3112 kl=0.0000 ce=0.3112 ppl~1.4 lr=1.11e-04 wd=0.01 4368 tok/s
+[train] step 620/924 loss=0.7020 kl=0.0000 ce=0.7020 ppl~2.0 lr=1.02e-04 wd=0.01 4367 tok/s
+[train] step 640/924 loss=0.2050 kl=0.0000 ce=0.2050 ppl~1.2 lr=9.39e-05 wd=0.01 4371 tok/s
+[train] step 660/924 loss=0.3438 kl=0.0000 ce=0.3438 ppl~1.4 lr=8.59e-05 wd=0.01 4364 tok/s
+[train] step 680/924 loss=0.6245 kl=0.0000 ce=0.6245 ppl~1.9 lr=7.83e-05 wd=0.01 4369 tok/s
+[train] step 700/924 loss=0.2127 kl=0.0000 ce=0.2127 ppl~1.2 lr=7.11e-05 wd=0.01 4378 tok/s
+[train] step 720/924 loss=0.2781 kl=0.0000 ce=0.2781 ppl~1.3 lr=6.44e-05 wd=0.01 4385 tok/s
+[train] step 740/924 loss=0.2588 kl=0.0000 ce=0.2588 ppl~1.3 lr=5.82e-05 wd=0.01 4393 tok/s
+[train] step 760/924 loss=0.6526 kl=0.0000 ce=0.6526 ppl~1.9 lr=5.26e-05 wd=0.01 4400 tok/s
+[train] step 780/924 loss=0.4057 kl=0.0000 ce=0.4057 ppl~1.5 lr=4.75e-05 wd=0.01 4407 tok/s
+[train] step 800/924 loss=0.4950 kl=0.0000 ce=0.4950 ppl~1.6 lr=4.31e-05 wd=0.01 4413 tok/s
+[train] step 820/924 loss=0.3158 kl=0.0000 ce=0.3158 ppl~1.4 lr=3.92e-05 wd=0.01 4418 tok/s
+[train] step 840/924 loss=0.7231 kl=0.0000 ce=0.7231 ppl~2.1 lr=3.61e-05 wd=0.01 4424 tok/s
+[train] step 860/924 loss=0.3084 kl=0.0000 ce=0.3084 ppl~1.4 lr=3.35e-05 wd=0.01 4427 tok/s
+[train] step 880/924 loss=0.4493 kl=0.0000 ce=0.4493 ppl~1.6 lr=3.17e-05 wd=0.01 4433 tok/s
+[train] step 900/924 loss=0.4921 kl=0.0000 ce=0.4921 ppl~1.6 lr=3.05e-05 wd=0.01 4438 tok/s
+[train] step 920/924 loss=0.4016 kl=0.0000 ce=0.4016 ppl~1.5 lr=3.00e-05 wd=0.01 4443 tok/s
+[train] checkpoint : runs/G1-ctrl-s1/model_e0.pt
+[train] terminé en 6815s -> runs/G1-ctrl-s1/model.pt

@@ -1,0 +1,9 @@
+[bench] noyau     : neon
+[bench] config      : V=12000 d=512 L=8 Hq=8 Hkv=4 ffn=1024 seq=128
+[bench] poids packés: 12.13 Mo (fichier: 12.13 Mo)
+[bench] KV cache    : 0.52 Mo (int8 pré-alloué)
+[bench] activations : 0.06 Mo
+[bench] TOTAL       : 12.12 Mo / 100 Mo -> OK
+[bench] RSS réel    : baseline=197.9 Mo, après chargement=198.1 Mo (+0.2), après génération=225.4 Mo (+27.5)
+[bench] DELTA vs baseline : +27.5 Mo / 100 Mo -> OK
+[bench] vitesse     : 67.9 tok/s

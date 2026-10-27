@@ -1,0 +1,23 @@
+[audit] OOD: 340 docs, 0.988M fenêtres, 0.988M 32-grammes uniques
+[audit] 464 textes à scanner
+[audit] 25/464 exclus=0 (3s)
+[audit] 50/464 exclus=0 (6s)
+[audit] 75/464 exclus=0 (8s)
+[audit] 100/464 exclus=0 (11s)
+[audit] 125/464 exclus=0 (13s)
+[audit] 150/464 exclus=0 (16s)
+[audit] 175/464 exclus=0 (19s)
+[audit] 200/464 exclus=0 (22s)
+[audit] 225/464 exclus=0 (26s)
+[audit] 250/464 exclus=0 (31s)
+[audit] 275/464 exclus=1 (35s)
+[audit] 300/464 exclus=1 (38s)
+[audit] 325/464 exclus=1 (41s)
+[audit] 350/464 exclus=1 (42s)
+[audit] 375/464 exclus=4 (44s)
+[audit] 400/464 exclus=4 (48s)
+[audit] 425/464 exclus=4 (52s)
+[audit] 450/464 exclus=4 (56s)
+[audit] 464/464 exclus=5 (59s)
+[audit] -> docs/results/gutenberg_ood_overlap_G.json
+[audit] exclus=5 propres=459 manquants=[]

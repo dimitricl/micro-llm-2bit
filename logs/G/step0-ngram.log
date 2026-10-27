@@ -1,0 +1,35 @@
+[ngram] t01: cache complet, sauté
+[ngram] t02: cache complet, sauté
+[ngram] t03: cache complet, sauté
+[ngram] t04: cache complet, sauté
+[ngram] t05: cache complet, sauté
+[ngram] t06: cache complet, sauté
+[ngram] t07: cache complet, sauté
+[ngram] t08: cache complet, sauté
+[ngram] t09: cache complet, sauté
+[ngram] t00: cache complet, sauté
+[ngram] val_E_frozen/train n=8: 448291/1813353 fenêtres (24.72%), 500/500 docs
+[ngram] val_E_frozen/t00 n=8: 1813353/1813353 fenêtres (100.00%), 500/500 docs
+[ngram] val_big/train n=8: 1887716/2698313 fenêtres (69.96%), 300/300 docs
+[ngram] val_big/t00 n=8: 814197/2698313 fenêtres (30.17%), 299/300 docs
+[ngram] ood/train n=8: 30926/996253 fenêtres (3.10%), 340/340 docs
+[ngram] ood/t00 n=8: 11344/996253 fenêtres (1.14%), 340/340 docs
+[ngram] val_E_frozen/train n=10: 249015/1812353 fenêtres (13.74%), 499/500 docs
+[ngram] val_E_frozen/t00 n=10: 1812353/1812353 fenêtres (100.00%), 500/500 docs
+[ngram] val_big/train n=10: 1760464/2697713 fenêtres (65.26%), 300/300 docs
+[ngram] val_big/t00 n=10: 682582/2697713 fenêtres (25.30%), 297/300 docs
+[ngram] ood/train n=10: 5563/995573 fenêtres (0.56%), 338/340 docs
+[ngram] ood/t00 n=10: 1539/995573 fenêtres (0.15%), 282/340 docs
+[ngram] val_E_frozen/train n=13: 143557/1810853 fenêtres (7.93%), 495/500 docs
+[ngram] val_E_frozen/t00 n=13: 1810853/1810853 fenêtres (100.00%), 500/500 docs
+[ngram] val_big/train n=13: 1656129/2696813 fenêtres (61.41%), 298/300 docs
+[ngram] val_big/t00 n=13: 616814/2696813 fenêtres (22.87%), 284/300 docs
+[ngram] ood/train n=13: 838/994553 fenêtres (0.08%), 126/340 docs
+[ngram] ood/t00 n=13: 87/994553 fenêtres (0.01%), 50/340 docs
+[ngram] val_E_frozen/train n=32: 63646/1801353 fenêtres (3.53%), 268/500 docs
+[ngram] val_E_frozen/t00 n=32: 1801353/1801353 fenêtres (100.00%), 500/500 docs
+[ngram] val_big/train n=32: 1286228/2691113 fenêtres (47.80%), 277/300 docs
+[ngram] val_big/t00 n=32: 485872/2691113 fenêtres (18.05%), 131/300 docs
+[ngram] ood/train n=32: 0/988093 fenêtres (0.00%), 0/340 docs
+[ngram] ood/t00 n=32: 0/988093 fenêtres (0.00%), 0/340 docs
+[ngram] -> docs/results/ngram_overlap.json

@@ -1,0 +1,43 @@
+[qa-eval] === E-t08 (exports/E-t08.bin) ===
+[qa-eval] E-t08 25/300 EM=0.0% (24s)
+[qa-eval] E-t08 50/300 EM=0.0% (48s)
+[qa-eval] E-t08 75/300 EM=0.0% (73s)
+[qa-eval] E-t08 100/300 EM=0.0% (97s)
+[qa-eval] E-t08 125/300 EM=0.0% (122s)
+[qa-eval] E-t08 150/300 EM=0.0% (146s)
+[qa-eval] E-t08 175/300 EM=0.0% (171s)
+[qa-eval] E-t08 200/300 EM=0.0% (196s)
+[qa-eval] E-t08 225/300 EM=0.0% (221s)
+[qa-eval] E-t08 250/300 EM=0.0% (246s)
+[qa-eval] E-t08 275/300 EM=0.0% (271s)
+[qa-eval] E-t08 300/300 EM=0.0% (295s)
+[qa-eval] === F-B (exports/F-B.bin) ===
+[qa-eval] F-B 25/300 EM=0.0% (25s)
+[qa-eval] F-B 50/300 EM=0.0% (49s)
+[qa-eval] F-B 75/300 EM=0.0% (74s)
+[qa-eval] F-B 100/300 EM=0.0% (99s)
+[qa-eval] F-B 125/300 EM=0.0% (123s)
+[qa-eval] F-B 150/300 EM=0.0% (148s)
+[qa-eval] F-B 175/300 EM=0.0% (173s)
+[qa-eval] F-B 200/300 EM=0.0% (198s)
+[qa-eval] F-B 225/300 EM=0.0% (223s)
+[qa-eval] F-B 250/300 EM=0.0% (248s)
+[qa-eval] F-B 275/300 EM=0.0% (273s)
+[qa-eval] F-B 300/300 EM=0.0% (297s)
+[qa-eval] === base768 (exports/enfant_base_fr.bin) ===
+[qa-eval] base768 25/300 EM=0.0% (68s)
+[qa-eval] base768 50/300 EM=0.0% (138s)
+[qa-eval] base768 75/300 EM=0.0% (208s)
+[qa-eval] base768 100/300 EM=0.0% (276s)
+[qa-eval] base768 125/300 EM=0.0% (345s)
+[qa-eval] base768 150/300 EM=0.0% (415s)
+[qa-eval] base768 175/300 EM=0.0% (489s)
+[qa-eval] base768 200/300 EM=0.0% (559s)
+[qa-eval] base768 225/300 EM=0.0% (631s)
+[qa-eval] base768 250/300 EM=0.0% (704s)
+[qa-eval] base768 275/300 EM=0.0% (777s)
+[qa-eval] base768 300/300 EM=0.0% (849s)
+[qa-eval] -> docs/results/qa_passage_baseline.json, docs/results/qa_passage_baseline_peritem.json
+[qa-eval] E-t08: EM=0.0% [0.0%,0.0%] contains=0.0% F1=0.001 copy=0.0% refus=94.0%
+[qa-eval] F-B: EM=0.0% [0.0%,0.0%] contains=0.0% F1=0.001 copy=0.3% refus=94.0%
+[qa-eval] base768: EM=0.0% [0.0%,0.0%] contains=0.0% F1=0.008 copy=0.0% refus=0.0%

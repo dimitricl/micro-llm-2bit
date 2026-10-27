@@ -1,0 +1,65 @@
+RAPPORT TACHES 1-4 — micro-llm-2bit (8 oct, ~10h20)
+================================================
+
+TACHE 1 — MEMOIRE (finie, 18/18 tests + bench OK)
+- engine.py : .bin en memmap zero-copie, logits par blocs de 2048
+  (6 Mo temporaires au lieu de 37 Mo), buffers de sortie prealloues.
+- bench base FR : chargement +85 Mo -> +0.5 Mo ; delta apres
+  generation +159 Mo -> +51 Mo (< 100 Mo OK). Tiny : +0.2 / +26 Mo.
+- Origine des 160 Mo : blob duplique (copies), embeddings fp32 par
+  token, threads/buffers du 1er step. Pas de fuite (flat ensuite).
+- Greedy bit-identique avant/apres (2 modeles), vitesse inchangee.
+- Nouveau : tests/test_rss.py (delta RSS, golden greedy, C vs NumPy).
+  Bug trouve et corrige en route : self.linears.append oublie.
+
+TACHE 2 — VALIDATION (finie, testee)
+- data.train_val_split : 5 % docs, seed fixe, sans chevauchement.
+- Vocab construit sur train seul (pas de fuite).
+- distill.train : --eval-every (val-CE/PPL), checkpoint best-val
+  (poids seuls), --patience (early stopping + restauration best),
+  tableau final train-PPL vs val-PPL + alerte si ecart > 1.5x.
+- CLI : --val-ratio, --eval-every, --patience (+ loop).
+- Tests : split sans fuite, early stopping, bestval poids seuls.
+
+TACHE 4 — CORPUS PAYS + THINK (code fini, generations en cours)
+- data_clean/make_monde_fr.py : tables FR, 245 phrases, 5 territoires
+  sans capitale dans monde_missing.txt (jamais inventes).
+- Diagnostic think : pays ratee = client Ollama qui parse <think>
+  comme tool-call, erreur 500 (hypothese b CONFIRMEE, ere gpt-oss).
+  Wiki 58 ignoree = 56 reponses vides fin de run (serveur fatigue,
+  hyp. c) + 2 sans balises ; pas de troncature num_predict (hyp. a
+  REJETEE : 1348/1515 chars < 768 tokens).
+- gen_think.py durci : parsing strict regex, 1 relance ciblee
+  (vide / toolcall / tronque), validation FR + longueurs + attendu,
+  rejetees dans .rejected.jsonl avec raison. Importable (main()).
+- clean_think.py : pays 134 OK / 116 rejetees (76 sans balises,
+  40 mauvaises reponses), wiki 144 OK / 98 rejetees.
+  q_wiki_retry.jsonl : 58 questions manquantes.
+- phi4-mini rendu muet repare par unload/reload Ollama.
+
+TACHE 3 — TRANCHES (scripts finis + valides, pas de train long)
+- make_slices.py : streaming, hash md5 deterministe, 10 tranches
+  ~104-108 Mo equilibrees, nettoyage wiki, .jsonl (1 doc/ligne pour
+  garder le split val coherent).
+- --vocab-from (reutilise), refus si vocab != checkpoint (message
+  clair), --lr-resume, --rewarmup-ratio.
+- run_slices.sh : estimation sans --go, epochs cumulees (steps
+  absolus), purge, export, bench, val-PPL par tranche.
+- CORRECTION : 1 epoch/tranche ~= 10h (6500 steps), pass complet
+  ~= 100h. Mes "2h" annonces avant etaient fausses.
+- Mini-validation en cours : tranche 3 Mo, tiny, 927 steps.
+
+INCIDENT — train think NaN : OOM GPU du mini (M4, base+hidden+seq256
+-> tenseurs NaN). Run tue. Relance a valider en format reduit
+(batch-size 1, seq 128, sans hidden).
+
+JOBS EN COURS + RESTANT (10h20)
+1. mini_test : step ~60/927, val-PPL 399 et descend. Reste ~40-50 min.
+   Apres : export + bench mini.
+2. think_pays2 : 19/250. Reste ~1h-1h30.
+3. think_wiki_retry : 20/58. Reste ~10-15 min.
+
+RESTE A FAIRE
+- Fin mini -> export + bench (validation pipeline T3).
+- Fin thinks -> fusion clean + retrain think (batch 1, seq 128).
+- Livraison : fichiers complets + bench final + resume.

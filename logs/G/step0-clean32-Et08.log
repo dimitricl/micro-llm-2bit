@@ -1,0 +1,5 @@
+[valbig] 232 docs, 1496048 chars
+[valbig] a: BPC=1.5229 [1.2986, 1.7709] PPL=22.09 [21.23, 23.03]
+[valbig] b: BPC=1.6838 [1.4465, 1.9769] PPL=31.20 [28.78, 34.21]
+[valbig] c: BPC=1.5683 [1.5395, 1.6026] PPL=21.03 [20.24, 21.95]
+[valbig] TERMINE en 49s -> docs/results/vb_clean32_Et08.json

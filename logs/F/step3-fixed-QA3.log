@@ -1,0 +1,3 @@
+[eval] noyau=neon prompts=32
+[eval] -> eval/F-Epilotqa3-fixed/samples.md
+[eval] metrics -> eval/F-Epilotqa3-fixed/metrics.json

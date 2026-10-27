@@ -1,0 +1,5 @@
+[valbig] 232 docs, 1496048 chars
+[valbig] a: BPC=1.4250 [1.2155, 1.6605] PPL=18.11 [17.33, 19.03]
+[valbig] b: BPC=1.5920 [1.3664, 1.8708] PPL=25.87 [23.70, 28.60]
+[valbig] c: BPC=1.4720 [1.4413, 1.5098] PPL=17.44 [16.70, 18.37]
+[valbig] TERMINE en 48s -> docs/results/vb_clean32_FB.json

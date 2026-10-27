@@ -1,0 +1,79 @@
+{
+ "version": "qa_fr_pilot_v2",
+ "fichier": "data/qa/qa_fr_pilot_v2.jsonl",
+ "sha256": "596d2eec50cfe7fdc5db2e1419f63664525f511d5fd3a2ead3dde77bfab44475",
+ "octets": 19693057,
+ "n_docs": 29097,
+ "n_docs_qa": 27768,
+ "n_docs_general": 1329,
+ "part_general_docs": 0.0457,
+ "part_general_tokens": 0.3573,
+ "tokens_qa": 4348968,
+ "tokens_general": 2417625,
+ "stream_tokens": 6766593,
+ "tokens_fenetres": 6766592,
+ "steps_par_epoque": 413,
+ "tokens_par_step": 16384,
+ "repeat": 4,
+ "n_variants_par_fait": 13,
+ "n_faits": 534,
+ "faits": {
+  "capitales": 160,
+  "dates": 168,
+  "definitions": 105,
+  "unites_sciences": 101
+ },
+ "templates": {
+  "capitales": [
+   "La capitale {de} est {cap}.",
+   "{cap} est la capitale {de}.",
+   "La capitale {de}, c'est {cap}.",
+   "{pays} {avoir} pour capitale {cap}.",
+   "Le chef-lieu {de} est {cap}.",
+   "{pays} : capitale {cap}.",
+   "La ville de {cap} est la capitale {de}.",
+   "{pays} {etre} un pays dont la capitale est {cap}.",
+   "On appelle {cap} la capitale {de}.",
+   "La capitale {de} porte le nom de {cap}.",
+   "{pays} {compter} {cap} comme capitale.",
+   "Sur le plan administratif, la capitale {de} est {cap}."
+  ],
+  "dates": [
+   "{sujet} a eu lieu en {annee}.",
+   "{sujet} date de {annee}.",
+   "{Sujet} a eu lieu en {annee}.",
+   "{Sujet} date de {annee}.",
+   "{Sujet} : {annee}.",
+   "{sujet} : {annee}.",
+   "En {annee} a eu lieu {sujet}.",
+   "L'année {annee} est celle de {sujet}."
+  ],
+  "definitions": [
+   "{terme_art} est {complement}.",
+   "Le mot « {nu} » désigne {complement}.",
+   "{terme_art} : {complement}.",
+   "On définit {terme_art} comme {complement}.",
+   "{terme_art}, c'est {complement}.",
+   "Par {nu}, on entend {complement}.",
+   "Le mot « {nu} » évoque {complement}.",
+   "Dans {terme_art}, il y a {complement}.",
+   "Le mot « {nu} », c'est {complement}."
+  ],
+  "unites_sciences": "phrases déclaratives des 20 unités de la sonde (UNIT_SENTENCES) + trames génériques"
+ },
+ "interdit": "aucune formulation de la slice `reformule` de la sonde ; aucun « ? » dans le QA généré ; vérifié à la génération",
+ "general": {
+  "source": "/Volumes/Lexar/clean-corpus/dedup/tranche_05.jsonl",
+  "seed": 0,
+  "doc_max_tokens": 3000,
+  "mode": "permutation déterministe, préfixe, docs plafonnés"
+ },
+ "split": {
+  "train": "tous les docs ci-dessus",
+  "val": "runs/abl_data/val_E_frozen.jsonl (gelée, externe)"
+ },
+ "probe_sha256": "d9817afb15d85248c3f062d8b4b994e8b6c9ac3411de12f01923701f8815ba7c",
+ "generateur": "tools/make_qa_corpus.py",
+ "generateur_sha256": "deeb2b2cea9d15f77c9a1cf8d2f6b8c86b356b9b4f19fcd63e92ae4c4c8bbeeb",
+ "gel": "Corpus figé AVANT entraînement : hash SHA256 ci-dessus. Toute évolution = qa_fr_pilot_v3."
+}

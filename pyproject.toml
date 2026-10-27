@@ -1,0 +1,12 @@
+[project]
+name = "micro-llm-2bit"
+version = "0.1.0"
+description = "Transformer ternaire MLX + runtime C portable sous 100 Mo"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

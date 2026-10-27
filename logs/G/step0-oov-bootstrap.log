@@ -1,0 +1,5 @@
+[oov] t08   combine 0.44% IC95 [0.26, 0.64]
+[oov] F-A   combine 0.67% IC95 [0.42, 0.93]  diff vs t08 +0.22 pp IC95 [-0.06, +0.52] p=0.121
+[oov] F-B   combine 0.74% IC95 [0.47, 1.03]  diff vs t08 +0.30 pp IC95 [-0.04, +0.65] p=0.088
+[oov] F-C   combine 0.72% IC95 [0.49, 0.98]  diff vs t08 +0.28 pp IC95 [-0.01, +0.58] p=0.057
+[oov] -> docs/results/oov_bootstrap_G.json

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# OS / local
+.DS_Store
+.env*
+MEMO.local.md
+
+# Artefacts lourds (régénérables)
+build/
+*.bin
+*.safetensors
+*.pt
+*.gguf
+checkpoints/
+exports/
+runs/
+
+# Modèles et tokenizers (> 1 Mo, non commités)
+models/*
+!models/README.md
+
+# Données volumineuses : seuls les petits jeux contractuels sont trackés
+data/*.jsonl
+data/*.bin
+!data/probe/*.jsonl
+!data/probe/*.manifest.json
+data/qa/*.jsonl
+!data/qa/*.manifest.json
+data_clean/
+data_fetch/
+
+# Logs de run
+logs/*.nohup
+logs/*.log

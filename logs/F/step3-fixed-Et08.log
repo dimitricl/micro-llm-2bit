@@ -1,0 +1,3 @@
+[eval] noyau=neon prompts=32
+[eval] -> eval/F-Et08-fixed/samples.md
+[eval] metrics -> eval/F-Et08-fixed/metrics.json
